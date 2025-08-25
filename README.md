@@ -105,6 +105,33 @@ make docker-up
 make docker-down
 ```
 
+### Container Registry
+
+The project includes a GitHub Actions workflow for building and pushing container images to GitHub Container Registry (ghcr.io).
+
+#### Manual Deployment
+To trigger a container build and push:
+
+1. Go to the **Actions** tab in the GitHub repository
+2. Select the **"Build and Push Container"** workflow
+3. Click **"Run workflow"**
+4. Optionally specify a custom image tag (default: `latest`)
+5. Click **"Run workflow"** to start the build
+
+The built container will be available at:
+```
+ghcr.io/dnviti/web-app-caa:latest
+```
+
+#### Pull and Run Container
+```bash
+# Pull the latest container
+docker pull ghcr.io/dnviti/web-app-caa:latest
+
+# Run the container
+docker run -p 3000:3000 -e APP_PORT=3000 ghcr.io/dnviti/web-app-caa:latest
+```
+
 ## Features Implemented
 
 ### ✅ Authentication System
