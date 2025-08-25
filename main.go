@@ -10,9 +10,15 @@ import (
 	"gin/middleware"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Printf("[STARTUP] Warning: Could not load .env file: %v", err)
+	}
+
 	// Load configuration
 	port := os.Getenv("APP_PORT")
 	if port == "" {
@@ -24,11 +30,6 @@ func main() {
 		host = "localhost"
 	}
 
-	backendBaseURL := os.Getenv("BACKEND_BASE_URL")
-	if backendBaseURL == "" {
-		backendBaseURL = "http://localhost:5000"
-	}
-
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
 		jwtSecret = "your-default-secret-key"
@@ -37,7 +38,6 @@ func main() {
 	log.Printf("[STARTUP] Server configuration loaded:")
 	log.Printf("[STARTUP] - PORT: %s", port)
 	log.Printf("[STARTUP] - HOST: %s", host)
-	log.Printf("[STARTUP] - BACKEND_BASE_URL: %s", backendBaseURL)
 	log.Printf("[STARTUP] - JWT_SECRET: %s", func() string {
 		if jwtSecret != "" {
 			return "[SET]"

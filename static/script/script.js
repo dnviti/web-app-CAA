@@ -1,4 +1,4 @@
-// web-app CAA/public/script/script.js
+// web-app CAA/static/script/script.js
 // --- Cached DOM Elements ---
 const dom = {
     textBar: null, textContentEl: null, textBarControls: null,

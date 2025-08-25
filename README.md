@@ -53,7 +53,7 @@ All original Node.js endpoints have been implemented:
 - `PUT /api/grid/item/:id` - Update grid item
 - `DELETE /api/grid/item/:id` - Delete grid item
 
-**AI Services (Proxy to Python Backend):**
+**AI Services (Direct LLM Integration):**
 - `POST /api/conjugate` - Verb conjugation service
 - `POST /api/correct` - Sentence correction service
 
@@ -89,7 +89,6 @@ Environment variables (with defaults):
 ### Server Configuration
 - `APP_PORT`: Server port (default: 3000)
 - `APP_HOST`: Server host (default: localhost)
-- `BACKEND_BASE_URL`: Python AI service URL (default: http://localhost:5000)
 - `JWT_SECRET`: JWT signing secret (default: your-default-secret-key)
 
 ### Database Configuration
@@ -138,10 +137,10 @@ Both databases support:
 
 ## AI Integration
 
-The Go server acts as a proxy for AI functionality, forwarding requests to the Python backend service. The Python service handles:
+The Go server provides direct AI functionality using integrated LLM services with template-based processing:
 
 - Italian verb conjugation with RAG knowledge
-- Sentence correction and completion
+- Sentence correction and completion  
 - Tense-specific grammar processing
 
 ## Key Implementation Details

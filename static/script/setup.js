@@ -1,4 +1,4 @@
-// web-app CAA/public/script/setup.js
+// web-app CAA/static/script/setup.js
 
 document.addEventListener('DOMContentLoaded', () => {
     const optionsContainer = document.getElementById('grid-options');

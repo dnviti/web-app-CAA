@@ -33,7 +33,7 @@ type DatabaseConfig struct {
 // loadDatabaseConfig loads database configuration from environment variables
 func loadDatabaseConfig() DatabaseConfig {
 	config := DatabaseConfig{
-		Driver:    getEnv("DB_DRIVER", "sqlite"),
+		Driver:    getEnv("DB_TYPE", "sqlite"), // Changed from DB_DRIVER to DB_TYPE to match .env
 		Host:      getEnv("DB_HOST", "localhost"),
 		Port:      getEnv("DB_PORT", "3306"),
 		User:      getEnv("DB_USER", "root"),
