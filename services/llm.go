@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"gin/lib/ollama"
 	"gin/models"
-	"gin/ollama"
 
 	"github.com/openai/openai-go/v2"
 	"github.com/openai/openai-go/v2/option"

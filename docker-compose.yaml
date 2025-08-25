@@ -1,0 +1,69 @@
+services:
+  web-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - APP_HOST=0.0.0.0
+      - APP_PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-your-default-secret-key}
+      - PUBLIC_URL=http://localhost:3000
+      - DB_TYPE=${DB_TYPE:-sqlite}
+      # OpenAI backend configuration
+      - BACKEND_TYPE=${BACKEND_TYPE:-openai}
+      - LLM_HOST=${LLM_HOST}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-gpt-3.5-turbo}
+      # MySQL configuration (if using external MySQL)
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # Ollama configuration (if using Ollama)
+      - OLLAMA_HOST=${OLLAMA_HOST}
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+    volumes:
+      # Mount data directory to persist SQLite database
+      - ./data:/root/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Optional: MySQL database service (uncomment if you want to run MySQL in Docker)
+  # mysql:
+  #   image: mysql:8.0
+  #   environment:
+  #     MYSQL_DATABASE: ${DB_NAME:-caa_database}
+  #     MYSQL_USER: ${DB_USER:-caa}
+  #     MYSQL_PASSWORD: ${DB_PASSWORD:-caa}
+  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   restart: unless-stopped
+  #   networks:
+  #     - app-network
+
+  # Optional: Ollama service (uncomment if you want to run Ollama locally)
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   restart: unless-stopped
+  #   networks:
+  #     - app-network
+
+# volumes:
+  # Uncomment when using MySQL or Ollama services
+  # mysql_data:
+  #   driver: local
+  # ollama_data:
+  #   driver: local
+
+networks:
+  app-network:
+    driver: bridge

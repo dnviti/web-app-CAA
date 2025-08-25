@@ -1,0 +1,61 @@
+# Ignore Docker-related files
+Dockerfile*
+docker-compose*.yml
+docker-compose*.yaml
+.dockerignore
+
+# Ignore Git files
+.git
+.gitignore
+.gitattributes
+
+# Ignore environment files (will be passed as environment variables)
+.env*
+!.env.example
+
+# Ignore OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore log files
+*.log
+logs/
+
+# Ignore temporary files
+tmp/
+temp/
+*.tmp
+
+# Ignore build artifacts that shouldn't be in Docker context
+# (Keep the go.mod, go.sum, and source files)
+
+# Ignore documentation files (optional)
+README*.md
+docs/
+*.md
+
+# Ignore test files (if you don't want them in production image)
+*_test.go
+test/
+tests/
+
+# Ignore development tools and scripts
+scripts/dev/
+Makefile
+makefile
+
+# Ignore cache directories
+.cache/
+node_modules/

@@ -1,0 +1,15 @@
+# Docker Compose override for development
+
+services:
+  web-app:
+    # Override for development - mount source code for hot reload
+    volumes:
+      - .:/app
+      - /app/gin  # Exclude binary
+    # Override to rebuild on file changes (if using air or similar)
+    # command: go run main.go
+    environment:
+      - GIN_MODE=debug
+    # Enable for development debugging
+    stdin_open: true
+    tty: true
