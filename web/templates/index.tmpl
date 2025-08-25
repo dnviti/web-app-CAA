@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5/dist/iro.min.js"></script>
+    <script src="/static/script/checkAuth.js" defer></script>
+    <script src="/static/script/script.js" defer></script>
+    <script src="/static/script/config.js" defer></script>
+</head>
+<body>
+    <header class="account-info-bar">
+        <div class="account-info">
+            <span class="material-icons">account_circle</span>
+            <span id="usernameDisplay">{{if .Username}}{{.Username}}{{else}}Caricamento...{{end}}</span>
+            <button class="mode-btn" id="editorModeBtn" aria-pressed="false">
+            <span class="material-icons" aria-hidden="true">edit</span>
+        </button>
+        </div>
+    </header>
+
+    <section class="text-bar-container">
+        <div class="text-bar" id="textBar">
+            <span id="textContent"></span>
+        </div>
+        <div class="text-bar-controls" id="textBarControls"></div>
+    </section>
+    <nav class="mode-toggle" aria-label="Modalità">
+        <button class="mode-btn" id="pastModeBtn" aria-pressed="false">
+            Passato
+        </button>
+        <button class="mode-btn active" id="presentModeBtn" aria-pressed="true">
+            Presente
+        </button>
+        <button class="mode-btn" id="futureModeBtn" aria-pressed="false">
+            Futuro
+        </button>
+    </nav>
+
+    <main class="main-container">
+        <nav class="navigation" id="navigation" aria-label="Navigazione categoria">
+            <button class="nav-btn" id="backBtn" aria-label="Indietro">
+                <span class="material-icons" aria-hidden="true">arrow_back</span>
+                Indietro
+            </button>
+            <span class="current-category" id="currentCategory"></span>
+        </nav>
+        <section class="symbol-grid" id="symbolGrid"></section>
+    </main>
+
+    <aside class="editor-panel" id="editorPanel" aria-label="Pannello Editor">
+        <header class="editor-header">
+            <h3>Editor</h3>
+            <button class="close-editor" id="closeEditor" title="Chiudi Editor" aria-label="Chiudi Editor">
+                <span class="material-icons" aria-hidden="true">close</span>
+            </button>
+            <div class="session-controls">
+                <button class="session-btn" id="startSessionBtn">
+                    <span class="material-icons">fullscreen</span> Avvia Sessione
+                </button>
+                <button class="session-btn" id="endSessionBtn" style="display: none;">
+                    <span class="material-icons">fullscreen_exit</span> Termina Sessione
+                </button>
+            </div>
+        </header>
+        <div class="editor-tools">
+            <div class="tool-section">
+                <button class="tool-btn" id="addSymbolBtn" aria-label="Aggiungi Simbolo">
+                    <span class="material-icons" aria-hidden="true">add</span>
+                    Aggiungi Simbolo
+                </button>
+                <button class="tool-btn" id="addCategoryBtn" aria-label="Aggiungi Categoria">
+                    <span class="material-icons" aria-hidden="true">create_new_folder</span>
+                    Aggiungi Categoria
+                </button>
+                <button class="tool-btn" id="editSystemControlsBtn" aria-label="Modifica Controlli">
+                    <span class="material-icons" aria-hidden="true">tune</span>
+                    Modifica Controlli
+                </button>
+            </div>
+            <div class="tool-section">
+                <h4>Dimensione Pagina</h4>
+                <div class="size-controls">
+                    <button class="size-btn" data-size="small">Piccolo</button>
+                    <button class="size-btn" data-size="medium">Medio</button>
+                    <button class="size-btn" data-size="big">Grande</button>
+                </div>
+            </div>
+            <button id="logoutBtn" class="tool-btn" aria-label="Logout">
+                <span class="material-icons"aria-hidden="true">logout</span>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <div class="modal" id="passwordModal" role="dialog" aria-modal="true" aria-labelledby="passwordModalTitle">
+        <div class="modal-content">
+            <h3 id="passwordModalTitle">Inserisci Password</h3>
+            <div class="form-group">
+                <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelPassword">Annulla</button>
+                <button class="btn-primary" id="confirmPassword">Conferma</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addSymbolModal" role="dialog" aria-modal="true" aria-labelledby="addSymbolModalTitle">
+        <div class="modal-content">
+            <h3 id="addSymbolModalTitle">Aggiungi Nuovo Simbolo</h3>
+            <div class="form-group">
+                <label for="symbolLabel">Etichetta:</label>
+                <input type="text" id="symbolLabel" placeholder="Es: Casa" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="symbolSpeak">Pronuncia (opzionale):</label>
+                <input type="text" id="symbolSpeak" placeholder="Lascia vuoto per usare l'etichetta" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="symbolType">Tipo di Simbolo:</label>
+                <select id="symbolType">
+                    <option value="nome">Nome</option>
+                    <option value="verbo">Verbo</option>
+                    <option value="altro">Altro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="symbolIconQuery">Cerca Icona (ARASAAC):</label>
+                <div class="icon-search-container">
+                    <input type="text" id="symbolIconQuery" placeholder="Es: Gatto" autocomplete="off">
+                    <button id="searchIconBtn" class="btn-primary" type="button">Cerca</button>
+                </div>
+                <div id="iconSearchResults" class="icon-search-results"></div>
+            </div>
+            <div class="custom-image-section">
+                <p class="section-divider">Oppure usa un'immagine personalizzata</p>
+                <div class="custom-image-controls">
+                    <input type="file" id="symbolCustomImageInput" accept="image/*" class="hidden-file-input">
+                    <button type="button" class="btn-secondary" id="symbolUploadBtn">Carica Foto</button>
+                    <button type="button" class="btn-secondary" id="symbolTakePhotoBtn">Scatta Foto</button>
+                </div>
+                <div id="symbolCustomImagePreview" class="custom-image-preview"></div>
+            </div>
+            <div class="form-group">
+                <label>Colore Sfondo:</label>
+                <div class="color-selection">
+                    <div class="pastel-presets" id="symbolPastelPresets">
+                        <div class="color-swatch" data-color="#FFADAD"></div>
+                        <div class="color-swatch" data-color="#FFD6A5"></div>
+                        <div class="color-swatch" data-color="#FDFFB6"></div>
+                        <div class="color-swatch" data-color="#CAFFBF"></div>
+                        <div class="color-swatch" data-color="#9BF6FF"></div>
+                        <div class="color-swatch" data-color="#A0C4FF"></div>
+                        <div class="color-swatch" data-color="#BDB2FF"></div>
+                        <div class="color-swatch" data-color="#FFC6FF"></div>
+                    </div>
+                    <div class="color-picker-container" id="symbolColorPickerContainer"></div>
+                </div>
+                <input type="hidden" id="symbolColor" value="#FFADAD">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelAddSymbol">Annulla</button>
+                <button class="btn-primary" id="confirmAddSymbol">Aggiungi</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addCategoryModal" role="dialog" aria-modal="true" aria-labelledby="addCategoryModalTitle">
+        <div class="modal-content">
+            <h3 id="addCategoryModalTitle">Aggiungi Nuova Categoria</h3>
+            <div class="form-group">
+                <label for="categoryLabel">Nome Categoria:</label>
+                <input type="text" id="categoryLabel" placeholder="Es: Animali" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="categoryIconQuery">Cerca Icona (ARASAAC):</label>
+                <div class="icon-search-container">
+                    <input type="text" id="categoryIconQuery" placeholder="Es: Cane" autocomplete="off">
+                    <button id="searchCategoryIconBtn" class="btn-primary" type="button">Cerca</button>
+                </div>
+                <div id="categoryIconSearchResults" class="icon-search-results"></div>
+            </div>
+            <div class="custom-image-section">
+                <p class="section-divider">Oppure usa un'immagine personalizzata</p>
+                <div class="custom-image-controls">
+                    <input type="file" id="categoryCustomImageInput" accept="image/*" class="hidden-file-input">
+                    <button type="button" class="btn-secondary" id="categoryUploadBtn">Carica Foto</button>
+                    <button type="button" class="btn-secondary" id="categoryTakePhotoBtn">Scatta Foto</button>
+                </div>
+                <div id="categoryCustomImagePreview" class="custom-image-preview"></div>
+            </div>
+            <div class="form-group">
+                <label>Colore:</label>
+                <div class="color-selection">
+                    <div class="pastel-presets" id="categoryPastelPresets">
+                        <div class="color-swatch" data-color="#FFADAD"></div>
+                        <div class="color-swatch" data-color="#FFD6A5"></div>
+                        <div class="color-swatch" data-color="#FDFFB6"></div>
+                        <div class="color-swatch" data-color="#CAFFBF"></div>
+                        <div class="color-swatch" data-color="#9BF6FF"></div>
+                        <div class="color-swatch" data-color="#A0C4FF"></div>
+                        <div class="color-swatch" data-color="#BDB2FF"></div>
+                        <div class="color-swatch" data-color="#FFC6FF"></div>
+                    </div>
+                    <div class="color-picker-container" id="categoryColorPickerContainer"></div>
+                </div>
+                <input type="hidden" id="categoryColor" value="#FFADAD">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelAddCategory">Annulla</button>
+                <button class="btn-primary" id="confirmAddCategory">Aggiungi</button>
+            </div>
+        </div>
+    </div>
+
+     <div id="symbolContextMenu" class="context-menu">
+        <ul class="context-menu-items">
+            <li class="context-menu-item" id="contextMenuEdit">Modifica</li>
+            <li class="context-menu-item" id="contextMenuToggleVisibility">Nascondi/Mostra</li>
+            <li class="context-menu-item" id="contextMenuCopy">Copia in...</li>
+            <li class="context-menu-item" id="contextMenuMove">Sposta in...</li>
+        </ul>
+    </div>
+
+    <div class="modal" id="categorySelectionModal" role="dialog" aria-modal="true" aria-labelledby="categorySelectionModalTitle">
+        <div class="modal-content">
+            <h3 id="categorySelectionModalTitle">Seleziona una categoria</h3>
+            <div id="categorySelectionList" class="category-selection-list"></div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="cancelCategorySelection">Annulla</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="cameraModal" role="dialog" aria-modal="true" aria-labelledby="cameraModalTitle">
+        <div class="modal-content">
+            <h3 id="cameraModalTitle">Scatta una foto</h3>
+            <div class="camera-view-container">
+                <video id="cameraView" autoplay playsinline></video>
+                <canvas id="cameraCanvas" style="display:none;"></canvas>
+            </div>
+            <div class="modal-buttons">
+                 <button class="btn-secondary" id="cancelCamera">Annulla</button>
+                 <button class="btn-primary" id="capturePhotoBtn">Scatta</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="systemControlsModal" role="dialog" aria-modal="true" aria-labelledby="systemControlsModalTitle">
+        <div class="modal-content">
+            <h3 id="systemControlsModalTitle">Modifica Controlli di Sistema</h3>
+            <div id="systemControlsList" class="system-controls-list">
+                </div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" id="closeSystemControlsModal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+    <div class="trash-can-container" id="trashCanContainer" aria-label="Cestino per eliminare">
+        <span class="material-icons" aria-hidden="true">delete_forever</span>
+    </div>
+
+    <div id="tutorialOverlay" class="tutorial-overlay">
+        <div class="tutorial-content">
+            <p>Puoi iniziare a costruire la tua interfaccia cliccando qui</p>
+            <div class="tutorial-arrow"></div>
+        </div>
+    </div>
+
+</body>
+</html>

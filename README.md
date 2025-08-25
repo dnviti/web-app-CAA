@@ -2,17 +2,108 @@
 
 This is the Go implementation of the Web App CAA (Comunicazione Aumentativa e Alternativa), originally implemented in Node.js and Python. This Go server maintains exact functional parity with the original implementation while using modern Go frameworks and libraries.
 
+## Project Structure
+
+This project follows the [Standard Go Project Layout](https://github.com/golang-standards/project-layout):
+
+```
+├── cmd/
+│   └── web-app-caa/        # Main application entry point
+│       └── main.go
+├── internal/               # Private application code
+│   ├── config/            # Configuration management
+│   ├── database/          # Database layer
+│   ├── handlers/          # HTTP request handlers
+│   ├── middleware/        # Authentication and logging middleware
+│   ├── models/            # Data models and structures
+│   ├── prompts/           # AI prompt templates
+│   └── services/          # Business logic layer
+├── pkg/                   # Public library code
+│   └── ollama/            # Ollama client library
+├── web/                   # Web application assets
+│   ├── static/            # Static files (CSS, JS, images)
+│   └── templates/         # HTML templates
+├── deployments/           # Docker and deployment configs
+├── docs/                  # Documentation
+├── data/                  # Application data (gitignored)
+├── configs/               # Configuration files
+├── Makefile              # Build automation
+├── go.mod                # Go module definition
+└── README.md
+```
+
 ## Architecture
 
-The Go implementation follows a clean architecture with the following structure:
+The Go implementation follows a clean architecture with proper separation of concerns:
 
-- **main.go**: Application entry point and router setup
-- **models/**: Data models and request/response structures
-- **database/**: Database connection and configuration
-- **services/**: Business logic layer
-- **handlers/**: HTTP request handlers
-- **middleware/**: Authentication and logging middleware
-- **public/**: Static web assets (HTML, CSS, JS)
+- **cmd/web-app-caa/**: Application entry point and server setup
+- **internal/models/**: Data models and request/response structures
+- **internal/database/**: Database connection and configuration
+- **internal/services/**: Business logic layer
+- **internal/handlers/**: HTTP request handlers
+- **internal/middleware/**: Authentication and logging middleware
+- **internal/config/**: Configuration management
+- **pkg/ollama/**: Reusable Ollama client library
+- **web/**: Static web assets and HTML templates
+
+## Quick Start
+
+### Prerequisites
+- Go 1.21 or higher
+- Make (optional, for using Makefile commands)
+
+### Build and Run
+
+#### Using Make (Recommended)
+```bash
+# Install dependencies
+make deps
+
+# Build the application
+make build
+
+# Run the application
+make run
+
+# Or run in development mode (without building binary)
+make dev
+
+# Run tests
+make test
+
+# Format code
+make fmt
+
+# Clean build artifacts
+make clean
+```
+
+#### Manual Build
+```bash
+# Install dependencies
+go mod tidy
+
+# Build the application
+go build -o bin/web-app-caa ./cmd/web-app-caa
+
+# Run the application
+./bin/web-app-caa
+
+# Or run directly
+go run ./cmd/web-app-caa/main.go
+```
+
+#### Using Docker
+```bash
+# Build Docker image
+make docker-build
+
+# Run with Docker Compose
+make docker-up
+
+# Stop Docker containers
+make docker-down
+```
 
 ## Features Implemented
 

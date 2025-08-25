@@ -1,4 +1,4 @@
-module gin
+module github.com/daniele/web-app-caa
 
 go 1.24.6
 

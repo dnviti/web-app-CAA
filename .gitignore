@@ -1,5 +1,6 @@
 # Binaries
 web-app-caa
+bin/
 *.exe
 *.exe~
 *.dll
