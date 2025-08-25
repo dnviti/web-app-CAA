@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="/public/style/style.css">
+    <link rel="stylesheet" href="/public/style/setup.css">
+</head>
+<body>
+    <div class="setup-container">
+        <h1>Benvenuto{{if .Username}}, {{.Username}}{{end}}! Scegli la tua configurazione iniziale.</h1>
+        <p>Potrai personalizzare tutto in seguito.</p>
+        {{if .Error}}
+        <div class="error-message">{{.Error}}</div>
+        {{end}}
+        <div id="grid-options" class="grid-options-container">
+            {{if .GridOptions}}
+                {{range .GridOptions}}
+                <div class="grid-option" data-grid="{{.Type}}">
+                    <h3>{{.Name}}</h3>
+                    <p>{{.Description}}</p>
+                    {{if .PreviewImage}}
+                    <img src="{{.PreviewImage}}" alt="{{.Name}} preview" class="grid-preview">
+                    {{end}}
+                </div>
+                {{end}}
+            {{end}}
+        </div>
+        <button id="confirm-setup" class="btn-primary" {{if not .GridOptions}}disabled{{end}}>Conferma e Inizia</button>
+    </div>
+    <script src="/public/script/setup.js"></script>
+    <script src="/public/script/config.js"></script>
+</body>
+</html>

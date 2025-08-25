@@ -1,0 +1,152 @@
+{
+  "presente_indicativo": {
+    "description": "Used for actions happening now, habitual actions, and absolute truths.",
+    "general_rules": {
+      "-are verbs (parlare)": {
+        "conjugation": "io parlo, tu parli, lui/lei parla, noi parliamo, voi parlate, loro parlano",
+        "example": "Parlo italiano con i miei amici. (I speak Italian with my friends.)"
+      },
+      "-ere verbs (credere)": {
+        "conjugation": "io credo, tu credi, lui/lei crede, noi crediamo, voi credete, loro credono",
+        "example": "Non credo a tutto quello che sento. (I don't believe everything I hear.)"
+      },
+      "-ire verbs (dormire)": {
+        "conjugation": "io dormo, tu dormi, lui/lei dorme, noi dormiamo, voi dormite, loro dormono",
+        "example": "Il bambino dorme tranquillamente. (The child sleeps peacefully.)"
+      },
+      "-ire verbs with -isc- (finire)": {
+        "conjugation": "io finisco, tu finisci, lui/lei finisce, noi finiamo, voi finite, loro finiscono",
+        "notes": "Other common verbs: capire, preferire, pulire, costruire.",
+        "example": "Capisco la lezione. (I understand the lesson.)"
+      }
+    },
+    "irregular_verbs": {
+      "Essere (to be)": {
+        "conjugation": "sono, sei, è, siamo, siete, sono",
+        "example": "Siamo studenti. (We are students.)"
+      },
+      "Avere (to have)": {
+        "conjugation": "ho, hai, ha, abbiamo, avete, hanno",
+        "example": "Ho una macchina nuova. (I have a new car.)"
+      },
+      "Andare (to go)": {
+        "conjugation": "vado, vai, va, andiamo, andate, vanno",
+        "example": "Domani vado al mare. (Tomorrow I'm going to the sea.)"
+      },
+      "Fare (to do/make)": {
+        "conjugation": "faccio, fai, fa, facciamo, fate, fanno",
+        "example": "Cosa fai stasera? (What are you doing tonight?)"
+      },
+      "Volere (to want)": {
+        "conjugation": "voglio, vuoi, vuole, vogliamo, volete, vogliono",
+        "example": "Voglio un caffè, per favore. (I want a coffee, please.)"
+      },
+      "Potere (to be able to/can)": {
+        "conjugation": "posso, puoi, può, possiamo, potete, possono",
+        "example": "Posso entrare? (May I come in?)"
+      },
+      "Dovere (to have to/must)": {
+        "conjugation": "devo, devi, deve, dobbiamo, dovete, devono",
+        "example": "Devo studiare per l'esame. (I have to study for the exam.)"
+      },
+      "Dire (to say/tell)": {
+        "conjugation": "dico, dici, dice, diciamo, dite, dicono",
+        "example": "La mamma dice sempre la verità. (Mom always tells the truth.)"
+      },
+      "Venire (to come)": {
+        "conjugation": "vengo, vieni, viene, veniamo, venite, vengono",
+        "example": "Vieni alla festa con me? (Are you coming to the party with me?)"
+      },
+      "Uscire (to go out)": {
+        "conjugation": "esco, esci, esce, usciamo, uscite, escono",
+        "example": "Sabato sera esco con gli amici. (On Saturday evening I go out with friends.)"
+      },
+      "Sapere (to know)": {
+        "conjugation": "so, sai, sa, sappiamo, sapete, sanno",
+        "example": "Non so la risposta. (I don't know the answer.)"
+      },
+      "Stare (to stay/to be)": {
+        "conjugation": "sto, stai, sta, stiamo, state, stanno",
+        "example": "Come stai? (How are you?)"
+      }
+    }
+  },
+  "passato_prossimo": {
+    "description": "The most common past tense, used for completed actions.",
+    "rule": "Il Passato Prossimo si forma con il presente di 'essere' o 'avere' + il participio passato del verbo.",
+    "regular_participles": "-are -> -ato; -ere -> -uto; -ire -> -ito",
+    "auxiliary_choice": {
+      "avere": {
+        "rule": "Used with most transitive verbs (verbs that take a direct object).",
+        "example": "Ho mangiato una pizza. (I ate a pizza.)"
+      },
+      "essere": {
+        "rule": "Used with verbs of motion (andare, venire), state of being (stare, rimanere), and all reflexive verbs. The participle must agree in gender and number with the subject.",
+        "example": "Maria è andata al cinema. / Marco e Luca sono andati al cinema."
+      }
+    },
+    "irregular_participles": {
+      "essere": "stato",
+      "avere": "avuto",
+      "fare": "fatto",
+      "dire": "detto",
+      "leggere": "letto",
+      "scrivere": "scritto",
+      "vedere": "visto",
+      "prendere": "preso",
+      "mettere": "messo",
+      "aprire": "aperto",
+      "chiudere": "chiuso",
+      "venire": "venuto",
+      "rimanere": "rimasto",
+      "chiedere": "chiesto",
+      "rispondere": "risposto"
+    }
+  },
+  "imperfetto": {
+    "description": "Used to describe ongoing past actions, habits, or states of being without a specific endpoint. It sets the scene.",
+    "regular_endings": {
+      "-are verbs (parlare)": {
+        "endings": "-avo, -avi, -ava, -avamo, -avate, -avano",
+        "example": "Da bambino, parlavo sempre con tutti. (As a child, I always used to talk to everyone.)"
+      },
+      "-ere verbs (credere)": {
+        "endings": "-evo, -evi, -eva, -evamo, -evate, -evano",
+        "example": "Credevo che fosse la scelta giusta. (I believed it was the right choice.)"
+      },
+      "-ire verbs (dormire)": {
+        "endings": "-ivo, -ivi, -iva, -ivamo, -ivate, -ivano",
+        "example": "Dormivo quando hai chiamato. (I was sleeping when you called.)"
+      }
+    },
+    "irregular_verbs": {
+      "Essere": "ero, eri, era, eravamo, eravate, erano",
+      "Fare": "facevo, facevi, faceva, facevamo, facevate, facevano",
+      "Dire": "dicevo, dicevi, diceva, dicevamo, dicevate, dicevano"
+    }
+  },
+
+  "futuro_semplice": {
+    "description": "Used to talk about actions that will happen in the future.",
+    "regular_rule": {
+      "rule": "For regular verbs, remove the final '-e' from the infinitive and add the future endings.",
+      "example": "Domani finiremo il progetto. (Tomorrow we will finish the project.)"
+    },
+    "endings": "-ò, -ai, -à, -emo, -ete, -anno",
+    "irregular_roots": {
+      "andare": "andr-",
+      "avere": "avr-",
+      "essere": "sar- (es. io sarò, noi saremo)",
+      "dare": "dar-",
+      "fare": "far-",
+      "vedere": "vedr-",
+      "potere": "potr-",
+      "dovere": "dovr- (es. io dovrò, noi dovremo)",
+      "sapere": "sapr-",
+      "vivere": "vivr-",
+      "venire": "verr- (es. io verrò, noi verremo)",
+      "volere": "vorr- (es. io vorrò, noi vorremo)"
+    },
+    "irregular_example": "L'anno prossimo sarò in Italia. noi vorremo visitare Roma. (We will want to visit Rome.) noi saremo in Italia. (We will be in Italy.)"
+    }
+}

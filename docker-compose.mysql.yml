@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: webapp_caa_db
+      MYSQL_USER: webapp_caa
+      MYSQL_PASSWORD: webapp_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  webapp:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      # Database Configuration
+      DB_DRIVER: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: webapp_caa
+      DB_PASSWORD: webapp_password
+      DB_NAME: webapp_caa_db
+      DB_CHARSET: utf8mb4
+      DB_PARSE_TIME: "true"
+      DB_LOC: Local
+      
+      # Server Configuration
+      APP_HOST: 0.0.0.0
+      APP_PORT: 3000
+      JWT_SECRET: your-production-secret-key
+      
+      # AI Configuration (example with Ollama)
+      BACKEND_TYPE: ollama
+      LLM_HOST: http://ollama:11434
+      LLM_MODEL: llama3.1:8b
+      
+      # Debug
+      DEBUG: "false"
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  # Optional: Ollama service for AI functionality
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   restart: unless-stopped
+
+volumes:
+  mysql_data:
+  # ollama_data:
