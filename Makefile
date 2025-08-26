@@ -14,11 +14,7 @@ BINARY_PATH=./bin/$(BINARY_NAME)
 
 # Build the application with CGO enabled (required for SQLite)
 build:
-	CGO_ENABLED=1 $(GOBUILD) -o $(BINARY_PATH) ./cmd/web-app-caa
-
-# Build the application with CGO explicitly disabled
-build-nocgo:
-	CGO_ENABLED=0 $(GOBUILD) -o $(BINARY_PATH) ./cmd/web-app-caa
+	CGO_ENABLED=1 $(GOBUILD) -o $(BINARY_PATH) ./cmd/web-app-CAA
 
 # Run the application
 run: build
@@ -26,7 +22,7 @@ run: build
 
 # Run the application directly without building binary
 dev:
-	$(GOCMD) run ./cmd/web-app-caa/main.go
+	$(GOCMD) run ./cmd/web-app-CAA/main.go
 
 # Test all packages
 test:
