@@ -1,10 +1,6 @@
 name: Build and Push Container
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
     inputs:
       tag:
