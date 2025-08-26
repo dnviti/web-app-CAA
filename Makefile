@@ -46,6 +46,16 @@ deps:
 docker-build:
 	docker build -f deployments/Dockerfile -t $(BINARY_NAME) .
 
+docker-build-ghcr:
+	docker build -f deployments/Dockerfile -t ghcr.io/dnviti/web-app-caa:latest .
+
+docker-push-ghcr: docker-build-ghcr
+	gh auth token | docker login ghcr.io -u dnviti --password-stdin
+	docker push ghcr.io/dnviti/web-app-caa:latest
+
+docker-build-and-push:
+	./scripts/build-and-push.sh
+
 docker-up:
 	docker-compose -f deployments/docker-compose.yaml up -d
 
