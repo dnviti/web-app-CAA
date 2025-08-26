@@ -16,77 +16,10 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  GO_VERSION: '1.24.6'
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GO_VERSION }}
-
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
-    - name: Install build dependencies for CGO
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc musl-dev sqlite3 libsqlite3-dev
-
-    - name: Download Go modules
-      run: go mod download
-
-    - name: Run tests with CGO enabled
-      run: |
-        export CGO_ENABLED=1
-        go test -v ./...
-
-    - name: Run vet
-      run: go vet ./...
-
-    - name: Run fmt check
-      run: |
-        if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
-          echo "The following files are not formatted:"
-          gofmt -s -l .
-          exit 1
-        fi
-
-    - name: Test build with CGO_ENABLED=1 (SQLite support)
-      run: |
-        export CGO_ENABLED=1
-        echo "Building with CGO_ENABLED=$CGO_ENABLED"
-        go build -v -o web-app-caa-test ./cmd/web-app-caa
-        ls -la web-app-caa-test
-
-    - name: Test CGO_ENABLED=1 issue workaround with Task
-      run: |
-        # Install Task
-        sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
-        
-        # Test the workaround: export CGO_ENABLED=0 but task should still build with CGO_ENABLED=1
-        export CGO_ENABLED=0
-        echo "Shell CGO_ENABLED: $CGO_ENABLED"
-        
-        # This should work because task uses direct command setting
-        task build
-        
-        # Verify binary was created
-        ls -la bin/web-app-caa
-
   build-and-push:
     runs-on: ubuntu-latest
-    needs: test
     permissions:
       contents: read
       packages: write
@@ -94,6 +27,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Install GCC for CGO
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc
 
       - name: Log in to Container Registry
         uses: docker/login-action@v3

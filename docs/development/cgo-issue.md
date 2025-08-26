@@ -90,13 +90,10 @@ To reproduce the issue and verify our solutions work:
 
 ## GitHub Actions Integration
 
-Our CI/CD pipeline in `.github/workflows/build-container.yml` properly handles CGO:
+Our CI/CD pipeline in `.github/workflows/build-container.yml` ensures CGO works by:
 
-- Installs necessary build tools (`gcc`, `musl-dev`, `sqlite3-dev`)
-- Explicitly sets `CGO_ENABLED=1` for SQLite-dependent builds
-- Tests both Go builds and Task builds with CGO
-- Demonstrates the task workarounds for the CGO_ENABLED=1 issue
-- Builds and pushes Docker containers with proper CGO support
+- Installing GCC compiler before building the Docker container
+- The Dockerfile handles CGO_ENABLED=1 for SQLite support
 
 ## References
 
