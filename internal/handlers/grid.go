@@ -1,4 +1,4 @@
-s but tpackage handlers
+package handlers
 
 import (
 	"log"
