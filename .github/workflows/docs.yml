@@ -46,8 +46,7 @@ jobs:
       
       - name: Build documentation
         run: |
-          cd docs
-          mkdocs build --strict
+          mkdocs build
       
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
@@ -55,7 +54,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs/site
+          path: ./site
 
   deploy:
     environment:
