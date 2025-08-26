@@ -1,5 +1,5 @@
 # Binaries
-web-app-caa
+web-app-*
 bin/
 *.exe
 *.exe~

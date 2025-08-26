@@ -3,47 +3,29 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
+	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/database"
 	"github.com/daniele/web-app-caa/internal/handlers"
 	"github.com/daniele/web-app-caa/internal/middleware"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Load .env file
-	if err := godotenv.Load(); err != nil {
-		log.Printf("[STARTUP] Warning: Could not load .env file: %v", err)
-	}
-
 	// Load configuration
-	port := os.Getenv("APP_PORT")
-	if port == "" {
-		port = "3000"
-	}
-
-	host := os.Getenv("APP_HOST")
-	if host == "" {
-		host = "localhost"
-	}
-
-	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" {
-		jwtSecret = "your-default-secret-key"
-	}
+	cfg := config.Load()
 
 	log.Printf("[STARTUP] Server configuration loaded:")
-	log.Printf("[STARTUP] - PORT: %s", port)
-	log.Printf("[STARTUP] - HOST: %s", host)
+	log.Printf("[STARTUP] - PORT: %s", cfg.Port)
+	log.Printf("[STARTUP] - HOST: %s", cfg.Host)
 	log.Printf("[STARTUP] - JWT_SECRET: %s", func() string {
-		if jwtSecret != "" {
+		if cfg.JWTSecret != "" {
 			return "[SET]"
 		}
 		return "[NOT SET]"
 	}())
+	log.Printf("[STARTUP] - TRUSTED_PROXIES: %v", cfg.TrustedProxies)
 
 	// Initialize database
 	database.Initialize()
@@ -73,7 +55,7 @@ func main() {
 	log.Printf("[MIDDLEWARE] JSON parser configured")
 
 	// Configure trusted proxies for security
-	r.SetTrustedProxies([]string{"127.0.0.1", "::1"})
+	r.SetTrustedProxies(cfg.TrustedProxies)
 
 	// Serve static files (CSS, JS, images)
 	r.Static("/static", "./web/static")
@@ -127,11 +109,11 @@ func main() {
 		c.String(http.StatusOK, "pong")
 	})
 
-	log.Printf("[STARTUP] Server is running on http://%s:%s", host, port)
+	log.Printf("[STARTUP] Server is running on http://%s:%s", cfg.Host, cfg.Port)
 	log.Printf("[STARTUP] Server startup completed successfully")
 
 	// Start server
-	if err := r.Run(":" + port); err != nil {
+	if err := r.Run(":" + cfg.Port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }

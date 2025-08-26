@@ -3,15 +3,17 @@ package config
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
 
 // Config holds application configuration
 type Config struct {
-	Port      string
-	Host      string
-	JWTSecret string
+	Port           string
+	Host           string
+	JWTSecret      string
+	TrustedProxies []string
 }
 
 // Load loads the application configuration
@@ -37,9 +39,24 @@ func Load() *Config {
 		jwtSecret = "your-default-secret-key"
 	}
 
+	// Load trusted proxies
+	trustedProxiesEnv := os.Getenv("TRUSTED_PROXIES")
+	var trustedProxies []string
+	if trustedProxiesEnv != "" {
+		// Split by comma and trim spaces
+		proxies := strings.Split(trustedProxiesEnv, ",")
+		for _, proxy := range proxies {
+			trustedProxies = append(trustedProxies, strings.TrimSpace(proxy))
+		}
+	} else {
+		// Default trusted proxies
+		trustedProxies = []string{"127.0.0.1", "::1"}
+	}
+
 	return &Config{
-		Port:      port,
-		Host:      host,
-		JWTSecret: jwtSecret,
+		Port:           port,
+		Host:           host,
+		JWTSecret:      jwtSecret,
+		TrustedProxies: trustedProxies,
 	}
 }
