@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/models"
 	"github.com/daniele/web-app-caa/pkg/ollama"
 
@@ -52,41 +53,31 @@ type TemplateData struct {
 }
 
 // NewLLMService creates a new LLMService with templates and RAG data
-func NewLLMService() *LLMService {
-	backendType := os.Getenv("BACKEND_TYPE")
-	if backendType == "" {
-		backendType = "ollama"
-	}
-
-	llmHost := os.Getenv("LLM_HOST")
-	if llmHost == "" {
-		llmHost = "http://localhost:11434"
-	}
-
-	openaiKey := os.Getenv("OPENAI_API_KEY")
-	llmModel := os.Getenv("LLM_MODEL")
-
+func NewLLMService(cfg *config.Config) *LLMService {
 	service := &LLMService{
-		backendType: backendType,
-		llmHost:     llmHost,
-		openaiKey:   openaiKey,
-		llmModel:    llmModel,
+		backendType: cfg.LLM.BackendType,
+		llmHost:     cfg.LLM.Host,
+		openaiKey:   cfg.LLM.OpenAIKey,
+		llmModel:    cfg.LLM.Model,
 		templates:   make(map[string]*template.Template),
 	}
 
 	// Initialize Ollama client if using Ollama backend
-	if backendType == "ollama" {
-		service.ollamaClient = ollama.NewClient(llmHost)
+	if cfg.LLM.BackendType == "ollama" {
+		service.ollamaClient = ollama.NewClient(&ollama.ClientConfig{
+			BaseURL: cfg.Ollama.BaseURL,
+			Timeout: cfg.Ollama.Timeout,
+		})
 	}
 
 	// Initialize OpenAI client if using OpenAI backend
-	if backendType == "openai" && openaiKey != "" {
+	if cfg.LLM.BackendType == "openai" && cfg.LLM.OpenAIKey != "" {
 		var opts []option.RequestOption
-		opts = append(opts, option.WithAPIKey(openaiKey))
+		opts = append(opts, option.WithAPIKey(cfg.LLM.OpenAIKey))
 
 		// If using a custom host (not official OpenAI), set base URL
-		if llmHost != "" && llmHost != "https://api.openai.com" {
-			opts = append(opts, option.WithBaseURL(llmHost))
+		if cfg.LLM.Host != "" && cfg.LLM.Host != "https://api.openai.com" {
+			opts = append(opts, option.WithBaseURL(cfg.LLM.Host))
 		}
 
 		client := openai.NewClient(opts...)
@@ -104,7 +95,7 @@ func NewLLMService() *LLMService {
 	}
 
 	log.Printf("LLMService initialized - Backend: %s, Host: %s, Model: %s",
-		backendType, llmHost, llmModel)
+		cfg.LLM.BackendType, cfg.LLM.Host, cfg.LLM.Model)
 
 	return service
 }

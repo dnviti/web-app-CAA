@@ -50,17 +50,19 @@ type ClientImpl struct {
 }
 
 // NewClient creates a new Ollama client with the given configuration
-func NewClient(baseURL string) Client {
-	if baseURL == "" {
-		baseURL = "http://localhost:11434" // Default Ollama URL
-	}
-
+func NewClient(config *ClientConfig) Client {
 	return &ClientImpl{
-		BaseURL: baseURL,
+		BaseURL: config.BaseURL,
 		HTTPClient: &http.Client{
-			Timeout: 60 * time.Second,
+			Timeout: config.Timeout,
 		},
 	}
+}
+
+// ClientConfig holds configuration for the Ollama client
+type ClientConfig struct {
+	BaseURL string
+	Timeout time.Duration
 }
 
 // Chat sends a chat request to Ollama and returns the response

@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"time"
-
 	"github.com/daniele/web-app-caa/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -44,11 +42,4 @@ type TokenClaims struct {
 	Username  string `json:"username"`
 	IssuedAt  int64  `json:"iat"`
 	ExpiresAt int64  `json:"exp"`
-}
-
-// Config holds authentication configuration
-type Config struct {
-	JWTSecret     string
-	TokenLifespan time.Duration
-	BcryptCost    int
 }

@@ -21,7 +21,7 @@ type AuthServiceImpl struct {
 	userRepo     UserRepository
 	gridRepo     GridRepository
 	tokenService TokenService
-	config       *Config
+	config       *AuthConfig
 }
 
 // NewAuthService creates a new authentication service
@@ -29,7 +29,7 @@ func NewAuthService(
 	userRepo UserRepository,
 	gridRepo GridRepository,
 	tokenService TokenService,
-	config *Config,
+	config *AuthConfig,
 ) AuthService {
 	return &AuthServiceImpl{
 		userRepo:     userRepo,

@@ -35,11 +35,11 @@ func main() {
 	log.Printf("[STARTUP] - TRUSTED_PROXIES: %v", cfg.TrustedProxies)
 
 	// Initialize database
-	database.Initialize()
+	database.Initialize(cfg)
 	db := database.GetDB()
 
 	// Initialize authentication system
-	authFactory := auth.NewFactory(db)
+	authFactory := auth.NewFactory(db, cfg)
 	authHandler := authFactory.GetHandler()
 	authMiddleware := authFactory.GetMiddleware()
 
@@ -71,8 +71,8 @@ func main() {
 	log.Printf("[MIDDLEWARE] Static files served from 'web/static' directory")
 
 	// Create other handlers (keeping existing ones for now)
-	gridHandlers := handlers.NewGridHandlers()
-	aiHandlers := handlers.NewAIHandlers()
+	gridHandlers := handlers.NewGridHandlers(cfg)
+	aiHandlers := handlers.NewAIHandlers(cfg)
 	pageHandlers := handlers.NewPageHandlers()
 
 	// Page routes (serve templates instead of static files)

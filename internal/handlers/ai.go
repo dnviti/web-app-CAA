@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/models"
 	"github.com/daniele/web-app-caa/internal/services"
 	"github.com/daniele/web-app-caa/internal/utils/token"
@@ -17,9 +18,9 @@ type AIHandlers struct {
 }
 
 // NewAIHandlers creates a new AIHandlers instance
-func NewAIHandlers() *AIHandlers {
+func NewAIHandlers(cfg *config.Config) *AIHandlers {
 	return &AIHandlers{
-		aiService: services.NewAIService(),
+		aiService: services.NewAIService(cfg),
 	}
 }
 

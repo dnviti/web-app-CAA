@@ -1,16 +1,15 @@
 package auth
 
 import (
-	"os"
-	"strconv"
 	"time"
 
+	"github.com/daniele/web-app-caa/internal/config"
 	"gorm.io/gorm"
 )
 
 // Factory creates and configures authentication components
 type Factory struct {
-	config       *Config
+	config       *AuthConfig
 	tokenService TokenService
 	userRepo     UserRepository
 	gridRepo     GridRepository
@@ -19,25 +18,36 @@ type Factory struct {
 	handler      *Handler
 }
 
+// AuthConfig holds auth-specific configuration derived from main config
+type AuthConfig struct {
+	JWTSecret     string
+	TokenLifespan time.Duration
+	BcryptCost    int
+}
+
 // NewFactory creates a new authentication factory
-func NewFactory(db *gorm.DB) *Factory {
-	// Load configuration from environment
-	config := loadConfig()
+func NewFactory(db *gorm.DB, cfg *config.Config) *Factory {
+	// Create auth-specific config from main config
+	authConfig := &AuthConfig{
+		JWTSecret:     cfg.APISecret,
+		TokenLifespan: time.Duration(cfg.TokenHourLifespan) * time.Hour,
+		BcryptCost:    cfg.BcryptCost,
+	}
 
 	// Create repositories
 	userRepo := NewGormUserRepository(db)
 	gridRepo := NewGormGridRepository(db)
 
 	// Create services
-	tokenService := NewJWTTokenService(config)
-	authService := NewAuthService(userRepo, gridRepo, tokenService, config)
+	tokenService := NewJWTTokenService(authConfig)
+	authService := NewAuthService(userRepo, gridRepo, tokenService, authConfig)
 
 	// Create middleware and handler
 	middleware := NewMiddleware(tokenService, userRepo)
 	handler := NewHandler(authService)
 
 	return &Factory{
-		config:       config,
+		config:       authConfig,
 		tokenService: tokenService,
 		userRepo:     userRepo,
 		gridRepo:     gridRepo,
@@ -75,28 +85,4 @@ func (f *Factory) GetUserRepository() UserRepository {
 // GetGridRepository returns the grid repository
 func (f *Factory) GetGridRepository() GridRepository {
 	return f.gridRepo
-}
-
-// loadConfig loads authentication configuration from environment variables
-func loadConfig() *Config {
-	jwtSecret := os.Getenv("API_SECRET")
-	if jwtSecret == "" {
-		jwtSecret = os.Getenv("JWT_SECRET")
-		if jwtSecret == "" {
-			jwtSecret = "your-default-secret-key"
-		}
-	}
-
-	tokenLifespanHours := 24 // default
-	if lifespanStr := os.Getenv("TOKEN_HOUR_LIFESPAN"); lifespanStr != "" {
-		if hours, err := strconv.Atoi(lifespanStr); err == nil {
-			tokenLifespanHours = hours
-		}
-	}
-
-	return &Config{
-		JWTSecret:     jwtSecret,
-		TokenLifespan: time.Duration(tokenLifespanHours) * time.Hour,
-		BcryptCost:    12, // Default bcrypt cost
-	}
 }

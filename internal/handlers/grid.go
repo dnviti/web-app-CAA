@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/models"
 	"github.com/daniele/web-app-caa/internal/services"
 	"github.com/daniele/web-app-caa/internal/utils/token"
@@ -15,13 +16,15 @@ import (
 type GridHandlers struct {
 	gridService *services.GridService
 	userService *services.UserService
+	cfg         *config.Config
 }
 
 // NewGridHandlers creates a new GridHandlers instance
-func NewGridHandlers() *GridHandlers {
+func NewGridHandlers(cfg *config.Config) *GridHandlers {
 	return &GridHandlers{
 		gridService: services.NewGridService(),
 		userService: services.NewUserService(),
+		cfg:         cfg,
 	}
 }
 
@@ -49,17 +52,18 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 	var selectedGrid map[string][]models.GridItemResponse
 	switch req.GridType {
 	case "simplified":
-		selectedGrid = services.SimplifiedGrid
+		selectedGrid = services.GetSimplifiedGrid(h.cfg)
 		log.Printf("[SETUP] Selected simplified grid")
 	case "empty":
+		defaultGrid := services.GetDefaultGrid(h.cfg)
 		selectedGrid = map[string][]models.GridItemResponse{
 			"home":           {},
-			"systemControls": services.DefaultGrid["systemControls"],
+			"systemControls": defaultGrid["systemControls"],
 		}
 		log.Printf("[SETUP] Selected empty grid with system controls")
 	case "default":
 	default:
-		selectedGrid = services.DefaultGrid
+		selectedGrid = services.GetDefaultGrid(h.cfg)
 		log.Printf("[SETUP] Selected default grid")
 	}
 

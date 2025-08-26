@@ -19,11 +19,11 @@ var (
 
 // JWTTokenService implements TokenService using JWT
 type JWTTokenService struct {
-	config *Config
+	config *AuthConfig
 }
 
 // NewJWTTokenService creates a new JWT token service
-func NewJWTTokenService(config *Config) TokenService {
+func NewJWTTokenService(config *AuthConfig) TokenService {
 	return &JWTTokenService{
 		config: config,
 	}

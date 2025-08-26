@@ -3,6 +3,7 @@ package services
 import (
 	"log"
 
+	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/models"
 )
 
@@ -12,9 +13,9 @@ type AIService struct {
 }
 
 // NewAIService creates a new AIService
-func NewAIService() *AIService {
+func NewAIService(cfg *config.Config) *AIService {
 	service := &AIService{
-		llmService: NewLLMService(),
+		llmService: NewLLMService(cfg),
 	}
 
 	log.Printf("AIService initialized with direct LLM integration")
