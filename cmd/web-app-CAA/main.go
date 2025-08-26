@@ -113,6 +113,11 @@ func main() {
 		protected.POST("/correct", aiHandlers.Correct)
 	}
 
+	// Chrome DevTools endpoint (to avoid 404 logs)
+	r.GET("/.well-known/appspecific/com.chrome.devtools.json", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{})
+	})
+
 	// Test endpoint
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
