@@ -16,7 +16,7 @@ Web App CAA supports multiple configuration methods, listed in order of preceden
 
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
-| `APP_PORT` | Server port | `3000` | `8080` |
+| `APP_PORT` | Server port | `6542` | `8080` |
 | `APP_HOST` | Server host | `localhost` | `0.0.0.0` |
 | `JWT_SECRET` | JWT signing secret | `your-default-secret-key` | `my-super-secret-jwt-key` |
 

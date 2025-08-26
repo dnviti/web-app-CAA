@@ -148,10 +148,15 @@ docker run -p 3000:3000 -e APP_PORT=3000 ghcr.io/dnviti/web-app-caa:latest
 ## Features Implemented
 
 ### ✅ Authentication System
-- User registration with hashed passwords (bcrypt)
-- JWT-based authentication
-- Editor password verification
+- User registration with automatic password hashing (bcrypt + GORM hooks)
+- JWT-based authentication using industry-standard practices
+  - Secure token generation with configurable lifespan
+  - HMAC-SHA256 signing with secret key rotation support
+  - Automatic token extraction from Authorization header
+  - User ID extraction directly from JWT claims
+- Editor password verification with separate hashing
 - User status management (pending_setup/active)
+- Enhanced security with input sanitization and validation
 
 ### ✅ Database Layer
 - SQLite database with GORM ORM
@@ -218,7 +223,7 @@ The Go implementation uses the following key dependencies:
 Environment variables (with defaults):
 
 ### Server Configuration
-- `APP_PORT`: Server port (default: 3000)
+- `APP_PORT`: Server port (default: 6542)
 - `APP_HOST`: Server host (default: localhost)
 - `JWT_SECRET`: JWT signing secret (default: your-default-secret-key)
 
@@ -277,10 +282,17 @@ The Go server provides direct AI functionality using integrated LLM services wit
 ## Key Implementation Details
 
 ### Authentication Flow
-1. User registration creates hashed passwords and initial grid
-2. Login returns JWT token with user ID and username
-3. Protected endpoints verify JWT and check user exists in database
-4. Editor password provides additional security for administrative functions
+1. **User Registration**: Creates account with GORM BeforeSave hooks automatically hashing passwords using bcrypt
+2. **Login Process**: Validates credentials and returns JWT token with configurable expiration time
+3. **Token Validation**: Protected endpoints extract user ID directly from JWT claims without database lookup
+4. **Database Verification**: Final verification ensures user still exists and is active
+5. **Editor Security**: Additional password layer for administrative functions with separate hash storage
+
+**JWT Configuration:**
+- `API_SECRET`: Secret key for JWT signing (falls back to JWT_SECRET for compatibility)
+- `TOKEN_HOUR_LIFESPAN`: Token expiration time in hours (default: 24)
+- Tokens include authorized flag, user_id, and expiration timestamp
+- Automatic token extraction from `Authorization: Bearer <token>` header
 
 ### Grid System
 1. Three grid templates: default (full), simplified, empty
@@ -317,6 +329,24 @@ The application will:
 - Serve static files from public directory
 
 ## Testing
+
+### JWT Authentication Testing
+A comprehensive test script is provided to verify JWT authentication:
+
+```bash
+# Run the test script (requires server to be running)
+./test_jwt.sh
+```
+
+The test script verifies:
+- User registration with JWT token generation
+- User login with credential validation
+- Protected endpoint access with valid tokens
+- Proper rejection of invalid tokens
+- Proper rejection of requests without tokens
+
+### Manual Testing
+You can also test the authentication manually:
 
 The implementation has been tested with:
 - User registration and login flows

@@ -98,6 +98,11 @@ func Initialize() {
 	log.Printf("[DATABASE] Connected and migrated successfully using %s driver", config.Driver)
 }
 
+// GetDB returns the database connection
+func GetDB() *gorm.DB {
+	return DB
+}
+
 // initializeMySQL initializes MySQL database connection
 func initializeMySQL(config DatabaseConfig, logLevel logger.LogLevel) (*gorm.DB, error) {
 	// Build MySQL DSN (Data Source Name)

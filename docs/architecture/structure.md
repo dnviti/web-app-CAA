@@ -10,13 +10,22 @@ web-app-CAA/
 │   └── web-app-caa/
 │       └── main.go        # Application entry point
 ├── internal/              # Private application code
+│   ├── auth/             # Clean authentication architecture
+│   │   ├── interfaces.go # Core interfaces and contracts
+│   │   ├── service.go    # Authentication business logic
+│   │   ├── jwt_service.go # JWT token operations
+│   │   ├── repository.go # Data persistence layer
+│   │   ├── middleware.go # HTTP authentication middleware
+│   │   ├── handler.go    # HTTP request handlers
+│   │   └── factory.go    # Dependency injection factory
 │   ├── config/           # Configuration management
 │   ├── database/         # Database layer
-│   ├── handlers/         # HTTP request handlers
-│   ├── middleware/       # Middleware components
+│   ├── handlers/         # HTTP request handlers (legacy)
+│   ├── middleware/       # Middleware components (legacy)
 │   ├── models/           # Data models
 │   ├── prompts/          # AI prompt templates
-│   └── services/         # Business logic layer
+│   ├── services/         # Business logic layer
+│   └── utils/            # Utility functions
 ├── pkg/                  # Public library code
 │   └── ollama/          # Ollama client library
 ├── web/                 # Web application assets
@@ -79,17 +88,24 @@ Contains the core application logic that should not be imported by other applica
 
 ```
 internal/
+├── auth/                 # Clean Authentication Architecture
+│   ├── interfaces.go    # Core interfaces and contracts
+│   ├── service.go       # Authentication business logic
+│   ├── jwt_service.go   # JWT token operations
+│   ├── repository.go    # Data persistence implementations
+│   ├── middleware.go    # HTTP authentication middleware
+│   ├── handler.go       # HTTP request/response handlers
+│   └── factory.go       # Dependency injection factory
 ├── config/
-│   └── config.go         # Configuration management
+│   └── config.go        # Configuration management
 ├── database/
-│   └── database.go       # Database connection and setup
+│   └── database.go      # Database connection and setup
 ├── handlers/
-│   ├── auth.go          # Authentication handlers
 │   ├── grid.go          # Grid management handlers
 │   ├── ai.go            # AI service handlers
-│   └── pages.go         # Web page handlers
+│   ├── pages.go         # Web page handlers
+│   └── auth_old.go      # Legacy auth handlers (backup)
 ├── middleware/
-│   ├── auth.go          # Authentication middleware
 │   └── ollama.go        # Ollama-specific middleware
 ├── models/
 │   └── models.go        # Data structures and models
@@ -98,13 +114,118 @@ internal/
 │   ├── passato.tmpl     # Past tense prompt template
 │   ├── futuro.tmpl      # Future tense prompt template
 │   └── correct_sentence.tmpl  # Sentence correction template
-└── services/
-    ├── user.go          # User management service
-    ├── grid.go          # Grid management service
-    ├── grids.go         # Grid template service
-    ├── ai.go            # AI service coordination
-    └── llm.go           # LLM service implementation
+├── services/
+│   ├── grid.go          # Grid management service
+│   ├── grids.go         # Grid template service
+│   ├── ai.go            # AI service coordination
+│   └── llm.go           # LLM service implementation
+└── utils/
+    └── token/           # Legacy token utilities
+        └── token.go     # JWT utilities (updated to modern lib)
 ```
+
+#### Authentication Architecture (`/internal/auth`)
+
+The authentication system follows clean architecture principles with clear separation of concerns and SOLID compliance:
+
+**`interfaces.go`** - Core interfaces and contracts
+```go
+type TokenService interface {
+    GenerateToken(userID uint) (string, error)
+    ValidateToken(tokenString string) (*TokenClaims, error)
+    ExtractTokenFromRequest(c *gin.Context) (string, error)
+}
+
+type AuthService interface {
+    Register(req *models.RegisterRequest) (*models.User, string, error)
+    Login(req *models.LoginRequest) (*models.User, string, error)
+    GetCurrentUser(userID uint) (*models.User, error)
+}
+
+type UserRepository interface {
+    Create(user *models.User) error
+    FindByID(id uint) (*models.User, error)
+    FindByUsername(username string) (*models.User, error)
+}
+```
+
+**`jwt_service.go`** - JWT token operations
+```go
+type JWTTokenService struct {
+    config *Config
+}
+
+func (s *JWTTokenService) GenerateToken(userID uint) (string, error) {
+    // Modern JWT implementation with golang-jwt/jwt/v5
+}
+```
+
+**`service.go`** - Authentication business logic
+```go
+type AuthServiceImpl struct {
+    userRepo     UserRepository
+    tokenService TokenService
+    config       *Config
+}
+
+func (s *AuthServiceImpl) Register(req *models.RegisterRequest) (*models.User, string, error) {
+    // Registration business logic
+}
+```
+
+**`repository.go`** - Data persistence layer
+```go
+type GormUserRepository struct {
+    db *gorm.DB
+}
+
+func (r *GormUserRepository) Create(user *models.User) error {
+    // GORM-based user creation
+}
+```
+
+**`handler.go`** - HTTP request/response handling
+```go
+type Handler struct {
+    authService AuthService
+}
+
+func (h *Handler) Register(c *gin.Context) {
+    // HTTP registration endpoint
+}
+```
+
+**`middleware.go`** - Request authentication
+```go
+type Middleware struct {
+    tokenService TokenService
+    userRepo     UserRepository
+}
+
+func (m *Middleware) RequireAuth() gin.HandlerFunc {
+    // JWT authentication middleware
+}
+```
+
+**`factory.go`** - Dependency injection
+```go
+type Factory struct {
+    // All components wired together
+}
+
+func NewFactory(db *gorm.DB) *Factory {
+    // Dependency injection setup
+}
+```
+
+**Architecture Benefits:**
+- ✅ **SOLID Principles**: Every component follows all five SOLID principles
+- ✅ **Dependency Inversion**: High-level modules depend on interfaces
+- ✅ **Single Responsibility**: Each component has one clear purpose
+- ✅ **Interface Segregation**: Focused, specific interfaces
+- ✅ **Open/Closed**: Extensible without modification
+- ✅ **Testability**: Easy to unit test with dependency injection
+- ✅ **Maintainability**: Clear separation of concerns
 
 #### Configuration Layer
 
@@ -136,20 +257,22 @@ func Initialize() {
 
 #### Handler Layer
 
-**`internal/handlers/auth.go`**
+**`internal/handlers/grid.go`**
 ```go
-type AuthHandlers struct {
-    userService *services.UserService
+type GridHandlers struct {
+    gridService *services.GridService
 }
 
-func (h *AuthHandlers) Login(c *gin.Context) {
-    // Handle user login
+func (h *GridHandlers) GetGrid(c *gin.Context) {
+    // Handle grid retrieval
 }
 
-func (h *AuthHandlers) Register(c *gin.Context) {
-    // Handle user registration
+func (h *GridHandlers) SaveGrid(c *gin.Context) {
+    // Handle grid saving
 }
 ```
+
+**Note:** Authentication handlers have been moved to the clean architecture implementation in `internal/auth/handler.go`.
 
 #### Service Layer
 

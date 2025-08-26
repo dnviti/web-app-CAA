@@ -163,7 +163,7 @@ Now that you have Web App CAA running:
 1. **[Learn about Configuration](configuration.md)** - Customize your setup
 2. **[Explore the Architecture](../architecture/overview.md)** - Understand the system design
 3. **[Check the API Documentation](../api/authentication.md)** - Integrate with other services
-4. **[Set up for Production](../deployment/production.md)** - Deploy to a server
+4. **[Deploy with Docker](../deployment/docker.md)** - Set up for production
 
 ## Troubleshooting
 

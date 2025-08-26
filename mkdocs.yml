@@ -78,5 +78,7 @@ nav:
       - Setup: development/setup.md
       - Testing: development/testing.md
       - Contributing: development/contributing.md
+      - CGO Issues: development/cgo-issue.md
+      - Clean Auth Refactoring: development/clean-auth-refactoring.md
 
 copyright: Copyright &copy; 2025 Daniele

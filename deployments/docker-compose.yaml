@@ -2,12 +2,12 @@ services:
   web-app:
     build: .
     ports:
-      - "3000:3000"
+      - "6542:6542"
     environment:
       - APP_HOST=0.0.0.0
-      - APP_PORT=3000
+      - APP_PORT=6542
       - JWT_SECRET=${JWT_SECRET:-your-default-secret-key}
-      - PUBLIC_URL=http://localhost:3000
+      - PUBLIC_URL=http://localhost:6542
       - DB_TYPE=${DB_TYPE:-sqlite}
       # OpenAI backend configuration
       - BACKEND_TYPE=${BACKEND_TYPE:-openai}

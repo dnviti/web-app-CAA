@@ -10,6 +10,14 @@ require (
 	gorm.io/gorm v1.30.1
 )
 
+require github.com/dgrijalva/jwt-go v3.2.0+incompatible
+
+require (
+	github.com/appleboy/gin-jwt/v2 v2.10.3 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
+)
+
 require (
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/joho/godotenv v1.5.1 // direct

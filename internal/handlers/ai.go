@@ -6,6 +6,7 @@ import (
 
 	"github.com/daniele/web-app-caa/internal/models"
 	"github.com/daniele/web-app-caa/internal/services"
+	"github.com/daniele/web-app-caa/internal/utils/token"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,14 +25,15 @@ func NewAIHandlers() *AIHandlers {
 
 // Conjugate handles conjugation requests and proxies them to the Python AI service
 func (h *AIHandlers) Conjugate(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
+	userID, err := token.ExtractTokenID(c)
+	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
 		return
 	}
 
-	userMap := user.(map[string]interface{})
-	userID := userMap["userId"].(uint)
+	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+	return
 
 	log.Printf("[CONJUGATE] Conjugation request from userId: %d", userID)
 
@@ -61,14 +63,15 @@ func (h *AIHandlers) Conjugate(c *gin.Context) {
 
 // Correct handles correction requests and proxies them to the Python AI service
 func (h *AIHandlers) Correct(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
+	userID, err := token.ExtractTokenID(c)
+	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
 		return
 	}
 
-	userMap := user.(map[string]interface{})
-	userID := userMap["userId"].(uint)
+	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+	return
 
 	log.Printf("[CORRECT] Correction request from userId: %d", userID)
 

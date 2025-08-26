@@ -4,10 +4,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/daniele/web-app-caa/internal/auth"
 	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/database"
 	"github.com/daniele/web-app-caa/internal/handlers"
-	"github.com/daniele/web-app-caa/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,16 +25,26 @@ func main() {
 		}
 		return "[NOT SET]"
 	}())
+	log.Printf("[STARTUP] - API_SECRET: %s", func() string {
+		if cfg.APISecret != "" {
+			return "[SET]"
+		}
+		return "[NOT SET]"
+	}())
+	log.Printf("[STARTUP] - TOKEN_HOUR_LIFESPAN: %d", cfg.TokenHourLifespan)
 	log.Printf("[STARTUP] - TRUSTED_PROXIES: %v", cfg.TrustedProxies)
 
 	// Initialize database
 	database.Initialize()
+	db := database.GetDB()
+
+	// Initialize authentication system
+	authFactory := auth.NewFactory(db)
+	authHandler := authFactory.GetHandler()
+	authMiddleware := authFactory.GetMiddleware()
 
 	// Create Gin router
 	r := gin.Default()
-
-	// Add middleware
-	r.Use(middleware.RequestLogging())
 
 	// CORS middleware - equivalent to Node.js CORS configuration
 	r.Use(func(c *gin.Context) {
@@ -52,7 +62,6 @@ func main() {
 	})
 
 	log.Printf("[MIDDLEWARE] CORS configured with credentials and all origins")
-	log.Printf("[MIDDLEWARE] JSON parser configured")
 
 	// Configure trusted proxies for security
 	r.SetTrustedProxies(cfg.TrustedProxies)
@@ -61,8 +70,7 @@ func main() {
 	r.Static("/static", "./web/static")
 	log.Printf("[MIDDLEWARE] Static files served from 'web/static' directory")
 
-	// Create handlers
-	authHandlers := handlers.NewAuthHandlers()
+	// Create other handlers (keeping existing ones for now)
 	gridHandlers := handlers.NewGridHandlers()
 	aiHandlers := handlers.NewAIHandlers()
 	pageHandlers := handlers.NewPageHandlers()
@@ -77,18 +85,19 @@ func main() {
 	// Auth API Endpoints (no authentication required)
 	api := r.Group("/api")
 	{
-		api.POST("/register", authHandlers.Register)
-		api.POST("/login", authHandlers.Login)
+		api.POST("/register", authHandler.Register)
+		api.POST("/login", authHandler.Login)
 	}
 
 	// Protected API Endpoints (authentication required)
 	protected := api.Group("/")
-	protected.Use(middleware.AuthenticateToken())
+	protected.Use(authMiddleware.RequireAuth())
 	{
 		// Auth endpoints
-		protected.POST("/check-editor-password", authHandlers.CheckEditorPassword)
+		protected.GET("/user", authHandler.CurrentUser)
+		protected.POST("/check-editor-password", authHandler.CheckEditorPassword)
 
-		// Grid endpoints
+		// Grid endpoints (keeping existing handlers for now)
 		protected.POST("/setup", gridHandlers.Setup)
 		protected.POST("/complete-setup", gridHandlers.CompleteSetup)
 		protected.GET("/grid", gridHandlers.GetGrid)
@@ -111,6 +120,7 @@ func main() {
 
 	log.Printf("[STARTUP] Server is running on http://%s:%s", cfg.Host, cfg.Port)
 	log.Printf("[STARTUP] Server startup completed successfully")
+	log.Printf("[AUTH] New clean authentication architecture initialized")
 
 	// Start server
 	if err := r.Run(":" + cfg.Port); err != nil {

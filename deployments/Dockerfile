@@ -38,8 +38,8 @@ COPY --from=builder /app/rag_knowledge.json ./rag_knowledge.json
 # Create data directory with proper permissions (application will create database files here)
 RUN mkdir -p ./data && chmod 755 ./data
 
-# Expose port 3000 to the outside world
-EXPOSE 3000
+# Expose port 6542 to the outside world
+EXPOSE 6542
 
 # Command to run the executable
 CMD ["./web-app-caa"]

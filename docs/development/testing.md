@@ -1,6 +1,6 @@
 # Testing Guide
 
-This guide covers testing strategies, tools, and best practices for Web App CAA. The project uses Go's built-in testing framework along with additional testing utilities.
+This guide covers testing strategies, tools, and best practices for Web App CAA. The project uses Go's built-in testing framework along with comprehensive authentication testing using the clean architecture implementation.
 
 ## Testing Philosophy
 
@@ -8,6 +8,7 @@ Web App CAA follows a comprehensive testing approach:
 
 - **Unit Tests**: Test individual functions and methods in isolation
 - **Integration Tests**: Test component interactions and API endpoints  
+- **Authentication Tests**: Comprehensive testing of the clean auth system
 - **Database Tests**: Test database operations with real database
 - **End-to-End Tests**: Test complete user workflows
 
@@ -16,23 +17,123 @@ Web App CAA follows a comprehensive testing approach:
 ```
 web-app-CAA/
 ├── internal/
+│   ├── auth/                   # Clean authentication architecture
+│   │   ├── interfaces.go
+│   │   ├── service_test.go     # Auth service unit tests
+│   │   ├── jwt_service_test.go # JWT service unit tests
+│   │   ├── repository_test.go  # Repository unit tests
+│   │   └── handler_test.go     # Handler integration tests
 │   ├── handlers/
-│   │   ├── auth.go
-│   │   └── auth_test.go        # Handler tests
+│   │   ├── grid.go
+│   │   └── grid_test.go        # Handler tests
 │   ├── services/
-│   │   ├── user.go
-│   │   └── user_test.go        # Service tests
+│   │   ├── grid.go
+│   │   └── grid_test.go        # Service tests
 │   └── models/
 │       ├── models.go
 │       └── models_test.go      # Model tests
-├── pkg/
-│   └── ollama/
-│       ├── client.go
-│       └── client_test.go      # Package tests
-└── tests/
-    ├── integration/            # Integration tests
-    ├── fixtures/               # Test data
-    └── helpers/                # Test utilities
+├── test_clean_auth.sh          # Comprehensive auth test script
+├── tests/
+│   ├── integration/            # Integration tests
+│   ├── fixtures/               # Test data
+│   └── helpers/                # Test utilities
+└── pkg/
+    └── ollama/
+        ├── client.go
+        └── client_test.go      # Package tests
+```
+
+## Authentication Testing
+
+### Comprehensive Test Script
+
+The project includes a comprehensive authentication test script that validates all authentication functionality:
+
+```bash
+# Run the comprehensive authentication test
+./test_clean_auth.sh
+```
+
+This script tests:
+- ✅ User Registration
+- ✅ User Login  
+- ✅ Current User Retrieval
+- ✅ Editor Password Validation (Correct & Wrong)
+- ✅ Invalid Token Rejection
+- ✅ Missing Token Rejection
+- ✅ Wrong Credentials Rejection
+- ✅ Duplicate Username Prevention
+
+### Authentication Test Results
+
+```
+Testing Clean JWT Authentication Implementation
+==============================================
+✓ User Registration              ✓ Current User Retrieval
+✓ User Login                     ✓ Editor Password Validation  
+✓ Invalid Token Rejection        ✓ Missing Token Rejection
+✓ Wrong Credentials Rejection    ✓ Duplicate Username Prevention
+
+✓ All authentication functions working correctly!
+✓ Clean architecture implementation successful!
+```
+
+### Clean Authentication Testing
+
+The clean authentication architecture includes comprehensive test coverage with dependency injection and interface-based testing:
+
+#### JWT Service Testing
+```go
+// internal/auth/jwt_service_test.go
+func TestJWTService_GenerateToken(t *testing.T) {
+    jwtService := NewJWTService("test-secret", time.Hour)
+    
+    userID := uint(1)
+    token, err := jwtService.GenerateToken(userID)
+    
+    assert.NoError(t, err)
+    assert.NotEmpty(t, token)
+    
+    // Validate the token
+    claims, err := jwtService.ValidateToken(token)
+    assert.NoError(t, err)
+    assert.Equal(t, userID, claims.UserID)
+}
+```
+
+#### Auth Service Testing  
+```go
+// internal/auth/service_test.go
+func TestAuthService_Register(t *testing.T) {
+    repo := &mockUserRepository{}
+    tokenService := &mockTokenService{}
+    authService := NewAuthService(repo, tokenService)
+    
+    user, token, err := authService.Register("testuser", "password123", "test@example.com")
+    
+    assert.NoError(t, err)
+    assert.NotNil(t, user)
+    assert.NotEmpty(t, token)
+    assert.Equal(t, "testuser", user.Username)
+}
+```
+
+#### Handler Integration Testing
+```go
+// internal/auth/handler_test.go
+func TestHandler_Register(t *testing.T) {
+    authService := &mockAuthService{}
+    handler := NewHandler(authService)
+    
+    gin.SetMode(gin.TestMode)
+    w := httptest.NewRecorder()
+    c, _ := gin.CreateTestContext(w)
+    
+    // Test registration endpoint
+    handler.Register(c)
+    
+    assert.Equal(t, http.StatusCreated, w.Code)
+}
 ```
 
 ## Running Tests

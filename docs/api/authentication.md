@@ -1,6 +1,16 @@
 # Authentication API
 
-The Authentication API handles user registration, login, and authorization for Web App CAA. All endpoints use JSON for request and response bodies.
+The Authentication API handles user registration, login, and authorization for Web App CAA using a clean architecture implementation with SOLID principles. All endpoints use JSON for request and response bodies.
+
+## Architecture Overview
+
+The authentication system follows clean architecture patterns with:
+
+- **Token Service**: JWT token generation and validation using `golang-jwt/jwt/v5`
+- **Auth Service**: Business logic for authentication operations  
+- **User Repository**: Data persistence layer with GORM
+- **Middleware**: HTTP request authentication and authorization
+- **Handler**: HTTP request/response handling
 
 ## Base URL
 
@@ -8,32 +18,61 @@ The Authentication API handles user registration, login, and authorization for W
 http://localhost:3000/api
 ```
 
+## Security Features
+
+- **Secure Password Hashing**: bcrypt with configurable cost
+- **JWT Token Management**: Modern, secure token implementation
+- **Editor Password Protection**: Separate password for administrative functions
+- **Database User Verification**: Real-time user existence checks
+- **Comprehensive Error Handling**: Proper error messages and HTTP status codes
+
 ## Authentication Flow
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant API
+    participant Handler
+    participant AuthService
+    participant UserRepo
+    participant TokenService
     participant Database
     
     Note over Client,Database: Registration Flow
-    Client->>API: POST /register
-    API->>Database: Create user
-    Database-->>API: User created
-    API-->>Client: Success response
+    Client->>Handler: POST /register
+    Handler->>AuthService: Register(request)
+    AuthService->>UserRepo: Create(user)
+    UserRepo->>Database: INSERT user
+    Database-->>UserRepo: User created
+    UserRepo-->>AuthService: User data
+    AuthService->>TokenService: GenerateToken(userID)
+    TokenService-->>AuthService: JWT token
+    AuthService-->>Handler: User + token
+    Handler-->>Client: Success response
     
     Note over Client,Database: Login Flow  
-    Client->>API: POST /login
-    API->>Database: Validate credentials
-    Database-->>API: User data
-    API-->>Client: JWT token + user info
+    Client->>Handler: POST /login
+    Handler->>AuthService: Login(credentials)
+    AuthService->>UserRepo: FindByUsername()
+    UserRepo->>Database: SELECT user
+    Database-->>UserRepo: User data
+    UserRepo-->>AuthService: User data
+    AuthService->>AuthService: ValidatePassword()
+    AuthService->>TokenService: GenerateToken(userID)
+    TokenService-->>AuthService: JWT token
+    AuthService-->>Handler: User + token
+    Handler-->>Client: JWT token + user info
     
     Note over Client,Database: Protected Requests
-    Client->>API: Request with JWT header
-    API->>API: Validate token
-    API->>Database: Get user data
-    Database-->>API: User data
-    API-->>Client: Protected resource
+    Client->>Handler: Request with JWT header
+    Handler->>Middleware: RequireAuth()
+    Middleware->>TokenService: ValidateToken()
+    TokenService-->>Middleware: Token claims
+    Middleware->>UserRepo: FindByID(userID)
+    UserRepo->>Database: SELECT user
+    Database-->>UserRepo: User data
+    UserRepo-->>Middleware: User exists
+    Middleware-->>Handler: User context
+    Handler-->>Client: Protected resource
 ```
 
 ## Endpoints
@@ -69,11 +108,8 @@ Content-Type: application/json
     ```json
     {
       "message": "User registered successfully",
-      "user": {
-        "id": 1,
-        "username": "john_doe",
-        "status": "pending_setup"
-      }
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "status": "pending_setup"
     }
     ```
 
@@ -87,14 +123,14 @@ Content-Type: application/json
 === "Validation Error (400 Bad Request)"
     ```json
     {
-      "error": "Username must be between 3 and 50 characters"
+      "error": "Username, password, editor password, and gridType are required"
     }
     ```
 
 === "Server Error (500 Internal Server Error)"
     ```json
     {
-      "error": "Internal server error"
+      "error": "Registration failed"
     }
     ```
 
@@ -156,13 +192,8 @@ Content-Type: application/json
 === "Success (200 OK)"
     ```json
     {
-      "message": "Login successful",
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      "user": {
-        "id": 1,
-        "username": "john_doe",
-        "status": "active"
-      }
+      "status": "pending_setup"
     }
     ```
 
@@ -180,6 +211,13 @@ Content-Type: application/json
     }
     ```
 
+=== "Server Error (500 Internal Server Error)"
+    ```json
+    {
+      "error": "Login failed"
+    }
+    ```
+
 #### JWT Token
 
 The returned token is a JSON Web Token (JWT) that must be included in the `Authorization` header for protected endpoints:
@@ -192,12 +230,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ```json
 {
-  "userId": 1,
-  "username": "john_doe",
-  "exp": 1735689600,
-  "iat": 1735603200
+  "user_id": 1,
+  "iat": 1735603200,
+  "exp": 1735689600
 }
 ```
+
+**Token Structure:**
+- `user_id`: Unique user identifier
+- `iat`: Token issued at timestamp
+- `exp`: Token expiration timestamp
 
 #### Example Usage
 
@@ -255,15 +297,13 @@ Content-Type: application/json
 === "Correct Password (200 OK)"
     ```json
     {
-      "message": "Editor password is correct",
       "valid": true
     }
     ```
 
-=== "Incorrect Password (401 Unauthorized)"
+=== "Incorrect Password (200 OK)"
     ```json
     {
-      "error": "Invalid editor password",
       "valid": false
     }
     ```
@@ -272,6 +312,20 @@ Content-Type: application/json
     ```json
     {
       "error": "Authorization token required"
+    }
+    ```
+
+=== "Invalid Token (401 Unauthorized)"
+    ```json
+    {
+      "error": "Invalid or expired token"
+    }
+    ```
+
+=== "Missing Password (400 Bad Request)"
+    ```json
+    {
+      "error": "Password is required"
     }
     ```
 

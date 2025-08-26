@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -10,10 +11,12 @@ import (
 
 // Config holds application configuration
 type Config struct {
-	Port           string
-	Host           string
-	JWTSecret      string
-	TrustedProxies []string
+	Port              string
+	Host              string
+	JWTSecret         string
+	APISecret         string
+	TokenHourLifespan int
+	TrustedProxies    []string
 }
 
 // Load loads the application configuration
@@ -26,7 +29,7 @@ func Load() *Config {
 	// Load configuration
 	port := os.Getenv("APP_PORT")
 	if port == "" {
-		port = "3000"
+		port = "6542"
 	}
 
 	host := os.Getenv("APP_HOST")
@@ -37,6 +40,19 @@ func Load() *Config {
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
 		jwtSecret = "your-default-secret-key"
+	}
+
+	apiSecret := os.Getenv("API_SECRET")
+	if apiSecret == "" {
+		// Fallback to JWT_SECRET for backwards compatibility
+		apiSecret = jwtSecret
+	}
+
+	tokenHourLifespan := 24 // Default to 24 hours
+	if lifespanStr := os.Getenv("TOKEN_HOUR_LIFESPAN"); lifespanStr != "" {
+		if parsed, err := strconv.Atoi(lifespanStr); err == nil {
+			tokenHourLifespan = parsed
+		}
 	}
 
 	// Load trusted proxies
@@ -54,9 +70,11 @@ func Load() *Config {
 	}
 
 	return &Config{
-		Port:           port,
-		Host:           host,
-		JWTSecret:      jwtSecret,
-		TrustedProxies: trustedProxies,
+		Port:              port,
+		Host:              host,
+		JWTSecret:         jwtSecret,
+		APISecret:         apiSecret,
+		TokenHourLifespan: tokenHourLifespan,
+		TrustedProxies:    trustedProxies,
 	}
 }

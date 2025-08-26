@@ -6,21 +6,19 @@ Welcome to the **Web App CAA** (Comunicazione Aumentativa e Alternativa) documen
 
 ### For New Users
 - **[Installation Guide](getting-started/installation.md)** - Get Web App CAA running on your system
-- **[Quick Start Guide](getting-started/quickstart.md)** - Your first steps with the application
-- **[User Guide](getting-started/user-guide.md)** - Complete walkthrough of all features
+- **[Quick Start Guide](getting-started/quick-start.md)** - Your first steps with the application
 - **[Configuration](getting-started/configuration.md)** - Customizing your setup
 
 ### For Developers
 - **[Development Setup](development/setup.md)** - Set up your development environment
 - **[Architecture Overview](architecture/overview.md)** - Understand the system design
-- **[API Reference](api/README.md)** - Complete API documentation
+- **[API Reference](api/authentication.md)** - Complete API documentation
 - **[Testing Guide](development/testing.md)** - Testing practices and tools
 - **[Contributing Guide](development/contributing.md)** - How to contribute to the project
 
 ### For DevOps/Deployment
 - **[Docker Deployment](deployment/docker.md)** - Deploy using Docker containers
-- **[Production Deployment](deployment/production.md)** - Production deployment guide
-- **[Environment Variables](deployment/environment.md)** - Configuration reference
+- **[GitHub Pages](deployment/github-pages.md)** - Documentation deployment
 
 ## �🚀 What is Web App CAA?
 
@@ -64,12 +62,10 @@ Web App CAA is a modern web application built in Go that provides:
 
 | I want to... | Go to... |
 |--------------|----------|
-| Install and try the app | [Quick Start Guide](getting-started/quickstart.md) |
-| Set up AI backends | [Configuration → AI Services](getting-started/configuration.md#ai-services) |
-| Deploy to production | [Production Deployment](deployment/production.md) |
+| Install and try the app | [Quick Start Guide](getting-started/quick-start.md) |
+| Deploy to production | [Docker Deployment](deployment/docker.md) |
 | Contribute code | [Contributing Guide](development/contributing.md) |
-| Understand the API | [API Reference](api/README.md) |
-| Customize grid templates | [User Guide → Grid Management](getting-started/user-guide.md#grid-management) |
+| Understand the API | [Authentication API](api/authentication.md) |
 | Set up development environment | [Development Setup](development/setup.md) |
 | Run tests | [Testing Guide](development/testing.md) |
 | Deploy with Docker | [Docker Deployment](deployment/docker.md) |
@@ -90,8 +86,8 @@ Web App CAA is a modern web application built in Go that provides:
 
 ## 🎯 Getting Started
 
-1. **[Install Prerequisites](getting-started/installation.md#prerequisites)**
-2. **[Clone and Build](getting-started/quick-start.md#build-and-run)**
+1. **[Install Prerequisites](getting-started/installation.md)**
+2. **[Clone and Build](getting-started/quick-start.md)**
 3. **[Configure Environment](getting-started/configuration.md)**
 4. **[Deploy with Docker](deployment/docker.md)**
 

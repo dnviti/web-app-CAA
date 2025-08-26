@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Web App CAA follows a clean, layered architecture that promotes maintainability, testability, and scalability. This document provides an overview of the system design, component interactions, and architectural decisions.
+Web App CAA follows a clean, layered architecture with SOLID principles that promotes maintainability, testability, and scalability. The authentication system has been completely refactored to implement clean architecture patterns with proper separation of concerns.
 
 ## System Architecture
 
@@ -17,15 +17,22 @@ graph TB
         STATIC[Static File Server]
     end
     
+    subgraph "Authentication Layer (Clean Architecture)"
+        AUTH_H[Auth Handler]
+        AUTH_MW[Auth Middleware]
+        AUTH_S[Auth Service]
+        TOKEN_S[Token Service]
+        USER_R[User Repository]
+        GRID_R[Grid Repository]
+    end
+    
     subgraph "Application Layer"
-        AUTH_H[Auth Handlers]
         GRID_H[Grid Handlers]
         AI_H[AI Handlers]
         PAGE_H[Page Handlers]
     end
     
     subgraph "Service Layer"
-        USER_S[User Service]
         GRID_S[Grid Service]
         AI_S[AI Service]
         LLM_S[LLM Service]
@@ -46,8 +53,15 @@ graph TB
     UI --> MIDDLEWARE
     API_CLIENT --> MIDDLEWARE
     MIDDLEWARE --> ROUTES
+    MIDDLEWARE --> AUTH_MW
     ROUTES --> STATIC
     ROUTES --> AUTH_H
+    AUTH_H --> AUTH_S
+    AUTH_S --> TOKEN_S
+    AUTH_S --> USER_R
+    AUTH_S --> GRID_R
+    AUTH_MW --> TOKEN_S
+    AUTH_MW --> USER_R
     ROUTES --> GRID_H
     ROUTES --> AI_H
     ROUTES --> PAGE_H
@@ -125,19 +139,55 @@ r.Use(corsMiddleware())
 
 ### Handler Layer
 
-#### Authentication Handlers
+#### Authentication System (Clean Architecture)
+
+The authentication system follows clean architecture principles with clear separation of concerns:
 
 ```go
-type AuthHandlers struct {
-    userService *services.UserService
+// Handler - HTTP layer
+type Handler struct {
+    authService AuthService
+}
+
+// Service - Business logic layer
+type AuthServiceImpl struct {
+    userRepo     UserRepository
+    gridRepo     GridRepository
+    tokenService TokenService
+    config       *Config
+}
+
+// Repository - Data layer
+type GormUserRepository struct {
+    db *gorm.DB
+}
+
+// Token Service - JWT operations
+type JWTTokenService struct {
+    config *Config
+}
+
+// Middleware - Request authentication
+type Middleware struct {
+    tokenService TokenService
+    userRepo     UserRepository
 }
 ```
 
+**Architecture Features:**
+- **SOLID Principles**: Every component follows Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion
+- **Dependency Injection**: All dependencies injected via interfaces using factory pattern
+- **Interface-Based Design**: All components depend on abstractions, not concretions
+- **Comprehensive Error Handling**: Proper error types and HTTP status codes
+- **Modern Security**: Uses `golang-jwt/jwt/v5` with secure token implementation
+
 **Responsibilities:**
-- User registration and login
-- JWT token generation and validation
-- Editor password verification
-- Session management
+- **Handler**: HTTP request/response handling
+- **AuthService**: Business logic (registration, login, validation)
+- **TokenService**: JWT token generation, validation, and extraction
+- **UserRepository**: Data persistence operations
+- **Middleware**: Request authentication and authorization
+- **Factory**: Dependency injection and component wiring
 
 #### Grid Handlers
 

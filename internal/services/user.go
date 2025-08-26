@@ -2,13 +2,11 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/daniele/web-app-caa/internal/database"
 	"github.com/daniele/web-app-caa/internal/models"
 
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -60,27 +58,14 @@ func (s *UserService) FindUserByID(id uint) (*models.User, error) {
 	return &user, nil
 }
 
-// CreateUser creates a new user with hashed passwords
+// CreateUser creates a new user (GORM hooks will handle password hashing)
 func (s *UserService) CreateUser(username, password, editorPassword string) (*models.User, error) {
 	log.Printf("Creating user: %s", username)
 
-	// Hash passwords
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Printf("Error hashing password: %v", err)
-		return nil, fmt.Errorf("error hashing password: %w", err)
-	}
-
-	hashedEditorPassword, err := bcrypt.GenerateFromPassword([]byte(editorPassword), bcrypt.DefaultCost)
-	if err != nil {
-		log.Printf("Error hashing editor password: %v", err)
-		return nil, fmt.Errorf("error hashing editor password: %w", err)
-	}
-
 	user := &models.User{
 		Username:       username,
-		Password:       string(hashedPassword),
-		EditorPassword: string(hashedEditorPassword),
+		Password:       password,       // Will be hashed by BeforeSave hook
+		EditorPassword: editorPassword, // Will be hashed by BeforeSave hook
 		Status:         "pending_setup",
 	}
 
@@ -91,6 +76,34 @@ func (s *UserService) CreateUser(username, password, editorPassword string) (*mo
 	}
 
 	log.Printf("User created with ID: %d", user.ID)
+	return user, nil
+}
+
+// LoginCheck verifies user credentials and returns user if valid
+func (s *UserService) LoginCheck(username, password string) (*models.User, error) {
+	log.Printf("Checking login credentials for user: %s", username)
+
+	user, err := s.FindUserByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		log.Printf("User not found during login: %s", username)
+		return nil, errors.New("user not found")
+	}
+
+	// Verify password using the model method
+	err = user.VerifyPassword(password)
+	if err != nil {
+		log.Printf("Password mismatch for user: %s", username)
+		return nil, errors.New("invalid credentials")
+	}
+
+	// Prepare user data for return (removes sensitive fields)
+	user.PrepareGive()
+
+	log.Printf("Login successful for user: %s", username)
 	return user, nil
 }
 
@@ -110,11 +123,30 @@ func (s *UserService) CheckEditorPassword(userID uint, password string) (bool, e
 		return false, result.Error
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.EditorPassword), []byte(password))
+	err := user.VerifyEditorPassword(password)
 	isMatch := err == nil
 
 	log.Printf("Editor password match: %t", isMatch)
 	return isMatch, nil
+}
+
+// GetUserByID retrieves a user by ID and prepares it for response
+func (s *UserService) GetUserByID(id uint) (*models.User, error) {
+	log.Printf("Getting user by ID: %d", id)
+
+	user, err := s.FindUserByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+
+	// Prepare user data for return (removes sensitive fields)
+	user.PrepareGive()
+
+	return user, nil
 }
 
 // UpdateUserStatus updates the user status
@@ -129,10 +161,4 @@ func (s *UserService) UpdateUserStatus(userID uint, status string) error {
 
 	log.Printf("User status updated, changes: %d", result.RowsAffected)
 	return nil
-}
-
-// VerifyPassword verifies a user's login password
-func (s *UserService) VerifyPassword(hashedPassword, password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	return err == nil
 }
