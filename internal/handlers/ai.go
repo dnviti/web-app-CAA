@@ -28,13 +28,10 @@ func NewAIHandlers(cfg *config.Config) *AIHandlers {
 func (h *AIHandlers) Conjugate(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
-
-	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-	return
 
 	log.Printf("[CONJUGATE] Conjugation request from userId: %d", userID)
 
@@ -66,13 +63,10 @@ func (h *AIHandlers) Conjugate(c *gin.Context) {
 func (h *AIHandlers) Correct(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
-
-	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-	return
 
 	log.Printf("[CORRECT] Correction request from userId: %d", userID)
 

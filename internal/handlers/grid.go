@@ -97,13 +97,10 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 func (h *GridHandlers) CompleteSetup(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
-
-	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-	return
 
 	log.Printf("[COMPLETE-SETUP] Completing setup for userId: %d", userID)
 
@@ -124,13 +121,10 @@ func (h *GridHandlers) CompleteSetup(c *gin.Context) {
 func (h *GridHandlers) GetGrid(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
-
-	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-	return
 
 	log.Printf("[GET-GRID] Retrieving grid for userId: %d", userID)
 
@@ -155,13 +149,10 @@ func (h *GridHandlers) GetGrid(c *gin.Context) {
 func (h *GridHandlers) SaveGrid(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
-
-	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-	return
 
 	log.Printf("[SAVE-GRID] Saving grid for userId: %d", userID)
 
@@ -186,13 +177,10 @@ func (h *GridHandlers) SaveGrid(c *gin.Context) {
 func (h *GridHandlers) AddItem(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
-
-	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-	return
 
 	log.Printf("[ADD-ITEM] Adding new item for userId: %d", userID)
 
@@ -226,16 +214,12 @@ func (h *GridHandlers) AddItem(c *gin.Context) {
 func (h *GridHandlers) UpdateItem(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-	return
 	itemID := c.Param("id")
-
-	log.Printf("[UPDATE-ITEM] Updating item %s for userId: %d", itemID, userID)
 
 	var updateData models.GridItemResponse
 	if err := c.ShouldBindJSON(&updateData); err != nil {
@@ -263,13 +247,11 @@ func (h *GridHandlers) UpdateItem(c *gin.Context) {
 func (h *GridHandlers) DeleteItem(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	log.Printf("[ERROR] Error extracting user ID from token: %v", err)
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-	return
 	itemID := c.Param("id")
 
 	log.Printf("[DELETE-ITEM] Deleting item %s for userId: %d", itemID, userID)
