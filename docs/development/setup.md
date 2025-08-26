@@ -517,6 +517,15 @@ go tool pprof http://localhost:6060/debug/pprof/heap
 
 ## Common Development Tasks
 
+### CGO Configuration
+
+This project requires CGO to be enabled for SQLite support. See [CGO_ENABLED=1 Issue](./cgo-issue.md) for detailed information about handling CGO in different environments.
+
+**Quick summary:**
+- SQLite driver requires `CGO_ENABLED=1`
+- Use `task build` or `make build` (both handle CGO properly)
+- In CI/CD, ensure build dependencies are installed
+
 ### Adding a New API Endpoint
 
 1. **Define route in main.go:**

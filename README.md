@@ -51,6 +51,19 @@ The Go implementation follows a clean architecture with proper separation of con
 ### Prerequisites
 - Go 1.21 or higher
 - Make (optional, for using Makefile commands)
+- CGO-compatible C compiler (required for SQLite support)
+  - Linux: `gcc` and `musl-dev` or `libc6-dev`
+  - macOS: Xcode command line tools (`xcode-select --install`)
+  - Windows: MinGW-w64 or Visual Studio Build Tools
+
+### Important: CGO Configuration
+
+This application uses SQLite with the `mattn/go-sqlite3` driver, which requires CGO to be enabled. The build system automatically handles this, but if you encounter CGO-related issues, please see the [CGO_ENABLED=1 Issue Documentation](docs/development/cgo-issue.md).
+
+**Quick reference:**
+- Building with `make build` or `task build` automatically sets `CGO_ENABLED=1`
+- For static binaries (no SQLite): use `make build-nocgo` 
+- In CI/CD environments, ensure build dependencies are installed
 
 ### Build and Run
 

@@ -1,0 +1,115 @@
+version: "3"
+
+# Environment variables that should be available to all tasks
+env:
+  BINARY_NAME: web-app-caa
+  BINARY_PATH: ./bin/{{.BINARY_NAME}}
+
+tasks:
+  default:
+    desc: Build and run the application
+    deps: [build]
+    cmds:
+      - "{{.BINARY_PATH}}"
+
+  build:
+    desc: Build the application with CGO enabled (required for SQLite)
+    cmds:
+      # Using direct environment variable setting in command to avoid CGO_ENABLED=1 issue
+      - mkdir -p bin
+      - CGO_ENABLED=1 go build -o {{.BINARY_PATH}} ./cmd/web-app-caa
+    generates:
+      - "{{.BINARY_PATH}}"
+    sources:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+
+  build-nocgo:
+    desc: Build the application without CGO (static binary)
+    cmds:
+      - mkdir -p bin
+      - CGO_ENABLED=0 go build -o {{.BINARY_PATH}} ./cmd/web-app-caa
+    generates:
+      - "{{.BINARY_PATH}}"
+    sources:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+
+  run:
+    desc: Run the application directly without building binary
+    cmds:
+      - CGO_ENABLED=1 go run ./cmd/web-app-caa/main.go
+
+  dev:
+    desc: Run the application in development mode with auto-restart
+    cmds:
+      - CGO_ENABLED=1 go run ./cmd/web-app-caa/main.go
+
+  test:
+    desc: Run all tests
+    cmds:
+      - CGO_ENABLED=1 go test -v ./...
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - go clean
+      - rm -rf ./bin
+
+  deps:
+    desc: Download and tidy dependencies
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  fmt:
+    desc: Format code
+    cmds:
+      - go fmt ./...
+
+  vet:
+    desc: Vet code
+    cmds:
+      - go vet ./...
+
+  lint:
+    desc: Lint code (requires golangci-lint)
+    cmds:
+      - golangci-lint run
+
+  docker-build:
+    desc: Build Docker image
+    cmds:
+      - docker build -f deployments/Dockerfile -t {{.BINARY_NAME}} .
+
+  docker-up:
+    desc: Start Docker Compose services
+    cmds:
+      - docker-compose -f deployments/docker-compose.yaml up -d
+
+  docker-down:
+    desc: Stop Docker Compose services
+    cmds:
+      - docker-compose -f deployments/docker-compose.yaml down
+
+  # Helper task for shell environment setup
+  shell-env:
+    desc: Print environment variables for shell evaluation
+    cmds:
+      - echo "export CGO_ENABLED=1"
+    silent: true
+
+  # Task that demonstrates the workaround for CGO_ENABLED issue
+  build-with-eval:
+    desc: Build using eval workaround for CGO_ENABLED=1 issue
+    cmds:
+      - mkdir -p bin
+      - eval $(task shell-env) && go build -o {{.BINARY_PATH}} ./cmd/web-app-caa
+    generates:
+      - "{{.BINARY_PATH}}"
+    sources:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"

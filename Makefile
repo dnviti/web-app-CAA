@@ -12,9 +12,13 @@ GOMOD=$(GOCMD) mod
 BINARY_NAME=web-app-caa
 BINARY_PATH=./bin/$(BINARY_NAME)
 
-# Build the application
+# Build the application with CGO enabled (required for SQLite)
 build:
-	$(GOBUILD) -o $(BINARY_PATH) ./cmd/web-app-caa
+	CGO_ENABLED=1 $(GOBUILD) -o $(BINARY_PATH) ./cmd/web-app-caa
+
+# Build the application with CGO explicitly disabled
+build-nocgo:
+	CGO_ENABLED=0 $(GOBUILD) -o $(BINARY_PATH) ./cmd/web-app-caa
 
 # Run the application
 run: build
