@@ -115,7 +115,11 @@ func (s *LLMService) loadRagData() error {
 	if err != nil {
 		return fmt.Errorf("error opening rag_knowledge.json: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Warning: failed to close rag_knowledge.json: %v", err)
+		}
+	}()
 
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&s.ragData); err != nil {

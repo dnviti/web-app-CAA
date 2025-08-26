@@ -1,4 +1,4 @@
-package handlers
+s but tpackage handlers
 
 import (
 	"log"
@@ -267,7 +267,9 @@ func (h *GridHandlers) DeleteItem(c *gin.Context) {
 	var req struct {
 		CategoryTarget string `json:"categoryTarget"`
 	}
-	c.ShouldBindJSON(&req) // Optional field
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("[DELETE-ITEM] Warning: failed to parse optional categoryTarget: %v", err)
+	}
 
 	if req.CategoryTarget != "" {
 		log.Printf("[DELETE-ITEM] Category target specified: %s", req.CategoryTarget)

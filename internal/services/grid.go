@@ -163,10 +163,14 @@ func (s *GridService) AddItem(itemData models.GridItemResponse, parentCategory s
 
 	// Get max order for the category
 	var maxOrder int
-	database.DB.Model(&models.GridItem{}).
+	err := database.DB.Model(&models.GridItem{}).
 		Where("parent_category = ? AND user_id = ?", parentCategory, userID).
 		Select("COALESCE(MAX(item_order), -1) as max_order").
 		Row().Scan(&maxOrder)
+	if err != nil {
+		log.Printf("Warning: failed to get max order, using default: %v", err)
+		maxOrder = -1
+	}
 
 	newOrder := maxOrder + 1
 	log.Printf("New item order: %d", newOrder)

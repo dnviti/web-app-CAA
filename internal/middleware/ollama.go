@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -95,7 +96,11 @@ func (c *OllamaClient) Chat(model, prompt string, options ...ChatOption) (*Ollam
 	if err != nil {
 		return nil, fmt.Errorf("error making ollama request: %w", err)
 	}
-	defer httpResp.Body.Close()
+	defer func() {
+		if err := httpResp.Body.Close(); err != nil {
+			log.Printf("Warning: failed to close response body: %v", err)
+		}
+	}()
 
 	// Check for HTTP errors
 	if httpResp.StatusCode != http.StatusOK {
