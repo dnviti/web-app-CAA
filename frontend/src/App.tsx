@@ -1,15 +1,16 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/authStore'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import SetupPage from './pages/SetupPage'
 import MainPage from './pages/MainPage'
+import DemoPage from './pages/DemoPage'
 import LoadingSpinner from './components/ui/LoadingSpinner'
 import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
-  const { token, user, isLoading, checkAuth } = useAuthStore()
+  const { token, isLoading, checkAuth } = useAuthStore()
 
   useEffect(() => {
     // Check authentication status on app start
@@ -28,6 +29,9 @@ function App() {
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50">
         <Routes>
+          {/* Demo route */}
+          <Route path="/demo" element={<DemoPage />} />
+          
           {/* Public routes */}
           <Route 
             path="/login" 

@@ -5,15 +5,48 @@
 @layer base {
   * {
     @apply border-gray-200;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html {
+    @apply scroll-smooth;
+    font-size: 16px; /* Default font size */
+  }
+
+  /* Page size classes */
+  html.size-small {
+    font-size: 14px;
+  }
+
+  html.size-big {
+    font-size: 18px;
   }
   
   body {
-    @apply bg-white text-gray-900 font-sans antialiased;
+    @apply text-gray-900 font-sans antialiased;
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: hsla(266,64%,61%,1);
+    background-image:
+      radial-gradient(at 23% 26%, hsla(283,73%,67%,1) 0px, transparent 50%),
+      radial-gradient(at 85% 4%, hsla(189,76%,68%,1) 0px, transparent 50%),
+      radial-gradient(at 50% 49%, hsla(40,100%,84%,1) 0px, transparent 50%),
+      radial-gradient(at 50% 85%, hsla(242,100%,70%,1) 0px, transparent 50%);
+    min-height: 100vh;
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  html {
-    @apply scroll-smooth;
+  /* Session active styling */
+  .session-active {
+    @apply bg-black;
+  }
+  
+  .session-active .account-info-bar {
+    @apply bg-gray-900;
   }
 }
 
