@@ -99,6 +99,16 @@ export interface ArasaacIcon {
   keywords: Array<{ keyword: string }>
 }
 
+// ARASAAC API types
+export interface ArasaacIcon {
+  _id: number
+  keywords: Array<{ keyword: string }>
+}
+
+export interface ArasaacSearchResponse {
+  icons: ArasaacIcon[]
+}
+
 // Modal and UI types
 export type ModalType = 
   | 'password'

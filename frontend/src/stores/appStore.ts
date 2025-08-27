@@ -4,9 +4,9 @@ import {
   AppState, 
   Categories, 
   GridItem, 
+  Symbol,
   TenseType, 
   SizeType, 
-  TextItem,
   ContextMenuAction 
 } from '../types'
 import { gridApi } from '../api/grid'
@@ -52,8 +52,8 @@ interface AppActions {
   setEditingItemId: (id: string | null) => void
   
   // Original symbol forms (for tense management)
-  storeOriginalSymbolForm: (id: string, form: Partial<GridItem>) => void
-  getOriginalSymbolForm: (id: string) => Partial<GridItem> | undefined
+  storeOriginalSymbolForm: (id: string, form: Partial<Symbol>) => void
+  getOriginalSymbolForm: (id: string) => Partial<Symbol> | undefined
   
   // Utility
   generateUniqueId: () => string
@@ -108,8 +108,7 @@ export const useAppStore = create<AppState & AppActions>()(
         })
         
         // Update grid for context if it's a noun or other specific types
-        // This would trigger verb conjugation
-        get().updateGridForContext?.()
+        // This would trigger verb conjugation - TODO: implement if needed
       },
 
       deleteLastWord: () => {
@@ -118,18 +117,18 @@ export const useAppStore = create<AppState & AppActions>()(
           set({ 
             textContent: textContent.slice(0, -1)
           })
-          get().updateGridForContext?.()
+          // Update grid for context - TODO: implement if needed
         }
       },
 
       deleteAllText: () => {
         set({ textContent: [] })
-        get().updateGridForContext?.()
+        // Update grid for context - TODO: implement if needed
       },
 
       setTense: (tense) => {
         set({ currentTense: tense })
-        get().updateGridForContext?.()
+        // Update grid for context - TODO: implement if needed
       },
 
       setPageSize: (size) => {
@@ -144,7 +143,7 @@ export const useAppStore = create<AppState & AppActions>()(
             const categories = response.data as Categories
             
             // Store original forms for verbs
-            const originalForms: Record<string, Partial<GridItem>> = {}
+            const originalForms: Record<string, Partial<Symbol>> = {}
             
             for (const key in categories) {
               if (Array.isArray(categories[key])) {
@@ -156,7 +155,7 @@ export const useAppStore = create<AppState & AppActions>()(
                       text: (item as any).text,
                       speak: (item as any).speak,
                       symbol_type: (item as any).symbol_type,
-                    }
+                    } as Partial<Symbol>
                   }
                 })
               }
@@ -240,7 +239,7 @@ export const useAppStore = create<AppState & AppActions>()(
         
         // Optimistically update UI
         const newCategories = { ...categories }
-        newCategories[parentKey][index] = { ...item, ...updates }
+        newCategories[parentKey][index] = { ...item, ...updates } as GridItem
         set({ categories: newCategories })
         
         try {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Edit, User, Volume2, ArrowLeft, Plus, Folder, Settings } from 'lucide-react'
 
 // Simple mock data for demonstration
@@ -24,8 +24,14 @@ const DemoPage: React.FC = () => {
   const [navigationStack, setNavigationStack] = useState(['home'])
   const [textContent, setTextContent] = useState<string[]>([])
   const [currentTense, setCurrentTense] = useState<'passato' | 'presente' | 'futuro'>('presente')
+  const [currentSize, setCurrentSize] = useState<'small' | 'medium' | 'big'>('medium')
   const [editorMode, setEditorMode] = useState(false)
   const [sessionActive, setSessionActive] = useState(false)
+
+  // Apply size class to HTML element when size changes
+  useEffect(() => {
+    document.documentElement.className = document.documentElement.className.replace(/size-\w+/, '') + ` size-${currentSize}`
+  }, [currentSize])
 
   const getCurrentItems = () => {
     return (mockCategories as any)[currentCategory] || []
@@ -180,14 +186,12 @@ const DemoPage: React.FC = () => {
 
         {/* Symbol Grid */}
         <div className="p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className={`symbol-grid size-${currentSize}`}>
             {currentItems.map((item: any) => (
               <div
                 key={item.id}
                 className={`
-                  relative aspect-square rounded-lg border-2 border-gray-200 
-                  cursor-pointer transition-all duration-200
-                  hover:border-blue-400 hover:shadow-md
+                  symbol-cell ${item.type} grid-cell
                   ${editorMode ? 'hover:scale-105' : ''}
                 `}
                 style={{ backgroundColor: item.color }}
@@ -198,17 +202,17 @@ const DemoPage: React.FC = () => {
                     <img
                       src={item.icon}
                       alt={item.label}
-                      className="w-12 h-12 mb-2 object-contain"
+                      className="symbol-icon mb-2 object-contain"
                     />
                   ) : (
-                    <div className="w-12 h-12 mb-2 bg-gray-300 rounded flex items-center justify-center">
+                    <div className="symbol-icon mb-2 bg-gray-300 rounded flex items-center justify-center">
                       <span className="material-icons text-gray-600 text-2xl">
                         {item.type === 'category' ? 'folder' : 'image'}
                       </span>
                     </div>
                   )}
                   
-                  <span className="text-sm font-medium text-center text-gray-900 leading-tight">
+                  <span className="symbol-label font-medium text-center text-gray-900 leading-tight">
                     {item.label}
                   </span>
                 </div>
@@ -281,10 +285,17 @@ const DemoPage: React.FC = () => {
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-gray-900">Dimensione Pagina</h4>
                 <div className="flex gap-2">
-                  {['small', 'medium', 'big'].map((size) => (
+                  {(['small', 'medium', 'big'] as const).map((size) => (
                     <button
                       key={size}
-                      className="flex-1 px-3 py-2 text-sm rounded-lg transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      onClick={() => setCurrentSize(size)}
+                      className={`
+                        flex-1 px-3 py-2 text-sm rounded-lg transition-colors
+                        ${currentSize === size
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }
+                      `}
                     >
                       {size === 'small' ? 'Piccolo' : size === 'medium' ? 'Medio' : 'Grande'}
                     </button>

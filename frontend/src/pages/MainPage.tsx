@@ -40,6 +40,8 @@ const MainPage: React.FC = () => {
     correctText,
     conjugateText,
     addGridItem,
+    updateGridItem,
+    deleteGridItem,
   } = useGridStore()
 
   // Modal states
@@ -47,6 +49,8 @@ const MainPage: React.FC = () => {
   const [showAddSymbolModal, setShowAddSymbolModal] = useState(false)
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
   const [showSystemControlsModal, setShowSystemControlsModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingItem, setEditingItem] = useState<GridItem | null>(null)
 
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -90,6 +94,68 @@ const MainPage: React.FC = () => {
       y: event.clientY,
       item
     })
+  }
+
+  // Context menu handlers
+  const handleEdit = () => {
+    if (contextMenu) {
+      setEditingItem(contextMenu.item)
+      setShowEditModal(true)
+      setContextMenu(null)
+    }
+  }
+
+  const handleCopy = async () => {
+    if (contextMenu) {
+      try {
+        const itemToCopy = contextMenu.item
+        const copiedItem: Omit<GridItem, 'id'> = {
+          ...itemToCopy,
+          label: `${itemToCopy.label} (Copia)`
+        }
+        delete (copiedItem as any).id // Remove id to let backend assign a new one
+        await addGridItem(copiedItem, currentCategory)
+        setContextMenu(null)
+      } catch (error) {
+        console.error('Error copying item:', error)
+        alert('Errore durante la copia dell\'elemento')
+      }
+    }
+  }
+
+  const handleDelete = async () => {
+    if (contextMenu && confirm('Sei sicuro di voler eliminare questo elemento?')) {
+      try {
+        await deleteGridItem(contextMenu.item.id, currentCategory)
+        setContextMenu(null)
+      } catch (error) {
+        console.error('Error deleting item:', error)
+        alert('Errore durante l\'eliminazione dell\'elemento')
+      }
+    }
+  }
+
+  const handleToggleVisibility = async () => {
+    if (contextMenu) {
+      try {
+        const item = contextMenu.item
+        await updateGridItem(item.id, { 
+          isVisible: item.isVisible === false ? true : false 
+        })
+        setContextMenu(null)
+      } catch (error) {
+        console.error('Error updating visibility:', error)
+        alert('Errore durante l\'aggiornamento della visibilità')
+      }
+    }
+  }
+
+  const handleMove = () => {
+    if (contextMenu) {
+      // For now, just close the menu - move functionality would require a category selector
+      alert('Funzionalità "Sposta" non ancora implementata')
+      setContextMenu(null)
+    }
   }
 
   const handleEditorToggle = () => {
@@ -176,6 +242,7 @@ const MainPage: React.FC = () => {
             onItemClick={handleSymbolClick}
             onItemRightClick={handleSymbolRightClick}
             editorMode={editorMode}
+            size={currentSize}
           />
         </div>
       </main>
@@ -201,17 +268,36 @@ const MainPage: React.FC = () => {
           className="fixed bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
-          <button className="w-full px-4 py-2 text-left hover:bg-gray-100">
+          <button 
+            className="w-full px-4 py-2 text-left hover:bg-gray-100"
+            onClick={handleEdit}
+          >
             Modifica
           </button>
-          <button className="w-full px-4 py-2 text-left hover:bg-gray-100">
+          <button 
+            className="w-full px-4 py-2 text-left hover:bg-gray-100"
+            onClick={handleCopy}
+          >
             Copia
           </button>
-          <button className="w-full px-4 py-2 text-left hover:bg-gray-100">
+          <button 
+            className="w-full px-4 py-2 text-left hover:bg-gray-100"
+            onClick={handleMove}
+          >
             Sposta
           </button>
-          <button className="w-full px-4 py-2 text-left hover:bg-gray-100">
-            Nascondi/Mostra
+          <button 
+            className="w-full px-4 py-2 text-left hover:bg-gray-100"
+            onClick={handleToggleVisibility}
+          >
+            {contextMenu.item.isVisible === false ? 'Mostra' : 'Nascondi'}
+          </button>
+          <hr className="my-1" />
+          <button 
+            className="w-full px-4 py-2 text-left hover:bg-red-100 text-red-600"
+            onClick={handleDelete}
+          >
+            Elimina
           </button>
         </div>
       )}
@@ -267,6 +353,24 @@ const MainPage: React.FC = () => {
         currentCategory={currentCategory}
         onAdd={async (item) => {
           await addGridItem(item, currentCategory)
+        }}
+      />
+
+      {/* Edit Modal */}
+      <AddItemModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setEditingItem(null)
+        }}
+        type={editingItem?.type === 'category' ? 'category' : 'symbol'}
+        currentCategory={currentCategory}
+        editingItem={editingItem}
+        onAdd={async () => {}} // Not used in edit mode
+        onEdit={async (itemId: string, updates: Partial<GridItem>) => {
+          await updateGridItem(itemId, updates)
+          setShowEditModal(false)
+          setEditingItem(null)
         }}
       />
 

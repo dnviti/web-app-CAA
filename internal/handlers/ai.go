@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/models"
@@ -115,4 +118,78 @@ func (h *AIHandlers) Correct(c *gin.Context) {
 
 	log.Printf("[CORRECT] AI service response received, returning corrections to client")
 	c.JSON(http.StatusOK, correctedData)
+}
+
+// ArasaacKeyword represents an ARASAAC keyword
+type ArasaacKeyword struct {
+	Type        int    `json:"type"`
+	Keyword     string `json:"keyword"`
+	HasLocution bool   `json:"hasLocution"`
+	Plural      string `json:"plural"`
+}
+
+// ArasaacIcon represents an ARASAAC icon
+type ArasaacIcon struct {
+	ID       int              `json:"_id"`
+	Keywords []ArasaacKeyword `json:"keywords"`
+}
+
+// SearchArasaac handles ARASAAC icon search requests
+// @Summary Search ARASAAC icons
+// @Description Search for ARASAAC icons by keyword
+// @Tags AI
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param query query string true "Search query"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /ai/search-arasaac [get]
+func (h *AIHandlers) SearchArasaac(c *gin.Context) {
+	userID, err := token.ExtractTokenID(c)
+	if err != nil {
+		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	query := c.Query("query")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Query parameter is required"})
+		return
+	}
+
+	log.Printf("[ARASAAC-SEARCH] Search request from userId: %d, query: '%s'", userID, query)
+
+	// Call ARASAAC API directly with Italian language parameter
+	arasaacURL := fmt.Sprintf("https://api.arasaac.org/api/pictograms/it/search/%s", url.QueryEscape(query))
+
+	resp, err := http.Get(arasaacURL)
+	if err != nil {
+		log.Printf("[ARASAAC-SEARCH] Error calling ARASAAC API: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search icons"})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("[ARASAAC-SEARCH] ARASAAC API returned status: %d", resp.StatusCode)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "External API error"})
+		return
+	}
+
+	var icons []ArasaacIcon
+	if err := json.NewDecoder(resp.Body).Decode(&icons); err != nil {
+		log.Printf("[ARASAAC-SEARCH] Error decoding ARASAAC response: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode response"})
+		return
+	}
+
+	log.Printf("[ARASAAC-SEARCH] Found %d icons for query '%s'", len(icons), query)
+
+	c.JSON(http.StatusOK, gin.H{
+		"icons": icons,
+	})
 }

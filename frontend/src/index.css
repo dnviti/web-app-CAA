@@ -142,6 +142,32 @@
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
 
+  /* Size-specific icon and text styles */
+  .symbol-grid.size-small .symbol-icon {
+    @apply w-8 h-8;
+  }
+  
+  .symbol-grid.size-small .symbol-label {
+    @apply text-xs;
+  }
+  
+  .symbol-grid.size-big .symbol-icon {
+    @apply w-16 h-16;
+  }
+  
+  .symbol-grid.size-big .symbol-label {
+    @apply text-base;
+  }
+
+  /* Default size (medium) */
+  .symbol-grid .symbol-icon {
+    @apply w-12 h-12;
+  }
+  
+  .symbol-grid .symbol-label {
+    @apply text-sm;
+  }
+
   /* Tense button styles */
   .tense-btn {
     @apply px-4 py-2 rounded-md text-sm font-medium transition-colors border;

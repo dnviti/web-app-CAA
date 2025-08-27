@@ -70,25 +70,17 @@ export function fileToDataURL(file: File): Promise<string> {
 /**
  * Debounces a function call
  */
-export function debounce<T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: any[]) => any>(
   func: T,
-  wait: number,
-  immediate = false
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: number | null = null
   
-  return function executedFunction(...args: Parameters<T>) {
-    const later = () => {
-      timeout = null
-      if (!immediate) func(...args)
+  return (...args: Parameters<T>) => {
+    if (timeout !== null) {
+      clearTimeout(timeout)
     }
-    
-    const callNow = immediate && !timeout
-    
-    if (timeout) clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-    
-    if (callNow) func(...args)
+    timeout = window.setTimeout(() => func(...args), wait)
   }
 }
 
@@ -99,7 +91,7 @@ export function throttle<T extends (...args: any[]) => any>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
-  let lastFunc: NodeJS.Timeout
+  let lastFunc: number | null = null
   let lastRan: number
   
   return function executedFunction(...args: Parameters<T>) {
@@ -107,8 +99,10 @@ export function throttle<T extends (...args: any[]) => any>(
       func(...args)
       lastRan = Date.now()
     } else {
-      clearTimeout(lastFunc)
-      lastFunc = setTimeout(() => {
+      if (lastFunc !== null) {
+        clearTimeout(lastFunc)
+      }
+      lastFunc = window.setTimeout(() => {
         if (Date.now() - lastRan >= limit) {
           func(...args)
           lastRan = Date.now()

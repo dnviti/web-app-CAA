@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { AuthState, User, LoginRequest, RegisterRequest } from '../types'
+import { AuthState, LoginRequest, RegisterRequest } from '../types'
 import { authApi } from '../api/auth'
 import { toast } from 'react-hot-toast'
 
@@ -30,6 +30,9 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           const response = await authApi.login(credentials)
           
           if (response.success && response.data) {
+            // Store token in localStorage for API client
+            localStorage.setItem('jwt_token', response.data.token)
+            
             set({
               user: response.data.user,
               token: response.data.token,
@@ -59,6 +62,9 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           const response = await authApi.register(userData)
           
           if (response.success && response.data) {
+            // Store token in localStorage for API client
+            localStorage.setItem('jwt_token', response.data.token)
+            
             set({
               user: response.data.user,
               token: response.data.token,
@@ -97,7 +103,16 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
 
       checkAuth: async () => {
-        const { token } = get()
+        let { token } = get()
+        
+        // If no token in store, check localStorage
+        if (!token) {
+          token = localStorage.getItem('jwt_token')
+          if (token) {
+            // Update store with token from localStorage
+            set({ token })
+          }
+        }
         
         if (!token) {
           set({ isLoading: false })
@@ -111,13 +126,18 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           const response = await authApi.verifyToken(token)
           
           if (response.success && response.data) {
+            // Ensure token is in localStorage
+            localStorage.setItem('jwt_token', token)
+            
             set({
               user: response.data,
+              token,
               isLoading: false,
               error: null,
             })
           } else {
             // Token invalid, clear auth state
+            localStorage.removeItem('jwt_token')
             set({
               user: null,
               token: null,
@@ -127,6 +147,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           }
         } catch (error) {
           // On error, clear auth state
+          localStorage.removeItem('jwt_token')
           set({
             user: null,
             token: null,

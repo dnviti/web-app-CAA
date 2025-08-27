@@ -142,6 +142,7 @@ func main() {
 		// AI endpoints
 		protected.POST("/conjugate", aiHandlers.Conjugate)
 		protected.POST("/correct", aiHandlers.Correct)
+		protected.GET("/ai/search-arasaac", aiHandlers.SearchArasaac)
 	}
 
 	// Chrome DevTools endpoint (to avoid 404 logs)

@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Modal from './ui/Modal'
 import Button from './ui/Button'
+import ArasaacIconPicker from './ArasaacIconPicker'
 import { GridItem } from '../types'
 
 interface AddItemModalProps {
@@ -9,6 +10,8 @@ interface AddItemModalProps {
   type: 'symbol' | 'category'
   onAdd: (item: Omit<GridItem, 'id'>) => void
   currentCategory: string
+  editingItem?: GridItem | null
+  onEdit?: (itemId: string, updates: Partial<GridItem>) => void
 }
 
 const AddItemModal: React.FC<AddItemModalProps> = ({
@@ -16,7 +19,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   onClose,
   type,
   onAdd,
-  currentCategory
+  currentCategory,
+  editingItem = null,
+  onEdit
 }) => {
   const [formData, setFormData] = useState({
     label: '',
@@ -26,6 +31,45 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     icon: '',
     target: ''
   })
+  const [iconSource, setIconSource] = useState<'url' | 'arasaac'>('arasaac')
+  const [selectedArasaacUrl, setSelectedArasaacUrl] = useState<string | null>(null)
+
+  const isEditing = Boolean(editingItem)
+
+  // Populate form data when editing
+  useEffect(() => {
+    if (editingItem) {
+      setFormData({
+        label: editingItem.label,
+        speak: (editingItem as any).speak || editingItem.label,
+        text: (editingItem as any).text || editingItem.label,
+        color: editingItem.color || '#f3f4f6',
+        icon: editingItem.icon || '',
+        target: (editingItem as any).target || currentCategory
+      })
+      
+      // Set icon source based on whether it looks like an ARASAAC URL
+      if (editingItem.icon?.includes('arasaac')) {
+        setIconSource('arasaac')
+        setSelectedArasaacUrl(editingItem.icon)
+      } else {
+        setIconSource('url')
+        setSelectedArasaacUrl(null)
+      }
+    } else {
+      // Reset form for new item
+      setFormData({
+        label: '',
+        speak: '',
+        text: '',
+        color: '#f3f4f6',
+        icon: '',
+        target: ''
+      })
+      setSelectedArasaacUrl(null)
+      setIconSource('arasaac')
+    }
+  }, [editingItem, currentCategory])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,26 +79,47 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       return
     }
 
-    const newItem: Omit<GridItem, 'id'> = {
-      label: formData.label,
-      color: formData.color,
-      icon: formData.icon || '/default-icon.png',
-      type: type,
-      isVisible: true,
-      isHideable: true,
-      ...(type === 'symbol' 
-        ? {
-            speak: formData.speak || formData.label,
-            text: formData.text || formData.label,
-            symbol_type: 'altro' as const
-          }
-        : {
-            target: formData.target || currentCategory
-          }
-      )
-    }
+    if (isEditing && editingItem && onEdit) {
+      // Edit existing item
+      const updates: Partial<GridItem> = {
+        label: formData.label,
+        color: formData.color,
+        icon: selectedArasaacUrl || formData.icon || '/default-icon.png',
+        ...(type === 'symbol' 
+          ? {
+              speak: formData.speak || formData.label,
+              text: formData.text || formData.label,
+            }
+          : {
+              target: formData.target || currentCategory
+            }
+        )
+      }
 
-    onAdd(newItem)
+      onEdit(editingItem.id, updates)
+    } else {
+      // Add new item
+      const newItem: Omit<GridItem, 'id'> = {
+        label: formData.label,
+        color: formData.color,
+        icon: selectedArasaacUrl || formData.icon || '/default-icon.png',
+        type: type,
+        isVisible: true,
+        isHideable: true,
+        ...(type === 'symbol' 
+          ? {
+              speak: formData.speak || formData.label,
+              text: formData.text || formData.label,
+              symbol_type: 'altro' as const
+            }
+          : {
+              target: formData.target || currentCategory
+            }
+        )
+      }
+
+      onAdd(newItem)
+    }
     
     // Reset form
     setFormData({
@@ -65,6 +130,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       icon: '',
       target: ''
     })
+    setSelectedArasaacUrl(null)
     
     onClose()
   }
@@ -77,7 +143,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Aggiungi ${type === 'symbol' ? 'Simbolo' : 'Categoria'}`}
+      title={`${isEditing ? 'Modifica' : 'Aggiungi'} ${type === 'symbol' ? 'Simbolo' : 'Categoria'}`}
       className="max-w-lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -163,15 +229,69 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            URL Icona
+            Icona
           </label>
-          <input
-            type="url"
-            value={formData.icon}
-            onChange={(e) => handleChange('icon', e.target.value)}
-            placeholder="https://example.com/icon.png"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          
+          {/* Icon source selector */}
+          <div className="flex gap-2 mb-3">
+            <button
+              type="button"
+              onClick={() => setIconSource('arasaac')}
+              className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                iconSource === 'arasaac' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              ARASAAC
+            </button>
+            <button
+              type="button"
+              onClick={() => setIconSource('url')}
+              className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                iconSource === 'url' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              URL
+            </button>
+          </div>
+
+          {iconSource === 'arasaac' ? (
+            <ArasaacIconPicker
+              onIconSelect={(iconUrl) => setSelectedArasaacUrl(iconUrl)}
+              selectedIconUrl={selectedArasaacUrl}
+              placeholder={`Cerca icona per ${type === 'symbol' ? 'simbolo' : 'categoria'}...`}
+              className="border border-gray-300 rounded-lg p-3"
+            />
+          ) : (
+            <input
+              type="url"
+              value={formData.icon}
+              onChange={(e) => {
+                handleChange('icon', e.target.value)
+                setSelectedArasaacUrl(null) // Clear ARASAAC selection when typing URL
+              }}
+              placeholder="https://example.com/icon.png"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          )}
+
+          {/* Preview selected icon */}
+          {(selectedArasaacUrl || formData.icon) && (
+            <div className="mt-3 p-2 border border-gray-200 rounded-lg">
+              <p className="text-sm text-gray-600 mb-2">Anteprima:</p>
+              <img 
+                src={selectedArasaacUrl || formData.icon} 
+                alt="Anteprima icona" 
+                className="w-16 h-16 object-contain border border-gray-200 rounded"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/default-icon.png'
+                }}
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 pt-4">
@@ -187,7 +307,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             type="submit"
             className="flex-1"
           >
-            Aggiungi
+            {isEditing ? 'Salva Modifiche' : 'Aggiungi'}
           </Button>
         </div>
       </form>

@@ -1,11 +1,12 @@
 import React from 'react'
-import { GridItem } from '../types'
+import { GridItem, SizeType } from '../types'
 
 export interface SymbolGridProps {
   items: GridItem[]
   onItemClick: (item: GridItem) => void
   onItemRightClick?: (item: GridItem, event: React.MouseEvent) => void
   editorMode?: boolean
+  size?: SizeType
   className?: string
 }
 
@@ -14,6 +15,7 @@ const SymbolGrid: React.FC<SymbolGridProps> = ({
   onItemClick,
   onItemRightClick,
   editorMode = false,
+  size = 'medium',
   className = ''
 }) => {
   const handleContextMenu = (item: GridItem, event: React.MouseEvent) => {
@@ -24,14 +26,12 @@ const SymbolGrid: React.FC<SymbolGridProps> = ({
   }
 
   return (
-    <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4 ${className}`}>
+    <div className={`symbol-grid size-${size} ${className}`}>
       {items.map((item) => (
         <div
           key={item.id}
           className={`
-            relative aspect-square rounded-lg border-2 border-gray-200 
-            cursor-pointer transition-all duration-200
-            hover:border-blue-400 hover:shadow-md
+            symbol-cell ${item.type} grid-cell
             ${item.isVisible === false ? 'opacity-50' : ''}
             ${editorMode ? 'hover:scale-105' : ''}
           `}
@@ -45,10 +45,10 @@ const SymbolGrid: React.FC<SymbolGridProps> = ({
               <img
                 src={item.icon}
                 alt={item.label}
-                className="w-12 h-12 mb-2 object-contain"
+                className="symbol-icon mb-2 object-contain"
               />
             ) : (
-              <div className="w-12 h-12 mb-2 bg-gray-300 rounded flex items-center justify-center">
+              <div className="symbol-icon mb-2 bg-gray-300 rounded flex items-center justify-center">
                 <span className="material-icons text-gray-600">
                   {item.type === 'category' ? 'folder' : 'image'}
                 </span>
@@ -56,7 +56,7 @@ const SymbolGrid: React.FC<SymbolGridProps> = ({
             )}
             
             {/* Label */}
-            <span className="text-sm font-medium text-center text-gray-900 leading-tight">
+            <span className="symbol-label font-medium text-center text-gray-900 leading-tight">
               {item.label}
             </span>
           </div>
