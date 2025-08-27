@@ -4,7 +4,6 @@
 
 @layer base {
   * {
-    @apply border-gray-200;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -25,7 +24,6 @@
   }
   
   body {
-    @apply text-gray-900 font-sans antialiased;
     font-family: 'Roboto', Arial, sans-serif;
     background-color: hsla(266,64%,61%,1);
     background-image:
@@ -37,7 +35,6 @@
     color: #333;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-feature-settings: "rlig" 1, "calt" 1;
   }
 
   /* Session active styling */
@@ -57,147 +54,653 @@
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700;
+    @apply btn bg-blue-600 text-white hover:bg-blue-700;
   }
   
   .btn-secondary {
-    @apply btn bg-secondary-100 text-secondary-900 hover:bg-secondary-200;
+    @apply btn bg-gray-600 text-white hover:bg-gray-700;
   }
   
-    .btn-error {
-    @apply btn bg-error-600 text-white hover:bg-error-700;
+  .btn-error {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
   }
   
   .btn-outline {
     @apply btn border border-gray-300 bg-white text-gray-700 hover:bg-gray-50;
   }
 
-  /* Symbol cell styles */
-    .grid-cell {
-    @apply relative flex flex-col items-center justify-center p-4 rounded-lg border-2 border-transparent cursor-pointer transition-all duration-200 hover:shadow-lg;
-  }
-  
-  .symbol-cell.category {
-    @apply bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300;
-  }
-  
-  .symbol-cell.symbol {
-    @apply bg-white border-gray-200 hover:border-gray-300 hover:shadow-md;
-  }
-  
-  .symbol-cell.dragging {
-    @apply opacity-50 rotate-3 scale-105;
-  }
-  
-  .symbol-cell.drag-over {
-    @apply border-blue-400 bg-blue-50 scale-105;
-  }
-  
-  .symbol-cell.hidden-in-user-mode {
-    @apply opacity-40 grayscale;
+  /* Account Info Bar */
+  .account-info-bar {
+    @apply flex justify-between items-center px-4 py-2 bg-black/20 text-white relative z-[101];
   }
 
-  /* Text bar styles */
+  .account-info {
+    @apply flex items-center gap-2 font-medium;
+  }
+
+  .account-info .mode-btn#editorModeBtn {
+    @apply p-1.5 bg-transparent rounded-full w-9 h-9 leading-none;
+  }
+
+  .account-info .mode-btn#editorModeBtn:hover {
+    @apply bg-white/20;
+  }
+
+  #logoutBtn {
+    @apply px-4 py-3 hidden items-center gap-2 flex-none bg-red-600 mt-4 rounded;
+  }
+
+  body.editor-mode-active #logoutBtn {
+    @apply flex;
+  }
+
+  body.editor-mode-active .session-controls {
+    @apply flex;
+  }
+
+  .session-btn {
+    @apply bg-green-500 border-none text-white px-4 py-2 rounded-full cursor-pointer flex items-center gap-2 text-sm font-medium transition-all hover:brightness-110;
+  }
+
+  #endSessionBtn {
+    @apply bg-red-500;
+  }
+
+  .session-controls {
+    @apply hidden gap-2.5;
+  }
+
+  /* Text Bar */
+  .text-bar-container {
+    @apply bg-white p-4 shadow-lg flex items-center gap-4 sticky top-0 z-[100];
+  }
+
+  body.editor-mode-active .text-bar-container {
+    @apply static;
+  }
+
   .text-bar {
-    @apply flex items-center gap-2 p-4 bg-white rounded-lg border-2 border-gray-200 min-h-[80px] flex-wrap;
+    @apply flex-1 bg-gray-50 border-2 border-gray-200 rounded-lg p-4 min-h-[60px] text-lg leading-relaxed flex items-center overflow-x-auto flex-wrap;
   }
-  
+
   .text-bar-item {
-    @apply flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-md border;
+    @apply inline-flex items-center m-0.5 px-1.5 py-0.5 bg-gray-200 rounded-md;
   }
-  
+
   .text-bar-symbol-icon {
+    @apply w-6 h-6 mr-1 align-middle;
+  }
+
+  .text-bar-controls {
+    @apply flex gap-2;
+  }
+
+  .control-btn {
+    @apply border-none rounded-lg p-2 cursor-pointer transition-all flex flex-col items-center justify-center w-20 h-[70px] bg-gray-50 text-gray-800 hover:-translate-y-0.5 hover:brightness-95;
+  }
+
+  .control-btn-icon {
+    @apply w-8 h-8 object-contain;
+  }
+
+  .control-btn-label {
+    @apply text-xs leading-tight mt-1 font-medium text-center break-words;
+  }
+
+  /* Mode Toggle */
+  .mode-toggle {
+    @apply flex justify-center p-4 gap-2.5;
+  }
+
+  .mode-btn {
+    @apply bg-white/20 border-2 border-white/30 text-white px-6 py-3 rounded-full cursor-pointer transition-all flex items-center gap-2 text-sm backdrop-blur-lg;
+  }
+
+  .mode-btn.active, .mode-btn:hover {
+    @apply bg-white text-purple-600 border-white border-2;
+  }
+
+  .mode-btn:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .mode-btn .control-btn-icon {
     @apply w-6 h-6 object-contain;
   }
 
-  /* Modal styles */
-  .modal-overlay {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm;
-  }
-  
-  .modal-content {
-    @apply bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6 max-h-[90vh] overflow-y-auto;
+  .mode-btn .control-btn-label {
+    @apply mt-0 text-sm font-medium;
   }
 
-  /* Navigation styles */
-  .navigation-breadcrumb {
-    @apply flex items-center gap-2 text-sm text-gray-600;
-  }
-  
-  .navigation-breadcrumb button {
-    @apply hover:text-primary-600 transition-colors;
+  /* Main Layout */
+  .main-container {
+    @apply p-5 max-w-6xl mx-auto;
   }
 
-  /* Grid styles */
+  /* Symbol Grid & Cells */
   .symbol-grid {
-    @apply grid gap-4 p-4;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
-  
-  .symbol-grid.size-small {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  }
-  
-  .symbol-grid.size-big {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    @apply grid gap-5 mb-5;
+    grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
   }
 
-  /* Size-specific icon and text styles */
-  .symbol-grid.size-small .symbol-icon {
-    @apply w-8 h-8;
+  html.size-small .symbol-grid { 
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+    @apply gap-4; 
   }
   
-  .symbol-grid.size-small .symbol-label {
-    @apply text-xs;
-  }
-  
-  .symbol-grid.size-big .symbol-icon {
-    @apply w-16 h-16;
-  }
-  
-  .symbol-grid.size-big .symbol-label {
-    @apply text-base;
+  html.size-big .symbol-grid { 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    @apply gap-6; 
   }
 
-  /* Default size (medium) */
-  .symbol-grid .symbol-icon {
-    @apply w-12 h-12;
-  }
-  
-  .symbol-grid .symbol-label {
-    @apply text-sm;
+  .symbol-cell {
+    @apply bg-white rounded-2xl p-4 cursor-pointer transition-all shadow-lg flex flex-col items-center text-center min-h-[150px] justify-center relative overflow-hidden text-gray-800 hover:-translate-y-1 hover:shadow-xl;
   }
 
-  /* Tense button styles */
-  .tense-btn {
-    @apply px-4 py-2 rounded-md text-sm font-medium transition-colors border;
+  html.size-small .symbol-cell { 
+    @apply min-h-[120px]; 
   }
   
-  .tense-btn.active {
-    @apply bg-primary-600 text-white border-primary-600;
-  }
-  
-  .tense-btn:not(.active) {
-    @apply bg-white text-gray-700 border-gray-300 hover:bg-gray-50;
+  html.size-big .symbol-cell { 
+    @apply min-h-[180px]; 
   }
 
-  /* Accessibility */
-  .sr-only {
-    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
-    clip: rect(0, 0, 0, 0);
+  .symbol-icon {
+    @apply flex-grow flex items-center justify-center w-full mb-2.5;
   }
 
-  /* Animation classes */
-  .animate-bounce-in {
-    animation: bounceIn 0.6s ease-out;
+  .symbol-icon img {
+    @apply max-w-20 max-h-20 object-contain;
+  }
+
+  html.size-small .symbol-icon img { 
+    @apply max-w-15 max-h-15; 
   }
   
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+  html.size-big .symbol-icon img { 
+    @apply max-w-25 max-h-25; 
+  }
+
+  .symbol-label {
+    @apply text-sm font-medium break-words max-w-full;
+  }
+
+  /* Drag and Drop Styles */
+  .symbol-cell.dragging {
+    @apply opacity-50 bg-purple-200;
+  }
+
+  .symbol-cell.drag-over {
+    @apply border-2 border-dashed border-purple-600;
+  }
+
+  /* Trash Can for Deletion */
+  .trash-can-container {
+    @apply fixed bottom-5 right-5 w-20 h-20 bg-red-600 text-white rounded-full hidden items-center justify-center shadow-lg z-[250] transition-all cursor-pointer scale-90 opacity-0;
+  }
+
+  .trash-can-container.active {
+    @apply flex scale-100 opacity-80;
+  }
+
+  .trash-can-container .material-icons {
+    @apply text-4xl pointer-events-none;
+  }
+
+  .trash-can-container.visible-for-drag {
+    @apply scale-110 opacity-100;
+  }
+
+  .trash-can-container.drag-over {
+    @apply scale-125 bg-red-700 shadow-xl;
+  }
+
+  /* Folder (Category) Styles */
+  .symbol-cell.category {
+    @apply p-0 bg-transparent shadow-none overflow-hidden rounded-none hover:translate-y-0 hover:shadow-none hover:bg-transparent;
+  }
+
+  .ffolder {
+    @apply relative inline-block text-center transition-all hover:-translate-y-1 hover:brightness-105;
+    background-color: var(--folder-bg, #A0C4FF);
+  }
+
+  .ffolder:after, .ffolder:before {
+    content: '';
+    @apply block absolute;
+    background-color: var(--folder-tab-bg, #8aabde);
+  }
+
+  .ffolder.medium {
+    @apply mt-4 w-full max-w-44 h-[122px] shadow-xl;
+    border-radius: 0 10px 10px 10px;
+  }
+
+  html.size-small .ffolder.medium { 
+    @apply max-w-35 h-25; 
   }
   
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
+  html.size-big .ffolder.medium { 
+    @apply max-w-50 h-35; 
+  }
+
+  .ffolder.medium:before {
+    @apply -top-4 left-0 w-16 h-4;
+    border-radius: 10px 10px 0 0;
+  }
+
+  html.size-small .ffolder.medium:before { 
+    @apply -top-3.5 w-12 h-3.5; 
+  }
+  
+  html.size-big .ffolder.medium:before { 
+    @apply -top-4.5 w-17 h-4.5; 
+  }
+
+  .folder-icon {
+    @apply w-14 h-14 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain;
+    top: 45%;
+  }
+
+  html.size-small .folder-icon { 
+    @apply w-11 h-11; 
+  }
+  
+  html.size-big .folder-icon { 
+    @apply w-16 h-16; 
+  }
+
+  .ffolder span {
+    @apply absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm font-medium px-3.5 py-1 rounded-2xl whitespace-nowrap text-black;
+    top: 80%;
+    background-color: var(--folder-tab-bg, #8aabde);
+  }
+
+  /* Navigation Bar */
+  .navigation {
+    @apply flex items-center justify-between bg-white/10 p-4 rounded-lg mb-5 backdrop-blur-lg;
+  }
+
+  .nav-btn {
+    @apply bg-white/20 border-none text-white px-5 py-2.5 rounded-full cursor-pointer flex items-center gap-2 transition-all hover:bg-white/30;
+  }
+
+  .current-category {
+    @apply text-white font-medium text-base;
+  }
+
+  /* Editor Panel */
+  .editor-panel {
+    @apply fixed top-0 right-0 w-75 h-screen bg-white shadow-xl z-[200] transform translate-x-full transition-transform overflow-y-auto;
+  }
+
+  .editor-panel.active { 
+    @apply translate-x-0; 
+  }
+
+  .editor-header {
+    @apply p-5 border-b border-gray-200 flex justify-between items-center;
+  }
+
+  .close-editor {
+    @apply bg-none border-none cursor-pointer p-1 rounded-full transition-all hover:bg-gray-50;
+  }
+
+  .editor-tools { 
+    @apply p-5; 
+  }
+
+  .tool-btn {
+    @apply w-full bg-purple-600 text-white border-none p-4 rounded-lg cursor-pointer mb-2.5 flex items-center justify-center gap-2.5 text-sm transition-all hover:bg-purple-700;
+  }
+
+  .tool-btn#editSystemControlsBtn {
+    @apply bg-gray-600 hover:bg-gray-700;
+  }
+
+  /* Modal Styles */
+  .modal {
+    @apply hidden fixed inset-0 bg-black/50 z-[300] justify-center items-center;
+  }
+
+  .modal.active { 
+    @apply flex; 
+  }
+
+  .modal-content {
+    @apply bg-white p-8 rounded-2xl w-11/12 max-w-lg shadow-xl max-h-[95vh] overflow-y-auto;
+  }
+
+  .modal-content h3 {
+    @apply mb-5 text-center text-gray-800;
+  }
+
+  .form-group { 
+    @apply mb-4; 
+  }
+
+  .form-group label {
+    @apply block mb-1 font-medium text-gray-600;
+  }
+
+  .form-group input, .form-group select {
+    @apply w-full p-3 border-2 border-gray-200 rounded-lg text-sm transition-colors focus:outline-none focus:border-purple-600;
+  }
+
+  .modal-buttons {
+    @apply flex gap-2.5 mt-5;
+  }
+
+  .system-controls-list {
+    @apply flex flex-col gap-3 mb-5;
+  }
+
+  .system-control-item {
+    @apply flex items-center gap-4 p-2.5 bg-gray-50 rounded-lg border border-gray-200;
+  }
+
+  .system-control-item img {
+    @apply w-10 h-10 rounded p-1;
+  }
+
+  .system-control-item .label {
+    @apply flex-grow font-medium;
+  }
+
+  .system-control-item .btn-primary {
+    @apply flex-shrink-0 px-3 py-2;
+  }
+
+  /* Context Menu */
+  .context-menu {
+    @apply fixed z-[400] w-36 bg-white rounded-lg shadow-lg hidden p-0;
+  }
+
+  .context-menu.active { 
+    @apply block; 
+  }
+
+  .context-menu-items { 
+    @apply list-none p-0 m-0; 
+  }
+
+  .context-menu-item {
+    @apply p-2.5 px-4 cursor-pointer text-sm transition-colors hover:bg-gray-100;
+  }
+
+  .symbol-cell.hidden-in-user-mode {
+    @apply opacity-60;
+  }
+
+  .hidden-in-user-mode::after {
+    content: 'visibility_off';
+    font-family: 'Material Icons';
+    @apply absolute top-1 right-1 text-xl text-gray-800 bg-white/70 rounded-full p-0.5;
+  }
+
+  /* Category Selection Modal */
+  .category-selection-list {
+    @apply flex flex-col gap-2.5 max-h-96 overflow-y-auto;
+  }
+
+  .category-selection-item {
+    @apply p-3 bg-gray-50 rounded-lg cursor-pointer transition-colors font-medium hover:bg-purple-600 hover:text-white;
+  }
+
+  /* Color Selection */
+  .color-selection { 
+    @apply mt-2.5; 
+  }
+
+  .pastel-presets {
+    @apply flex flex-wrap gap-2.5 mb-4 justify-center;
+  }
+
+  .color-swatch {
+    @apply w-7 h-7 rounded-full cursor-pointer border-3 border-transparent transition-all;
+  }
+
+  .color-swatch.selected {
+    @apply border-purple-600 scale-110;
+  }
+
+  .color-picker-container {
+    @apply flex justify-center items-center mt-2.5;
+  }
+
+  /* Icon Search & Custom Images */
+  .icon-search-container {
+    @apply flex gap-2.5;
+  }
+
+  .icon-search-container input { 
+    @apply flex-1; 
+  }
+
+  #searchIconBtn, #searchCategoryIconBtn {
+    @apply flex-shrink-0 px-5;
+  }
+
+  .icon-search-results {
+    @apply flex flex-wrap gap-2.5 mt-4 p-2.5 border border-gray-200 rounded-lg min-h-12 items-center justify-start max-h-56 overflow-y-auto;
+  }
+
+  .icon-search-result {
+    @apply w-15 h-15 object-contain border-3 border-transparent rounded-lg cursor-pointer transition-all;
+  }
+
+  .icon-search-result.selected {
+    @apply border-purple-600 scale-110 bg-purple-50;
+  }
+
+  .custom-image-section {
+    @apply mt-5 pt-4 border-t border-gray-200;
+  }
+
+  .section-divider {
+    @apply text-center text-gray-600 text-sm mb-4;
+  }
+
+  .hidden-file-input { 
+    @apply hidden; 
+  }
+
+  .custom-image-controls {
+    @apply flex gap-2.5 justify-center;
+  }
+
+  .custom-image-controls .btn-secondary { 
+    @apply flex-1; 
+  }
+
+  .custom-image-preview {
+    @apply mt-4 flex justify-center items-center min-h-15;
+  }
+
+  .custom-image-preview img {
+    @apply max-w-50 max-h-50 rounded-lg border-3 border-purple-600 object-cover;
+  }
+
+  /* Camera Modal */
+  .camera-view-container {
+    @apply relative w-full max-w-sm mx-auto mb-4 bg-black;
+  }
+
+  #cameraView {
+    @apply w-full block rounded-lg;
+  }
+
+  /* Login/Registration Page Styles */
+  .login-container {
+    @apply flex justify-center items-center min-h-screen p-5;
+  }
+
+  .login-content {
+    @apply bg-white p-10 rounded-2xl w-full max-w-sm shadow-xl;
+  }
+
+  .login-content h3 {
+    @apply mb-6 text-center text-gray-800 text-2xl;
+  }
+
+  .register-link {
+    @apply text-center mt-5 text-sm;
+  }
+
+  .register-link a {
+    @apply text-purple-600 no-underline font-medium hover:underline;
+  }
+
+  /* Tool Sections */
+  .tool-section {
+    @apply mb-5 pb-4 border-b border-gray-200 last:border-b-0 last:mb-0 last:pb-0;
+  }
+
+  .tool-section h4 {
+    @apply mb-2.5 text-gray-600 text-sm uppercase;
+  }
+
+  .size-controls {
+    @apply flex gap-2.5;
+  }
+
+  .size-btn {
+    @apply flex-1 p-2.5 border-2 border-gray-600 bg-white text-gray-600 rounded-lg cursor-pointer font-medium transition-all;
+  }
+
+  .size-btn.active,
+  .size-btn:hover {
+    @apply bg-purple-600 border-purple-600 text-white;
+  }
+
+  /* Tutorial Overlay */
+  .tutorial-overlay {
+    @apply hidden fixed inset-0 bg-black/50 z-[999] justify-center items-center;
+  }
+
+  .tutorial-content {
+    @apply absolute bg-white p-4 rounded-lg shadow-lg text-center;
+    top: 3em;
+    left: 2em;
+  }
+
+  .tutorial-arrow {
+    @apply absolute w-0 h-0;
+    top: -10px;
+    left: 2em;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #fff;
+  }
+
+  /* Text bar specific styles to match original */
+  .text-bar {
+    @apply bg-gray-50 border-2 border-gray-200 rounded-lg p-4 min-h-[60px] text-lg leading-relaxed flex items-center overflow-x-auto w-full flex-wrap;
+  }
+
+  /* Control button specific colors */
+  .control-btn {
+    @apply bg-gray-50 text-gray-800;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    #symbolTakePhotoBtn,
+    #categoryTakePhotoBtn {
+      @apply hidden;
+    }
+    
+    .text-bar-container {
+      @apply flex-col gap-2.5;
+    }
+    
+    .text-bar-controls {
+      @apply w-full justify-center;
+    }
+    
+    .symbol-grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      @apply gap-4;
+    }
+    
+    .symbol-cell { 
+      @apply min-h-[140px]; 
+    }
+    
+    .symbol-icon img { 
+      @apply max-w-15 max-h-15; 
+    }
+    
+    .symbol-label { 
+      @apply text-xs; 
+    }
+    
+    .mode-toggle { 
+      @apply p-2.5; 
+    }
+    
+    .main-container { 
+      @apply p-4; 
+    }
+
+    /* Responsive Editor Panel */
+    .editor-panel {
+      @apply w-full h-auto max-h-[60vh] top-auto bottom-0 right-0 transform translate-y-full border-t border-gray-200 rounded-t-3xl shadow-xl overflow-y-auto;
+    }
+    
+    .editor-panel.active {
+      @apply translate-y-0;
+    }
+    
+    .editor-header {
+      @apply p-2.5 px-5;
+    }
+    
+    .editor-tools {
+      @apply flex flex-col gap-4 p-4;
+    }
+    
+    .tool-section {
+      @apply w-full;
+    }
+    
+    .tool-btn {
+      @apply mb-0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .symbol-grid {
+      @apply grid-cols-2 gap-2.5;
+    }
+
+    html.size-small .symbol-grid { 
+      @apply grid-cols-3 gap-2; 
+    }
+    
+    html.size-big .symbol-grid { 
+      @apply grid-cols-2 gap-3; 
+    }
+
+    .symbol-cell { 
+      @apply min-h-[130px]; 
+    }
+    
+    .text-bar { 
+      @apply text-base p-3 min-h-[50px]; 
+    }
+    
+    .control-btn { 
+      @apply w-[70px] h-15 p-1;
+    }
+    
+    .control-btn-icon {
+      @apply w-7 h-7;
+    }
+    
+    .control-btn-label {
+      @apply text-xs;
+    }
   }
 }
 
@@ -231,7 +734,7 @@
 
   /* Focus styles */
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2;
   }
 
   /* Safe area insets for mobile */
@@ -241,5 +744,174 @@
   
   .safe-area-inset-bottom {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Additional utilities for specific elements */
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Custom width/height utilities */
+  .w-15 {
+    width: 3.75rem; /* 60px */
+  }
+  
+  .h-15 {
+    height: 3.75rem; /* 60px */
+  }
+  
+  .w-17 {
+    width: 4.25rem; /* 68px */
+  }
+  
+  .h-17 {
+    height: 4.25rem; /* 68px */
+  }
+  
+  .w-25 {
+    width: 6.25rem; /* 100px */
+  }
+  
+  .h-25 {
+    height: 6.25rem; /* 100px */
+  }
+  
+  .w-35 {
+    width: 8.75rem; /* 140px */
+  }
+  
+  .h-35 {
+    height: 8.75rem; /* 140px */
+  }
+  
+  .w-44 {
+    width: 11rem; /* 176px */
+  }
+  
+  .w-50 {
+    width: 12.5rem; /* 200px */
+  }
+  
+  .w-75 {
+    width: 18.75rem; /* 300px */
+  }
+
+  /* Custom max-width utilities */
+  .max-w-15 {
+    max-width: 3.75rem; /* 60px */
+  }
+  
+  .max-h-15 {
+    max-height: 3.75rem; /* 60px */
+  }
+  
+  .max-w-25 {
+    max-width: 6.25rem; /* 100px */
+  }
+  
+  .max-h-25 {
+    max-height: 6.25rem; /* 100px */
+  }
+  
+  .max-w-35 {
+    max-width: 8.75rem; /* 140px */
+  }
+  
+  .max-w-44 {
+    max-width: 11rem; /* 176px */
+  }
+  
+  .max-w-50 {
+    max-width: 12.5rem; /* 200px */
+  }
+  
+  .max-h-50 {
+    max-height: 12.5rem; /* 200px */
+  }
+
+  /* Z-index utilities */
+  .z-101 {
+    z-index: 101;
+  }
+  
+  .z-200 {
+    z-index: 200;
+  }
+  
+  .z-250 {
+    z-index: 250;
+  }
+  
+  .z-300 {
+    z-index: 300;
+  }
+  
+  .z-400 {
+    z-index: 400;
+  }
+  
+  .z-999 {
+    z-index: 999;
+  }
+
+  /* Accessibility */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  /* Animation keyframes */
+  @keyframes bounceIn {
+    0% {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    0% {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Animation classes */
+  .animate-bounce-in {
+    animation: bounceIn 0.6s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
   }
 }

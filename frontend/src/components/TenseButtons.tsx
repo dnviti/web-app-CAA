@@ -20,23 +20,17 @@ const TenseButtons: React.FC<TenseButtonsProps> = ({
   ]
 
   return (
-    <nav className={`flex items-center justify-center gap-1 p-4 bg-white border-b border-gray-200 ${className}`}>
+    <div className={`mode-toggle ${className}`}>
       {tenses.map(({ key, label }) => (
         <button
           key={key}
           onClick={() => onTenseChange(key)}
-          className={`
-            px-6 py-2 rounded-full font-medium transition-all duration-200
-            ${currentTense === key
-              ? 'bg-purple-500 text-white shadow-lg'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }
-          `}
+          className={`mode-btn ${currentTense === key ? 'active' : ''}`}
         >
           {label}
         </button>
       ))}
-    </nav>
+    </div>
   )
 }
 

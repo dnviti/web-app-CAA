@@ -235,7 +235,7 @@ function handleContextMenuAction(action) {
     clearContextMenuState();
 }
 
-function executeCopyOrMove(targetKey) {
+async function executeCopyOrMove(targetKey) {
     const contextState = getContextMenuState();
     const found = findItemById(contextState.symbolId);
     
@@ -248,8 +248,40 @@ function executeCopyOrMove(targetKey) {
     const categories = getCategories();
     
     if (contextState.action === 'copy') {
-        itemToProcess.id = generateUniqueId();
-        categories[targetKey].push(itemToProcess);
+        // Copy item through backend API to get new UUID
+        try {
+            const authToken = localStorage.getItem('jwt_token');
+            const itemDataForCopy = { ...itemToProcess };
+            delete itemDataForCopy.id; // Remove ID so backend generates new UUID
+            
+            const response = await fetch(`${API_BASE_URL}/api/grid/item`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${authToken}` 
+                },
+                body: JSON.stringify({ 
+                    item: itemDataForCopy, 
+                    parentCategory: targetKey 
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Server responded with an error.');
+            }
+            
+            const newItemWithUUID = await response.json();
+            
+            // Add the copied item with backend-generated UUID to UI
+            categories[targetKey].push(newItemWithUUID);
+            
+            console.log('Item copied successfully with new UUID:', newItemWithUUID.id);
+        } catch (error) {
+            console.error('Failed to copy item:', error);
+            alert('Error copying item. Please try again.');
+            clearContextMenuState();
+            return;
+        }
     } else if (contextState.action === 'move') {
         categories[found.parentKey] = categories[found.parentKey].filter(i => i.id !== contextState.symbolId);
         categories[targetKey].push(itemToProcess);

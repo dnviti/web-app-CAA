@@ -37,10 +37,6 @@ function shadeColor(color, percent) {
     return "#" + RR + GG + BB;
 }
 
-function generateUniqueId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
 // Recursive helper to find a category by its target key anywhere in the data
 function findCategoryByTarget(targetKey) {
     const categories = getCategories();
@@ -180,7 +176,6 @@ function deepClone(obj) {
 if (typeof window !== 'undefined') {
     window.findItemById = findItemById;
     window.shadeColor = shadeColor;
-    window.generateUniqueId = generateUniqueId;
     window.findCategoryByTarget = findCategoryByTarget;
     window.getCategoryName = getCategoryName;
     window.getAllCategories = getAllCategories;

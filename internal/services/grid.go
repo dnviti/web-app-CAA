@@ -7,6 +7,7 @@ import (
 
 	"github.com/daniele/web-app-caa/internal/database"
 	"github.com/daniele/web-app-caa/internal/models"
+	"github.com/google/uuid"
 
 	"gorm.io/gorm"
 )
@@ -146,7 +147,11 @@ func (s *GridService) GetGrid(userID uint) (map[string][]models.GridItemResponse
 
 // AddItem adds a new item to the grid
 func (s *GridService) AddItem(itemData models.GridItemResponse, parentCategory string, userID uint) (*models.GridItemResponse, error) {
-	log.Printf("Adding item %s to category %s for user %d", itemData.ID, parentCategory, userID)
+	log.Printf("Adding item to category %s for user %d", parentCategory, userID)
+
+	// Generate a new UUID for the item - backend controls all IDs
+	newID := uuid.New().String()
+	log.Printf("Generated new UUID: %s", newID)
 
 	// Process image if needed
 	iconData := itemData.Icon
@@ -176,7 +181,7 @@ func (s *GridService) AddItem(itemData models.GridItemResponse, parentCategory s
 	log.Printf("New item order: %d", newOrder)
 
 	gridItem := models.GridItem{
-		ID:             itemData.ID,
+		ID:             newID, // Use the backend-generated UUID
 		UserID:         userID,
 		ParentCategory: parentCategory,
 		ItemOrder:      newOrder,
@@ -198,10 +203,10 @@ func (s *GridService) AddItem(itemData models.GridItemResponse, parentCategory s
 		return nil, err
 	}
 
-	log.Printf("Item added successfully: %s", itemData.ID)
+	log.Printf("Item added successfully with UUID: %s", newID)
 
 	response := models.GridItemResponse{
-		ID:         itemData.ID,
+		ID:         newID, // Return the backend-generated UUID
 		Type:       itemData.Type,
 		Label:      itemData.Label,
 		Icon:       iconData,

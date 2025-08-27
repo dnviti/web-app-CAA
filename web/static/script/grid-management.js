@@ -142,9 +142,8 @@ async function confirmEditItem(itemType) {
             }
         }
     } else {
-        // Add new item
-        const newItem = {
-            id: generateUniqueId(),
+        // Create new item data (without ID - backend will generate UUID)
+        const newItemData = {
             label: label,
             color: color,
             icon: icon,
@@ -153,21 +152,55 @@ async function confirmEditItem(itemType) {
         };
         
         if (itemType === 'category') {
-            const targetKey = generateUniqueId();
-            newItem.target = targetKey;
-            
-            // Initialize empty category
-            categories[targetKey] = [];
+            // Backend will handle target generation as well
+            newItemData.target = label.toLowerCase().replace(/\s+/g, '-');
         } else {
-            newItem.speak = speak;
-            newItem.symbol_type = symbolType;
+            newItemData.speak = speak;
+            newItemData.symbol_type = symbolType;
         }
         
-        if (!categories[currentCategory]) {
-            categories[currentCategory] = [];
+        // Send to backend to get UUID
+        try {
+            const authToken = localStorage.getItem('jwt_token');
+            const response = await fetch(`${API_BASE_URL}/api/grid/item`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${authToken}` 
+                },
+                body: JSON.stringify({ 
+                    item: newItemData, 
+                    parentCategory: getCurrentCategory() 
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Server responded with an error.');
+            }
+            
+            const result = await response.json();
+            
+            // Add the item with backend-generated UUID to UI
+            const categories = getCategories();
+            const currentCategory = getCurrentCategory();
+            
+            if (!categories[currentCategory]) {
+                categories[currentCategory] = [];
+            }
+            
+            categories[currentCategory].push(result);
+            
+            // If it's a category, initialize its target array
+            if (itemType === 'category' && result.target) {
+                categories[result.target] = [];
+            }
+            
+            console.log('Item created successfully with UUID:', result.id);
+        } catch (error) {
+            console.error('Failed to create item:', error);
+            alert('Error creating item. Please try again.');
+            return; // Don't proceed with UI updates on error
         }
-        
-        categories[currentCategory].push(newItem);
     }
     
     // Update grid context if this affects tense forms

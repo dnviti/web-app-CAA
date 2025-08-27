@@ -87,7 +87,6 @@ function shadeColor(color, percent) {
     const BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
     return "#" + RR + GG + BB;
 }
-function generateUniqueId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -970,58 +969,53 @@ async function confirmEditItem(itemType) {
         }
 
     } else {
-        const newItem = { ...data, id: generateUniqueId(), isVisible: true };
+        // Create new item data (without ID - backend will generate UUID)
+        const newItemData = { ...data, isVisible: true };
         if (itemType === 'category') {
-            newItem.type = 'category';
-            newItem.target = newItem.label.toLowerCase().replace(/\s+/g, '-');
-            if (categories[newItem.target]) return alert('A category with this name already exists.');
+            newItemData.type = 'category';
+            newItemData.target = newItemData.label.toLowerCase().replace(/\s+/g, '-');
+            if (categories[newItemData.target]) return alert('A category with this name already exists.');
         } else {
-            newItem.type = 'symbol';
+            newItemData.type = 'symbol';
         }
 
         const parentKey = getCurrentCategory();
         
-        // Add the new item to its parent's array.
-        if (!categories[parentKey]) categories[parentKey] = [];
-        categories[parentKey].push(newItem);
-
-        // If it's a new category, also create its own empty array for children.
-        if (newItem.type === 'category') {
-            categories[newItem.target] = [];
-        }
-
-        if (newItem.type === 'symbol') {
-            originalSymbolForms[newItem.id] = {
-                label: newItem.label,
-                speak: newItem.speak,
-                text: newItem.text, // Add this line
-                symbol_type: newItem.symbol_type
-            };
-        }
-        
-        renderSymbols();
-
+        // Send to backend to get UUID
         try {
+            const authToken = localStorage.getItem('jwt_token');
             const response = await fetch(`${API_BASE_URL}/api/grid/item`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-                body: JSON.stringify({ item: newItem, parentCategory: parentKey })
+                body: JSON.stringify({ item: newItemData, parentCategory: parentKey })
             });
+            
             if (!response.ok) throw new Error('Server responded with an error.');
+            
             const result = await response.json();
-            if (result.icon && newItem.icon !== result.icon) {
-                newItem.icon = result.icon;
-                renderSymbols();
+            
+            // Add the item with backend-generated UUID to UI
+            if (!categories[parentKey]) categories[parentKey] = [];
+            categories[parentKey].push(result);
+
+            // If it's a new category, also create its own empty array for children.
+            if (result.type === 'category') {
+                categories[result.target] = [];
             }
-            console.log('Item created successfully.');
+
+            if (result.type === 'symbol') {
+                originalSymbolForms[result.id] = {
+                    label: result.label,
+                    speak: result.speak,
+                    text: result.text,
+                    symbol_type: result.symbol_type
+                };
+            }
+            
+            console.log('Item created successfully with UUID:', result.id);
         } catch (error) {
             console.error('Failed to create item:', error);
-            alert('Error saving new item. Removing it from view.');
-            categories[parentKey] = categories[parentKey].filter(i => i.id !== newItem.id);
-            if (newItem.type === 'category') {
-                delete categories[newItem.target];
-            }
-            renderSymbols();
+            alert('Error creating item. Please try again.');
         } finally {
             closeModal(modal);
         }
@@ -1293,7 +1287,7 @@ function populateCategorySelectionModal() {
         });
 }
 
-function executeCopyOrMove(targetKey) {
+async function executeCopyOrMove(targetKey) {
     const found = findItemById(contextMenuSymbolId);
     if (!found) {
         clearContextMenuState();
@@ -1302,8 +1296,40 @@ function executeCopyOrMove(targetKey) {
     
     const itemToProcess = { ...found.item };
     if (contextMenuAction === 'copy') {
-        itemToProcess.id = generateUniqueId();
-        categories[targetKey].push(itemToProcess);
+        // Copy item through backend API to get new UUID
+        try {
+            const authToken = localStorage.getItem('jwt_token');
+            const itemDataForCopy = { ...itemToProcess };
+            delete itemDataForCopy.id; // Remove ID so backend generates new UUID
+            
+            const response = await fetch(`${API_BASE_URL}/api/grid/item`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${authToken}` 
+                },
+                body: JSON.stringify({ 
+                    item: itemDataForCopy, 
+                    parentCategory: targetKey 
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Server responded with an error.');
+            }
+            
+            const newItemWithUUID = await response.json();
+            
+            // Add the copied item with backend-generated UUID to UI
+            categories[targetKey].push(newItemWithUUID);
+            
+            console.log('Item copied successfully with new UUID:', newItemWithUUID.id);
+        } catch (error) {
+            console.error('Failed to copy item:', error);
+            alert('Error copying item. Please try again.');
+            clearContextMenuState();
+            return;
+        }
     } else if (contextMenuAction === 'move') {
         categories[found.parentKey] = categories[found.parentKey].filter(i => i.id !== contextMenuSymbolId);
         categories[targetKey].push(itemToProcess);

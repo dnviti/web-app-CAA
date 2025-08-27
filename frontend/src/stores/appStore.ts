@@ -54,9 +54,6 @@ interface AppActions {
   // Original symbol forms (for tense management)
   storeOriginalSymbolForm: (id: string, form: Partial<Symbol>) => void
   getOriginalSymbolForm: (id: string) => Partial<Symbol> | undefined
-  
-  // Utility
-  generateUniqueId: () => string
 }
 
 export const useAppStore = create<AppState & AppActions>()(
@@ -194,36 +191,36 @@ export const useAppStore = create<AppState & AppActions>()(
       addItem: async (item, parentKey) => {
         const { categories } = get()
         
-        // Optimistically update UI
-        const newCategories = { ...categories }
-        if (!newCategories[parentKey]) {
-          newCategories[parentKey] = []
-        }
-        newCategories[parentKey].push(item)
-        
-        // If it's a category, create its target array
-        if (item.type === 'category' && 'target' in item) {
-          newCategories[item.target] = []
-        }
-        
-        set({ categories: newCategories })
-        
         try {
+          // Send item to backend (without ID) and get the UUID back
           const response = await gridApi.addItem(item, parentKey)
           
-          if (response.success) {
+          if (response.success && response.data) {
+            // Use the UUID returned from backend
+            const itemWithBackendId = response.data
+            
+            // Update UI with the item that has the backend-generated UUID
+            const newCategories = { ...categories }
+            if (!newCategories[parentKey]) {
+              newCategories[parentKey] = []
+            }
+            newCategories[parentKey].push(itemWithBackendId)
+            
+            // If it's a category, create its target array
+            if (itemWithBackendId.type === 'category' && 'target' in itemWithBackendId) {
+              newCategories[itemWithBackendId.target] = []
+            }
+            
+            set({ categories: newCategories })
             toast.success('Elemento aggiunto')
             return true
           } else {
-            // Revert on failure
-            set({ categories })
             toast.error('Errore nell\'aggiunta dell\'elemento')
             return false
           }
         } catch (error) {
-          // Revert on failure
-          set({ categories })
           toast.error('Errore di connessione')
+          console.error('Failed to add item:', error)
           return false
         }
       },
@@ -411,10 +408,6 @@ export const useAppStore = create<AppState & AppActions>()(
       getOriginalSymbolForm: (id) => {
         const { originalSymbolForms } = get()
         return originalSymbolForms[id]
-      },
-
-      generateUniqueId: () => {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2)
       },
     }),
     {

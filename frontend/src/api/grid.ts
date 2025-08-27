@@ -19,8 +19,8 @@ export const gridApi = {
   /**
    * Add a new item to the grid
    */
-  addItem: async (item: GridItem, parentCategory: string): Promise<ApiResponse<{ icon?: string }>> => {
-    return apiRequest<{ icon?: string }>('POST', '/api/grid/item', { item, parentCategory })
+  addItem: async (item: Omit<GridItem, 'id'>, parentCategory: string): Promise<ApiResponse<GridItem>> => {
+    return apiRequest<GridItem>('POST', '/api/grid/item', { item, parentCategory })
   },
 
   /**

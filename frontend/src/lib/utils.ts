@@ -3,13 +3,6 @@
  */
 
 /**
- * Generates a unique ID using timestamp and random string
- */
-export function generateUniqueId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2)
-}
-
-/**
  * Shades a color by a percentage (darker = negative, lighter = positive)
  */
 export function shadeColor(color: string, percent: number): string {

@@ -26,40 +26,59 @@ const SymbolGrid: React.FC<SymbolGridProps> = ({
   }
 
   return (
-    <div className={`symbol-grid size-${size} ${className}`}>
+    <div className={`symbol-grid ${className}`}>
       {items.map((item) => (
         <div
           key={item.id}
           className={`
-            symbol-cell ${item.type} grid-cell
-            ${item.isVisible === false ? 'opacity-50' : ''}
+            symbol-cell ${item.type} ${size}
+            ${item.isVisible === false ? 'hidden-in-user-mode' : ''}
             ${editorMode ? 'hover:scale-105' : ''}
+            ${item.type === 'category' ? 'category' : ''}
           `}
-          style={{ backgroundColor: item.color || '#f3f4f6' }}
+          style={{ 
+            backgroundColor: item.type === 'category' ? undefined : (item.color || '#f3f4f6'),
+            '--folder-bg': item.type === 'category' ? (item.color || '#A0C4FF') : undefined,
+            '--folder-tab-bg': item.type === 'category' ? (item.color ? `${item.color}dd` : '#8aabde') : undefined,
+          } as React.CSSProperties}
           onClick={() => onItemClick(item)}
           onContextMenu={(e) => handleContextMenu(item, e)}
         >
-          {/* Icon */}
-          <div className="flex flex-col items-center justify-center h-full p-2">
-            {item.icon ? (
+          {item.type === 'category' ? (
+            /* Folder structure for categories */
+            <div className={`ffolder ${size}`}>
               <img
-                src={item.icon}
+                src={item.icon || '/default-folder-icon.svg'}
                 alt={item.label}
-                className="symbol-icon mb-2 object-contain"
+                className="folder-icon"
               />
-            ) : (
-              <div className="symbol-icon mb-2 bg-gray-300 rounded flex items-center justify-center">
-                <span className="material-icons text-gray-600">
-                  {item.type === 'category' ? 'folder' : 'image'}
-                </span>
+              <span>{item.label}</span>
+            </div>
+          ) : (
+            /* Regular symbol structure */
+            <div className="flex flex-col items-center justify-center h-full p-2">
+              <div className="symbol-icon">
+                {item.icon ? (
+                  <img
+                    src={item.icon}
+                    alt={item.label}
+                    className="object-contain"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-300 rounded flex items-center justify-center">
+                    <span className="material-icons text-gray-600">
+                      image
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
-            
-            {/* Label */}
-            <span className="symbol-label font-medium text-center text-gray-900 leading-tight">
-              {item.label}
-            </span>
-          </div>
+              
+              {/* Label */}
+              <span className="symbol-label font-medium text-center text-gray-900 leading-tight">
+                {item.label}
+              </span>
+            </div>
+          )}
 
           {/* Editor mode indicators */}
           {editorMode && (
