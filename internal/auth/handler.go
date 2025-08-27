@@ -31,7 +31,7 @@ func NewHandler(authService AuthService) *Handler {
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 409 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /register [post]
+// @Router /auth/register [post]
 func (h *Handler) Register(c *gin.Context) {
 	log.Printf("[AUTH-HANDLER] Registration request started")
 
@@ -84,7 +84,7 @@ func (h *Handler) Register(c *gin.Context) {
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 401 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /login [post]
+// @Router /auth/login [post]
 func (h *Handler) Login(c *gin.Context) {
 	log.Printf("[AUTH-HANDLER] Login request started")
 
@@ -133,7 +133,7 @@ func (h *Handler) Login(c *gin.Context) {
 // @Success 200 {object} models.User
 // @Failure 401 {object} models.ErrorResponse
 // @Failure 404 {object} models.ErrorResponse
-// @Router /user [get]
+// @Router /auth/verify [get]
 func (h *Handler) CurrentUser(c *gin.Context) {
 	userID := GetUserID(c)
 	if userID == 0 {

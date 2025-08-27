@@ -109,8 +109,12 @@ func main() {
 	// Auth API Endpoints (no authentication required)
 	api := r.Group("/api")
 	{
-		api.POST("/register", authHandler.Register)
-		api.POST("/login", authHandler.Login)
+		// Auth endpoints
+		auth := api.Group("/auth")
+		{
+			auth.POST("/register", authHandler.Register)
+			auth.POST("/login", authHandler.Login)
+		}
 	}
 
 	// Protected API Endpoints (authentication required)
@@ -118,7 +122,10 @@ func main() {
 	protected.Use(authMiddleware.RequireAuth())
 	{
 		// Auth endpoints
-		protected.GET("/user", authHandler.CurrentUser)
+		authProtected := protected.Group("/auth")
+		{
+			authProtected.GET("/verify", authHandler.CurrentUser)
+		}
 		protected.POST("/check-editor-password", authHandler.CheckEditorPassword)
 
 		// Grid endpoints (keeping existing handlers for now)

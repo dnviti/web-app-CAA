@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 import { ApiResponse } from '../types'
 
 // Get base URL from environment or default
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:6542'
 
 // Create axios instance with default config
 export const apiClient = axios.create({
