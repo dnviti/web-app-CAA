@@ -1,4 +1,4 @@
-.PHONY: build run test clean docker-build docker-up docker-down deps
+.PHONY: build run test clean docker-build docker-up docker-down deps swagger
 
 # Go parameters
 GOCMD=go
@@ -11,6 +11,10 @@ GOMOD=$(GOCMD) mod
 # Binary names
 BINARY_NAME=web-app-caa
 BINARY_PATH=./bin/$(BINARY_NAME)
+
+# Generate Swagger documentation
+swagger:
+	~/go/bin/swag init -g cmd/web-app-CAA/main.go --output docs
 
 # Build the application with CGO enabled (required for SQLite)
 build:

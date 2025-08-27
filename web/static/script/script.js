@@ -41,6 +41,7 @@ const modules = [
 // Load modules dynamically
 function loadModules() {
     const basePath = '/static/script/';
+    let loadedCount = 0;
     
     modules.forEach((module, index) => {
         const script = document.createElement('script');
@@ -49,6 +50,20 @@ function loadModules() {
         
         script.onload = () => {
             console.log(`✓ Loaded module: ${module}`);
+            loadedCount++;
+            
+            // If this is the last module and it's main.js, trigger initialization
+            if (loadedCount === modules.length && module === 'main.js') {
+                console.log('All modules loaded, triggering application initialization...');
+                // Wait a bit to ensure all scripts are fully executed
+                setTimeout(() => {
+                    if (typeof window.initializeApp === 'function') {
+                        window.initializeApp();
+                    } else {
+                        console.warn('initializeApp function not found, falling back to DOMContentLoaded');
+                    }
+                }, 100);
+            }
         };
         
         script.onerror = () => {

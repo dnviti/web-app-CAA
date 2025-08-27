@@ -2,8 +2,10 @@
 // Main application initialization
 
 // --- MAIN APPLICATION INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', async () => {
+async function initializeApplication() {
     try {
+        console.log('Starting application initialization...');
+        
         // Initialize DOM elements first
         initializeDOMElements();
         
@@ -15,9 +17,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadSize();
         
         // Load grid data from server
+        console.log('Loading grid data from server...');
         const loadedData = await loadGridFromDB();
         
         if (loadedData && Object.keys(loadedData).length > 0) {
+            console.log('Grid data loaded successfully:', loadedData);
             setCategories(loadedData);
             
             // Process original symbol forms for tense conjugation
@@ -49,7 +53,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error during application initialization:', error);
         showInitializationError(error);
     }
+}
+
+// Fallback DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', async () => {
+    // Only run if not already initialized by the module loader
+    if (!window.applicationInitialized) {
+        console.log('Initializing via DOMContentLoaded fallback...');
+        await initializeApplication();
+        window.applicationInitialized = true;
+    }
 });
+
+// Export initialization function for module loader
+window.initializeApp = async function() {
+    if (!window.applicationInitialized) {
+        console.log('Initializing via module loader...');
+        await initializeApplication();
+        window.applicationInitialized = true;
+    }
+};
 
 // Process original symbol forms for tense functionality
 function processOriginalSymbolForms() {

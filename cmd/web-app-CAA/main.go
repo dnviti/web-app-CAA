@@ -10,7 +10,31 @@ import (
 	"github.com/daniele/web-app-caa/internal/handlers"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/daniele/web-app-caa/docs" // Import generated docs
 )
+
+// @title           Web App CAA API
+// @version         1.0
+// @description     This is a CAA (Communication and Alternative Augmentative) web application API.
+// @description     It provides endpoints for grid management, user authentication, and AI-powered language services.
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:6542
+// @BasePath  /api
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
 	// Load configuration
@@ -119,9 +143,19 @@ func main() {
 	})
 
 	// Test endpoint
+	// @Summary Health check
+	// @Description Check if the API server is running
+	// @Tags Health
+	// @Produce plain
+	// @Success 200 {string} string "pong"
+	// @Router /ping [get]
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
+
+	// Swagger documentation
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	log.Printf("[SWAGGER] Swagger documentation available at http://%s:%s/swagger/index.html", cfg.Host, cfg.Port)
 
 	log.Printf("[STARTUP] Server is running on http://%s:%s", cfg.Host, cfg.Port)
 	log.Printf("[STARTUP] Server startup completed successfully")

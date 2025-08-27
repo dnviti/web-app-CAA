@@ -106,6 +106,48 @@ go build -o bin/web-app-caa ./cmd/web-app-caa
 go run ./cmd/web-app-caa/main.go
 ```
 
+## API Documentation (Swagger/OpenAPI)
+
+This application provides comprehensive API documentation using Swagger/OpenAPI 3.0 specification.
+
+### Accessing Swagger UI
+
+When the server is running, access the interactive API documentation at:
+```
+http://localhost:6542/swagger/index.html
+```
+
+### Features
+
+- **Interactive API Testing**: Test all endpoints directly from the browser
+- **Authentication Support**: Built-in JWT Bearer token authentication
+- **Complete Model Definitions**: All request and response models documented
+- **Organized by Tags**: Endpoints grouped by functionality (Auth, Grid, AI, Health)
+
+### API Endpoints
+
+- **Authentication**: User registration, login, and JWT token management
+- **Grid Management**: CRUD operations for CAA communication grids
+- **AI Language Processing**: Italian verb conjugation and sentence correction
+- **Health Checks**: Server status and monitoring endpoints
+
+### Regenerating Documentation
+
+After modifying API endpoints or models, regenerate the documentation:
+
+```bash
+make swagger
+```
+
+Or manually:
+```bash
+~/go/bin/swag init -g cmd/web-app-CAA/main.go --output docs
+```
+
+### API Development
+
+For detailed information about adding new endpoints and following API conventions, see [docs/api/swagger.md](docs/api/swagger.md).
+
 #### Using Docker
 ```bash
 # Build Docker image

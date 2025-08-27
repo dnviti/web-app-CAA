@@ -21,6 +21,17 @@ func NewHandler(authService AuthService) *Handler {
 }
 
 // Register handles user registration requests
+// @Summary Register a new user
+// @Description Register a new user with username, password, editor password, and grid type
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body models.RegisterRequest true "Registration request"
+// @Success 201 {object} models.AuthResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 409 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /register [post]
 func (h *Handler) Register(c *gin.Context) {
 	log.Printf("[AUTH-HANDLER] Registration request started")
 
@@ -63,6 +74,17 @@ func (h *Handler) Register(c *gin.Context) {
 }
 
 // Login handles user login requests
+// @Summary Login user
+// @Description Authenticate user with username and password
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body models.LoginRequest true "Login request"
+// @Success 200 {object} models.LoginResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /login [post]
 func (h *Handler) Login(c *gin.Context) {
 	log.Printf("[AUTH-HANDLER] Login request started")
 
@@ -103,6 +125,15 @@ func (h *Handler) Login(c *gin.Context) {
 }
 
 // CurrentUser returns the current authenticated user
+// @Summary Get current user
+// @Description Get the current authenticated user information
+// @Tags Auth
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.User
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /user [get]
 func (h *Handler) CurrentUser(c *gin.Context) {
 	userID := GetUserID(c)
 	if userID == 0 {
@@ -125,6 +156,18 @@ func (h *Handler) CurrentUser(c *gin.Context) {
 }
 
 // CheckEditorPassword validates editor password
+// @Summary Check editor password
+// @Description Validate the editor password for the current user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body models.CheckEditorPasswordRequest true "Editor password check request"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 403 {object} models.ErrorResponse
+// @Router /check-editor-password [post]
 func (h *Handler) CheckEditorPassword(c *gin.Context) {
 	userID := GetUserID(c)
 	if userID == 0 {

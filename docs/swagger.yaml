@@ -1,0 +1,608 @@
+basePath: /api
+definitions:
+  models.AddItemRequest:
+    properties:
+      item:
+        $ref: '#/definitions/models.GridItemResponse'
+      parentCategory:
+        type: string
+    required:
+    - item
+    - parentCategory
+    type: object
+  models.AuthResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+      token:
+        type: string
+    type: object
+  models.CheckEditorPasswordRequest:
+    properties:
+      password:
+        type: string
+    required:
+    - password
+    type: object
+  models.ConjugateRequest:
+    properties:
+      base_forms:
+        items:
+          type: string
+        type: array
+      sentence:
+        type: string
+      tense:
+        type: string
+      words:
+        items:
+          type: string
+        type: array
+    type: object
+  models.ConjugateResponse:
+    properties:
+      conjugations: {}
+    type: object
+  models.CorrectRequest:
+    properties:
+      sentence:
+        type: string
+    type: object
+  models.CorrectResponse:
+    properties:
+      correction:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  models.GridItemResponse:
+    properties:
+      action:
+        type: string
+      color:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      isHideable:
+        type: boolean
+      isVisible:
+        type: boolean
+      label:
+        type: string
+      speak:
+        type: string
+      symbol_type:
+        type: string
+      target:
+        type: string
+      text:
+        type: string
+      type:
+        type: string
+    type: object
+  models.GridResponse:
+    additionalProperties:
+      items:
+        $ref: '#/definitions/models.GridItemResponse'
+      type: array
+    type: object
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.LoginResponse:
+    properties:
+      status:
+        type: string
+      token:
+        type: string
+    type: object
+  models.RegisterRequest:
+    properties:
+      editorPassword:
+        type: string
+      gridType:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - editorPassword
+    - gridType
+    - password
+    - username
+    type: object
+  models.SetupRequest:
+    properties:
+      gridType:
+        type: string
+    required:
+    - gridType
+    type: object
+  models.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:6542
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: |-
+    This is a CAA (Communication and Alternative Augmentative) web application API.
+    It provides endpoints for grid management, user authentication, and AI-powered language services.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Web App CAA API
+  version: "1.0"
+paths:
+  /check-editor-password:
+    post:
+      consumes:
+      - application/json
+      description: Validate the editor password for the current user
+      parameters:
+      - description: Editor password check request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckEditorPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Check editor password
+      tags:
+      - Auth
+  /complete-setup:
+    post:
+      description: Mark the user setup as complete
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Complete setup
+      tags:
+      - Grid
+  /conjugate:
+    post:
+      consumes:
+      - application/json
+      description: Conjugate verbs in Italian based on tense and context
+      parameters:
+      - description: Conjugation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConjugateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConjugateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Conjugate verbs
+      tags:
+      - AI
+  /correct:
+    post:
+      consumes:
+      - application/json
+      description: Correct Italian sentences using AI language processing
+      parameters:
+      - description: Correction request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CorrectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CorrectResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Correct sentences
+      tags:
+      - AI
+  /grid:
+    get:
+      description: Retrieve the complete grid configuration for the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GridResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get grid
+      tags:
+      - Grid
+    post:
+      consumes:
+      - application/json
+      description: Save the complete grid configuration
+      parameters:
+      - description: Grid data to save
+        in: body
+        name: grid
+        required: true
+        schema:
+          $ref: '#/definitions/models.GridResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Save grid
+      tags:
+      - Grid
+  /grid/item:
+    post:
+      consumes:
+      - application/json
+      description: Add a new item to a specific category in the grid
+      parameters:
+      - description: Add item request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.GridItemResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add grid item
+      tags:
+      - Grid
+  /grid/item/{id}:
+    delete:
+      description: Delete an existing item from the grid
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete grid item
+      tags:
+      - Grid
+    put:
+      consumes:
+      - application/json
+      description: Update an existing item in the grid
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated item data
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.GridItemResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update grid item
+      tags:
+      - Grid
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with username and password
+      parameters:
+      - description: Login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login user
+      tags:
+      - Auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with username, password, editor password, and
+        grid type
+      parameters:
+      - description: Registration request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Auth
+  /setup:
+    post:
+      consumes:
+      - application/json
+      description: Initialize a grid with the specified type (simplified, empty, or
+        default)
+      parameters:
+      - description: Setup request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SetupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Setup grid
+      tags:
+      - Grid
+  /user:
+    get:
+      description: Get the current authenticated user information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - Auth
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

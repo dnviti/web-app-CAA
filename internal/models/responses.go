@@ -31,3 +31,24 @@ type LoginResponse struct {
 	Token  string `json:"token"`
 	Status string `json:"status"`
 }
+
+// ErrorResponse represents an error response
+type ErrorResponse struct {
+	Error   string `json:"error"`
+	Message string `json:"message,omitempty"`
+}
+
+// SuccessResponse represents a success response
+type SuccessResponse struct {
+	Message string `json:"message"`
+}
+
+// ConjugateResponse represents the conjugation response
+type ConjugateResponse struct {
+	Conjugations interface{} `json:"conjugations"`
+}
+
+// CorrectResponse represents the correction response
+type CorrectResponse struct {
+	Correction string `json:"correction"`
+}

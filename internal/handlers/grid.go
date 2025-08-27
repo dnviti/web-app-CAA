@@ -29,6 +29,18 @@ func NewGridHandlers(cfg *config.Config) *GridHandlers {
 }
 
 // Setup handles grid setup request
+// @Summary Setup grid
+// @Description Initialize a grid with the specified type (simplified, empty, or default)
+// @Tags Grid
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body models.SetupRequest true "Setup request"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /setup [post]
 func (h *GridHandlers) Setup(c *gin.Context) {
 	// Extract user ID from token
 	userID, err := token.ExtractTokenID(c)
@@ -94,6 +106,15 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 }
 
 // CompleteSetup handles setup completion request
+// @Summary Complete setup
+// @Description Mark the user setup as complete
+// @Tags Grid
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.SuccessResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /complete-setup [post]
 func (h *GridHandlers) CompleteSetup(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
@@ -118,6 +139,15 @@ func (h *GridHandlers) CompleteSetup(c *gin.Context) {
 }
 
 // GetGrid retrieves the entire grid for a user
+// @Summary Get grid
+// @Description Retrieve the complete grid configuration for the current user
+// @Tags Grid
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.GridResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /grid [get]
 func (h *GridHandlers) GetGrid(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
@@ -146,6 +176,18 @@ func (h *GridHandlers) GetGrid(c *gin.Context) {
 }
 
 // SaveGrid saves a full grid (updates from client)
+// @Summary Save grid
+// @Description Save the complete grid configuration
+// @Tags Grid
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param grid body models.GridResponse true "Grid data to save"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /grid [post]
 func (h *GridHandlers) SaveGrid(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
@@ -174,6 +216,18 @@ func (h *GridHandlers) SaveGrid(c *gin.Context) {
 }
 
 // AddItem adds a new item to the grid
+// @Summary Add grid item
+// @Description Add a new item to a specific category in the grid
+// @Tags Grid
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body models.AddItemRequest true "Add item request"
+// @Success 201 {object} models.GridItemResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /grid/item [post]
 func (h *GridHandlers) AddItem(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
@@ -211,6 +265,20 @@ func (h *GridHandlers) AddItem(c *gin.Context) {
 }
 
 // UpdateItem updates an existing item
+// @Summary Update grid item
+// @Description Update an existing item in the grid
+// @Tags Grid
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Item ID"
+// @Param item body models.GridItemResponse true "Updated item data"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /grid/item/{id} [put]
 func (h *GridHandlers) UpdateItem(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
@@ -244,6 +312,17 @@ func (h *GridHandlers) UpdateItem(c *gin.Context) {
 }
 
 // DeleteItem deletes an item
+// @Summary Delete grid item
+// @Description Delete an existing item from the grid
+// @Tags Grid
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Item ID"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /grid/item/{id} [delete]
 func (h *GridHandlers) DeleteItem(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {

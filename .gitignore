@@ -1,11 +1,15 @@
-# Binaries
-web-app-*
-bin/
+# ===============================================================
+# Go / Golang
+# ===============================================================
+
+# Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+web-app-*
+bin/
 
 # Test binary, built with `go test -c`
 *.test
@@ -13,34 +17,97 @@ bin/
 # Output of the go coverage tool
 *.out
 
-# Dependency directories
+# Dependency directories (Go modules)
 vendor/
 
 # Go workspace file
 go.work
+
+
+# ===============================================================
+# Node.js / npm / yarn
+# ===============================================================
+
+# Dependency directories
+node_modules/
+
+# Debug log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+
+# ===============================================================
+# Vite / React Build Artifacts
+# ===============================================================
+
+# Build output
+dist/
+.next/
+out/
+build/
+
+# Vite local development cache
+.vite/
+
+# Create React App build output
+build/
+
+# Gatsby build output
+.cache/
+public/
+
+# Static site generator build output
+site/
+
+
+# ===============================================================
+# General
+# ===============================================================
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
 
 # Database files
 data/
 *.sqlite
 *.db
 
-# Environment files
-.env
-.env.local
-.env.production
-
-# Logs
+# Log files
 *.log
+logs
+*.log.*
 app.log
 
-# IDE files
+# Temporary files
+tmp/
+temp/
+
+# IDE configuration
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS generated files
+# OS-generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -48,9 +115,3 @@ app.log
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Temporary files
-tmp/
-temp/
-
-site/

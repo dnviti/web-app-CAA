@@ -25,6 +25,18 @@ func NewAIHandlers(cfg *config.Config) *AIHandlers {
 }
 
 // Conjugate handles conjugation requests and proxies them to the Python AI service
+// @Summary Conjugate verbs
+// @Description Conjugate verbs in Italian based on tense and context
+// @Tags AI
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body models.ConjugateRequest true "Conjugation request"
+// @Success 200 {object} models.ConjugateResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /conjugate [post]
 func (h *AIHandlers) Conjugate(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
@@ -60,6 +72,18 @@ func (h *AIHandlers) Conjugate(c *gin.Context) {
 }
 
 // Correct handles correction requests and proxies them to the Python AI service
+// @Summary Correct sentences
+// @Description Correct Italian sentences using AI language processing
+// @Tags AI
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body models.CorrectRequest true "Correction request"
+// @Success 200 {object} models.CorrectResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /correct [post]
 func (h *AIHandlers) Correct(c *gin.Context) {
 	userID, err := token.ExtractTokenID(c)
 	if err != nil {
