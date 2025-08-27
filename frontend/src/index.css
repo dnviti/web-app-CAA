@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  
+  body {
+    @apply bg-white text-gray-900 font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+}
+
+@layer components {
+  /* Button variants */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-secondary-100 text-secondary-900 hover:bg-secondary-200;
+  }
+  
+    .btn-error {
+    @apply btn bg-error-600 text-white hover:bg-error-700;
+  }
+  
+  .btn-outline {
+    @apply btn border border-gray-300 bg-white text-gray-700 hover:bg-gray-50;
+  }
+
+  /* Symbol cell styles */
+    .grid-cell {
+    @apply relative flex flex-col items-center justify-center p-4 rounded-lg border-2 border-transparent cursor-pointer transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .symbol-cell.category {
+    @apply bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300;
+  }
+  
+  .symbol-cell.symbol {
+    @apply bg-white border-gray-200 hover:border-gray-300 hover:shadow-md;
+  }
+  
+  .symbol-cell.dragging {
+    @apply opacity-50 rotate-3 scale-105;
+  }
+  
+  .symbol-cell.drag-over {
+    @apply border-blue-400 bg-blue-50 scale-105;
+  }
+  
+  .symbol-cell.hidden-in-user-mode {
+    @apply opacity-40 grayscale;
+  }
+
+  /* Text bar styles */
+  .text-bar {
+    @apply flex items-center gap-2 p-4 bg-white rounded-lg border-2 border-gray-200 min-h-[80px] flex-wrap;
+  }
+  
+  .text-bar-item {
+    @apply flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-md border;
+  }
+  
+  .text-bar-symbol-icon {
+    @apply w-6 h-6 object-contain;
+  }
+
+  /* Modal styles */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm;
+  }
+  
+  .modal-content {
+    @apply bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6 max-h-[90vh] overflow-y-auto;
+  }
+
+  /* Navigation styles */
+  .navigation-breadcrumb {
+    @apply flex items-center gap-2 text-sm text-gray-600;
+  }
+  
+  .navigation-breadcrumb button {
+    @apply hover:text-primary-600 transition-colors;
+  }
+
+  /* Grid styles */
+  .symbol-grid {
+    @apply grid gap-4 p-4;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  
+  .symbol-grid.size-small {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  
+  .symbol-grid.size-big {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  /* Tense button styles */
+  .tense-btn {
+    @apply px-4 py-2 rounded-md text-sm font-medium transition-colors border;
+  }
+  
+  .tense-btn.active {
+    @apply bg-primary-600 text-white border-primary-600;
+  }
+  
+  .tense-btn:not(.active) {
+    @apply bg-white text-gray-700 border-gray-300 hover:bg-gray-50;
+  }
+
+  /* Accessibility */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  /* Animation classes */
+  .animate-bounce-in {
+    animation: bounceIn 0.6s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Touch-friendly tap targets */
+  .tap-target {
+    @apply min-w-[44px] min-h-[44px];
+  }
+
+  /* Focus styles */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  /* Safe area insets for mobile */
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
