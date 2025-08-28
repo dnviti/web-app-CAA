@@ -25,14 +25,14 @@ func (r *GormUserRepository) Create(user *models.User) error {
 		log.Printf("[USER-REPO] Error creating user: %v", err)
 		return err
 	}
-	log.Printf("[USER-REPO] User created successfully with ID: %d", user.ID)
+	log.Printf("[USER-REPO] User created successfully with ID: %s", user.ID)
 	return nil
 }
 
 // FindByID finds a user by ID
-func (r *GormUserRepository) FindByID(id uint) (*models.User, error) {
+func (r *GormUserRepository) FindByID(id string) (*models.User, error) {
 	var user models.User
-	if err := r.db.First(&user, id).Error; err != nil {
+	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrUserNotFound
 		}
@@ -93,10 +93,10 @@ func (r *GormGridRepository) CreateGridItems(items []models.GridItem) error {
 }
 
 // FindByUserID finds all grid items for a user
-func (r *GormGridRepository) FindByUserID(userID uint) ([]models.GridItem, error) {
+func (r *GormGridRepository) FindByUserID(userID string) ([]models.GridItem, error) {
 	var items []models.GridItem
 	if err := r.db.Where("user_id = ?", userID).Find(&items).Error; err != nil {
-		log.Printf("[GRID-REPO] Error finding grid items for user %d: %v", userID, err)
+		log.Printf("[GRID-REPO] Error finding grid items for user %s: %v", userID, err)
 		return nil, err
 	}
 	return items, nil

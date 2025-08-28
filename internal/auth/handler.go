@@ -47,7 +47,7 @@ func (h *Handler) Register(c *gin.Context) {
 	log.Printf("[AUTH-HANDLER] Registration data received: username=%s, gridType=%s",
 		req.Username, req.GridType)
 
-	user, token, err := h.authService.Register(&req)
+	user, token, refreshToken, err := h.authService.Register(&req)
 	if err != nil {
 		log.Printf("[AUTH-HANDLER] Registration failed: %v", err)
 
@@ -67,9 +67,10 @@ func (h *Handler) Register(c *gin.Context) {
 	log.Printf("[AUTH-HANDLER] Registration successful for user: %s", user.Username)
 
 	c.JSON(http.StatusCreated, models.AuthResponse{
-		Message: "User registered successfully",
-		Token:   token,
-		Status:  user.Status,
+		Message:      "User registered successfully",
+		Token:        token,
+		RefreshToken: refreshToken,
+		Status:       user.Status,
 	})
 }
 
@@ -99,7 +100,7 @@ func (h *Handler) Login(c *gin.Context) {
 
 	log.Printf("[AUTH-HANDLER] Login attempt for username: %s", req.Username)
 
-	user, token, err := h.authService.Login(&req)
+	user, token, refreshToken, err := h.authService.Login(&req)
 	if err != nil {
 		log.Printf("[AUTH-HANDLER] Login failed: %v", err)
 
@@ -119,8 +120,9 @@ func (h *Handler) Login(c *gin.Context) {
 	log.Printf("[AUTH-HANDLER] Login successful for user: %s", user.Username)
 
 	c.JSON(http.StatusOK, models.LoginResponse{
-		Token:  token,
-		Status: user.Status,
+		Token:        token,
+		RefreshToken: refreshToken,
+		Status:       user.Status,
 	})
 }
 
@@ -136,7 +138,7 @@ func (h *Handler) Login(c *gin.Context) {
 // @Router /auth/verify [get]
 func (h *Handler) CurrentUser(c *gin.Context) {
 	userID := GetUserID(c)
-	if userID == 0 {
+	if userID == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "User not authenticated",
 		})
@@ -170,7 +172,7 @@ func (h *Handler) CurrentUser(c *gin.Context) {
 // @Router /check-editor-password [post]
 func (h *Handler) CheckEditorPassword(c *gin.Context) {
 	userID := GetUserID(c)
-	if userID == 0 {
+	if userID == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "User not authenticated",
 		})
@@ -185,7 +187,7 @@ func (h *Handler) CheckEditorPassword(c *gin.Context) {
 		return
 	}
 
-	log.Printf("[AUTH-HANDLER] Checking editor password for user ID: %d", userID)
+	log.Printf("[AUTH-HANDLER] Checking editor password for user ID: %s", userID)
 
 	isValid, err := h.authService.ValidateEditorPassword(userID, req.Password)
 	if err != nil {
@@ -205,5 +207,141 @@ func (h *Handler) CheckEditorPassword(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"valid": true,
+	})
+}
+
+// RefreshToken handles token refresh requests
+// @Summary Refresh access token
+// @Description Generate new access and refresh tokens using a refresh token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body models.RefreshTokenRequest true "Refresh token request"
+// @Success 200 {object} models.RefreshTokenResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /auth/refresh [post]
+func (h *Handler) RefreshToken(c *gin.Context) {
+	log.Printf("[AUTH-HANDLER] Token refresh request started")
+
+	var req models.RefreshTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("[AUTH-HANDLER] Invalid refresh token request: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Refresh token is required",
+		})
+		return
+	}
+
+	newAccessToken, newRefreshToken, err := h.authService.RefreshToken(req.RefreshToken)
+	if err != nil {
+		log.Printf("[AUTH-HANDLER] Token refresh failed: %v", err)
+
+		switch err {
+		case ErrInvalidToken:
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Invalid refresh token",
+			})
+		case ErrTokenExpired:
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Refresh token expired",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Token refresh failed",
+			})
+		}
+		return
+	}
+
+	log.Printf("[AUTH-HANDLER] Token refresh successful")
+
+	c.JSON(http.StatusOK, models.RefreshTokenResponse{
+		Token:        newAccessToken,
+		RefreshToken: newRefreshToken,
+	})
+}
+
+// RevokeToken handles token revocation requests
+// @Summary Revoke refresh token
+// @Description Revoke a refresh token to prevent further use
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body models.RefreshTokenRequest true "Refresh token request"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /auth/revoke [post]
+func (h *Handler) RevokeToken(c *gin.Context) {
+	log.Printf("[AUTH-HANDLER] Token revocation request started")
+
+	var req models.RefreshTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("[AUTH-HANDLER] Invalid revoke token request: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Refresh token is required",
+		})
+		return
+	}
+
+	if err := h.authService.RevokeRefreshToken(req.RefreshToken); err != nil {
+		log.Printf("[AUTH-HANDLER] Token revocation failed: %v", err)
+
+		switch err {
+		case ErrInvalidToken:
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Invalid refresh token",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Token revocation failed",
+			})
+		}
+		return
+	}
+
+	log.Printf("[AUTH-HANDLER] Token revoked successfully")
+
+	c.JSON(http.StatusOK, models.SuccessResponse{
+		Message: "Token revoked successfully",
+	})
+}
+
+// Logout handles user logout requests
+// @Summary Logout user
+// @Description Revoke all refresh tokens for the authenticated user
+// @Tags Auth
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.SuccessResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /auth/logout [post]
+func (h *Handler) Logout(c *gin.Context) {
+	log.Printf("[AUTH-HANDLER] Logout request started")
+
+	userID := GetUserID(c)
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "User not authenticated",
+		})
+		return
+	}
+
+	if err := h.authService.RevokeAllRefreshTokens(userID); err != nil {
+		log.Printf("[AUTH-HANDLER] Logout failed for user %s: %v", userID, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Logout failed",
+		})
+		return
+	}
+
+	log.Printf("[AUTH-HANDLER] Logout successful for user: %s", userID)
+
+	c.JSON(http.StatusOK, models.SuccessResponse{
+		Message: "Logged out successfully",
 	})
 }

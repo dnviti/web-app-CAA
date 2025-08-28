@@ -5,23 +5,37 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 // User represents a user in the system
 type User struct {
-	ID             uint      `json:"id" gorm:"primaryKey;autoIncrement"`
+	ID             string    `json:"id" gorm:"primaryKey;type:varchar(36)"`
 	Username       string    `json:"username" gorm:"uniqueIndex;not null"`
+	Email          string    `json:"email" gorm:"uniqueIndex;size:255"`
 	Password       string    `json:"-" gorm:"not null"`
 	EditorPassword string    `json:"-" gorm:"column:editor_password"`
 	Status         string    `json:"status" gorm:"default:pending_setup;not null"`
+	IsActive       bool      `json:"is_active" gorm:"default:true"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
+
+	// Many-to-many relationship with roles
+	Roles []*Role `json:"roles,omitempty" gorm:"many2many:user_roles"`
 }
 
 func (User) TableName() string {
 	return "users"
+}
+
+// BeforeCreate generates a UUID for the user before creating it
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	if u.ID == "" {
+		u.ID = uuid.New().String()
+	}
+	return nil
 }
 
 // BeforeSave is a GORM hook that runs before saving the user

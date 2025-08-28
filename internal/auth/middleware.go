@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -51,10 +52,21 @@ func (m *Middleware) RequireAuth() gin.HandlerFunc {
 			return
 		}
 
+		// Convert UserID interface{} to string
+		var userIDStr string
+		switch v := claims.UserID.(type) {
+		case string:
+			userIDStr = v
+		case float64:
+			userIDStr = fmt.Sprintf("%.0f", v)
+		default:
+			userIDStr = fmt.Sprintf("%v", v)
+		}
+
 		// Verify user exists in database
-		user, err := m.userRepo.FindByID(claims.UserID)
+		user, err := m.userRepo.FindByID(userIDStr)
 		if err != nil {
-			log.Printf("[AUTH-MIDDLEWARE] User not found in database: %d", claims.UserID)
+			log.Printf("[AUTH-MIDDLEWARE] User not found in database: %s", userIDStr)
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "User not found",
 			})
@@ -65,7 +77,7 @@ func (m *Middleware) RequireAuth() gin.HandlerFunc {
 		log.Printf("[AUTH-MIDDLEWARE] Authentication successful for user: %s", user.Username)
 
 		// Store user info in context for use in handlers
-		c.Set("user_id", claims.UserID)
+		c.Set("user_id", userIDStr)
 		c.Set("user", user)
 		c.Set("token_claims", claims)
 
@@ -74,11 +86,21 @@ func (m *Middleware) RequireAuth() gin.HandlerFunc {
 }
 
 // GetUserID extracts user ID from context
-func GetUserID(c *gin.Context) uint {
+func GetUserID(c *gin.Context) string {
 	if userID, exists := c.Get("user_id"); exists {
-		return userID.(uint)
+		// Handle both string and numeric user IDs
+		switch v := userID.(type) {
+		case string:
+			return v
+		case uint:
+			return fmt.Sprintf("%d", v)
+		case float64:
+			return fmt.Sprintf("%.0f", v)
+		default:
+			return fmt.Sprintf("%v", v)
+		}
 	}
-	return 0
+	return ""
 }
 
 // GetUser extracts user from context

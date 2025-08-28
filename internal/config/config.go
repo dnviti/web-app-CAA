@@ -22,6 +22,7 @@ type Config struct {
 	APISecret         string
 	TokenHourLifespan int
 	BcryptCost        int
+	RSAKeys           RSAKeyConfig
 
 	// Database configuration
 	Database DatabaseConfig
@@ -30,6 +31,14 @@ type Config struct {
 	Ollama OllamaConfig
 	LLM    LLMConfig
 	APIs   APIConfig
+}
+
+// RSAKeyConfig holds RSA signing key configuration
+type RSAKeyConfig struct {
+	KeySize        int           // RSA key size in bits (default: 2048)
+	Algorithm      string        // Signing algorithm (RS256, RS384, RS512)
+	RotationDays   int           // Days after which keys should be rotated
+	RotationPeriod time.Duration // Calculated rotation period
 }
 
 // DatabaseConfig holds database configuration
@@ -87,6 +96,7 @@ func Load() *Config {
 		APISecret:         getAPISecret(),
 		TokenHourLifespan: getEnvInt("TOKEN_HOUR_LIFESPAN", 24),
 		BcryptCost:        getEnvInt("BCRYPT_COST", 12),
+		RSAKeys:           loadRSAKeyConfig(),
 
 		// Database configuration
 		Database: DatabaseConfig{
@@ -209,4 +219,14 @@ func parseTrustedProxies() []string {
 		result = append(result, strings.TrimSpace(proxy))
 	}
 	return result
+}
+
+func loadRSAKeyConfig() RSAKeyConfig {
+	rotationDays := getEnvInt("RSA_KEY_ROTATION_DAYS", 30) // Default: rotate every 30 days
+	return RSAKeyConfig{
+		KeySize:        getEnvInt("RSA_KEY_SIZE", 2048),
+		Algorithm:      getEnv("RSA_ALGORITHM", "RS256"),
+		RotationDays:   rotationDays,
+		RotationPeriod: time.Duration(rotationDays) * 24 * time.Hour,
+	}
 }

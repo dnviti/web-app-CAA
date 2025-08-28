@@ -24,6 +24,11 @@ type CheckEditorPasswordRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// RefreshTokenRequest represents the refresh token request payload
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
 // AddItemRequest represents the add item request payload
 type AddItemRequest struct {
 	Item           GridItemResponse `json:"item" binding:"required"`

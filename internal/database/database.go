@@ -42,7 +42,15 @@ func Initialize(cfg *config.Config) {
 	}
 
 	// Auto-migrate the models
-	if err := DB.AutoMigrate(&models.User{}, &models.GridItem{}); err != nil {
+	if err := DB.AutoMigrate(
+		&models.User{},
+		&models.GridItem{},
+		&models.Role{},
+		&models.Permission{},
+		&models.UserRole{},
+		&models.RolePermission{},
+		&models.SigningKey{},
+	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 

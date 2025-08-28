@@ -27,14 +27,99 @@ apiClient.interceptors.request.use(
   }
 )
 
-// Response interceptor for error handling
+// Flag to prevent multiple refresh attempts
+let isRefreshing = false
+let failedQueue: Array<{
+  resolve: (value: any) => void
+  reject: (error: any) => void
+}> = []
+
+const processQueue = (error: any, token = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error)
+    } else {
+      resolve(token)
+    }
+  })
+  
+  failedQueue = []
+}
+
+// Response interceptor for error handling and token refresh
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('jwt_token')
-      window.location.href = '/login'
+  async (error) => {
+    const originalRequest = error.config
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If we're already refreshing, queue this request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`
+          return apiClient(originalRequest)
+        }).catch(err => {
+          return Promise.reject(err)
+        })
+      }
+
+      originalRequest._retry = true
+      isRefreshing = true
+
+      const refreshToken = localStorage.getItem('refresh_token')
+      
+      if (!refreshToken) {
+        // No refresh token available, clear auth and redirect
+        localStorage.removeItem('jwt_token')
+        localStorage.removeItem('refresh_token')
+        processQueue(error, null)
+        isRefreshing = false
+        
+        // Only redirect if not already on login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login'
+        }
+        return Promise.reject(error)
+      }
+
+      try {
+        const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
+          refresh_token: refreshToken
+        })
+        
+        if (response.data.token && response.data.refresh_token) {
+          // Update stored tokens
+          localStorage.setItem('jwt_token', response.data.token)
+          localStorage.setItem('refresh_token', response.data.refresh_token)
+          
+          // Process queued requests
+          processQueue(null, response.data.token)
+          
+          // Retry the original request with the new token
+          originalRequest.headers.Authorization = `Bearer ${response.data.token}`
+          return apiClient(originalRequest)
+        } else {
+          throw new Error('Invalid refresh response')
+        }
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError)
+        
+        // Clear tokens and process queue
+        localStorage.removeItem('jwt_token')
+        localStorage.removeItem('refresh_token')
+        processQueue(refreshError, null)
+        
+        // Only redirect if not already on login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login'
+        }
+        
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
     }
     
     return Promise.reject(error)

@@ -20,7 +20,19 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   token: string
+  refresh_token: string
   user: User
+  message?: string
+  status?: string
+}
+
+export interface RefreshTokenRequest {
+  refresh_token: string
+}
+
+export interface RefreshTokenResponse {
+  token: string
+  refresh_token: string
 }
 
 // Symbol and Grid types

@@ -1,5 +1,32 @@
 basePath: /api
 definitions:
+  handlers.CreatePermissionRequest:
+    properties:
+      action:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      resource:
+        type: string
+    required:
+    - action
+    - name
+    - resource
+    type: object
+  handlers.CreateRoleRequest:
+    properties:
+      description:
+        type: string
+      display_name:
+        type: string
+      name:
+        type: string
+    required:
+    - display_name
+    - name
+    type: object
   models.AddItemRequest:
     properties:
       item:
@@ -112,6 +139,30 @@ definitions:
       token:
         type: string
     type: object
+  models.Permission:
+    properties:
+      action:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      resource:
+        type: string
+      roles:
+        description: Many-to-many relationship with roles
+        items:
+          $ref: '#/definitions/models.Role'
+        type: array
+      updated_at:
+        type: string
+    type: object
   models.RegisterRequest:
     properties:
       editorPassword:
@@ -127,6 +178,33 @@ definitions:
     - gridType
     - password
     - username
+    type: object
+  models.Role:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      permissions:
+        description: Many-to-many relationship with permissions
+        items:
+          $ref: '#/definitions/models.Permission'
+        type: array
+      updated_at:
+        type: string
+      users:
+        description: Many-to-many relationship with users
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
     type: object
   models.SetupRequest:
     properties:
@@ -144,8 +222,17 @@ definitions:
     properties:
       created_at:
         type: string
+      email:
+        type: string
       id:
-        type: integer
+        type: string
+      is_active:
+        type: boolean
+      roles:
+        description: Many-to-many relationship with roles
+        items:
+          $ref: '#/definitions/models.Role'
+        type: array
       status:
         type: string
       updated_at:
@@ -168,6 +255,42 @@ info:
   title: Web App CAA API
   version: "1.0"
 paths:
+  /ai/search-arasaac:
+    get:
+      consumes:
+      - application/json
+      description: Search for ARASAAC icons by keyword
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search ARASAAC icons
+      tags:
+      - AI
   /auth/login:
     post:
       consumes:
@@ -200,6 +323,413 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Login user
+      tags:
+      - Auth
+  /auth/rbac/permissions:
+    get:
+      consumes:
+      - application/json
+      description: Get all available permissions in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Permission'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all permissions
+      tags:
+      - Auth
+    post:
+      consumes:
+      - application/json
+      description: Create a new permission
+      parameters:
+      - description: Permission data
+        in: body
+        name: permission
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreatePermissionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Permission'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create permission
+      tags:
+      - Auth
+  /auth/rbac/roles:
+    get:
+      consumes:
+      - application/json
+      description: Get all available roles in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all roles
+      tags:
+      - Auth
+    post:
+      consumes:
+      - application/json
+      description: Create a new role
+      parameters:
+      - description: Role data
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create role
+      tags:
+      - Auth
+  /auth/rbac/roles/{role_name}/permissions/{permission_name}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a permission from a role
+      parameters:
+      - description: Role Name
+        in: path
+        name: role_name
+        required: true
+        type: string
+      - description: Permission Name
+        in: path
+        name: permission_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove permission from role
+      tags:
+      - Auth
+    post:
+      consumes:
+      - application/json
+      description: Assign a permission to a role
+      parameters:
+      - description: Role Name
+        in: path
+        name: role_name
+        required: true
+        type: string
+      - description: Permission Name
+        in: path
+        name: permission_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assign permission to role
+      tags:
+      - Auth
+  /auth/rbac/users/{user_id}/check-permission:
+    get:
+      consumes:
+      - application/json
+      description: Check if a user has permission to perform an action on a resource
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Resource
+        in: query
+        name: resource
+        required: true
+        type: string
+      - description: Action
+        in: query
+        name: action
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Check user permission
+      tags:
+      - Auth
+  /auth/rbac/users/{user_id}/permissions:
+    get:
+      consumes:
+      - application/json
+      description: Get all permissions assigned to a user through their roles
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Permission'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user permissions
+      tags:
+      - Auth
+  /auth/rbac/users/{user_id}/roles:
+    get:
+      consumes:
+      - application/json
+      description: Get all roles assigned to a user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user roles
+      tags:
+      - Auth
+  /auth/rbac/users/{user_id}/roles/{role_name}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a role from a user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Role Name
+        in: path
+        name: role_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove role from user
+      tags:
+      - Auth
+    post:
+      consumes:
+      - application/json
+      description: Assign a role to a user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Role Name
+        in: path
+        name: role_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assign role to user
       tags:
       - Auth
   /auth/register:

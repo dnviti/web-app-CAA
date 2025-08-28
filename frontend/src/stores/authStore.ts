@@ -14,7 +14,7 @@ interface AuthActions {
   setError: (error: string | null) => void
 }
 
-export const useAuthStore = create<AuthState & AuthActions>()(
+export const useAuthStore = create<AuthState & AuthActions & { isInitialized: boolean }>()(
   persist(
     (set, get) => ({
       // State
@@ -22,6 +22,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       token: null,
       isLoading: false,
       error: null,
+      isInitialized: false,
 
       // Actions
       login: async (credentials) => {
@@ -30,8 +31,9 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           const response = await authApi.login(credentials)
           
           if (response.success && response.data) {
-            // Store token in localStorage for API client
+            // Store both tokens in localStorage for API client
             localStorage.setItem('jwt_token', response.data.token)
+            localStorage.setItem('refresh_token', response.data.refresh_token)
             
             set({
               user: response.data.user,
@@ -62,8 +64,9 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           const response = await authApi.register(userData)
           
           if (response.success && response.data) {
-            // Store token in localStorage for API client
+            // Store both tokens in localStorage for API client
             localStorage.setItem('jwt_token', response.data.token)
+            localStorage.setItem('refresh_token', response.data.refresh_token)
             
             set({
               user: response.data.user,
@@ -88,44 +91,74 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         }
       },
 
-      logout: () => {
+      logout: async () => {
+        try {
+          // Try to logout on the server (revoke refresh tokens)
+          await authApi.logout()
+        } catch (error) {
+          console.warn('Server logout failed, continuing with client-side logout')
+        }
+        
         set({
           user: null,
           token: null,
           error: null,
+          isInitialized: true,
         })
         
         // Clear all localStorage data
         localStorage.removeItem('jwt_token')
+        localStorage.removeItem('refresh_token')
         localStorage.removeItem('isFirstLogin')
         
         toast.success('Logout effettuato')
       },
 
       checkAuth: async () => {
-        let { token } = get()
+        const { token: currentToken, isInitialized } = get()
+        
+        // If already checking or initialized, don't check again
+        if (isInitialized) {
+          console.log('checkAuth: already initialized, skipping')
+          return
+        }
+        
+        console.log('checkAuth: start', { currentToken: !!currentToken })
         
         // If no token in store, check localStorage
+        let token = currentToken
         if (!token) {
           token = localStorage.getItem('jwt_token')
           if (token) {
-            // Update store with token from localStorage
-            set({ token })
+            console.log('checkAuth: found token in localStorage')
           }
         }
         
         if (!token) {
-          set({ isLoading: false })
+          console.log('checkAuth: no token found, setting initialized')
+          set({ 
+            user: null, 
+            token: null, 
+            isLoading: false, 
+            isInitialized: true 
+          })
           return
         }
 
-        set({ isLoading: true })
+        // Set loading state and update token if found in localStorage
+        console.log('checkAuth: verifying token, setting loading')
+        set({ 
+          token, 
+          isLoading: true 
+        })
         
         try {
+          console.log('checkAuth: calling verify API')
           // Verify token with backend
           const response = await authApi.verifyToken(token)
           
           if (response.success && response.data) {
+            console.log('checkAuth: token valid, setting user')
             // Ensure token is in localStorage
             localStorage.setItem('jwt_token', token)
             
@@ -134,25 +167,32 @@ export const useAuthStore = create<AuthState & AuthActions>()(
               token,
               isLoading: false,
               error: null,
+              isInitialized: true,
             })
           } else {
+            console.log('checkAuth: token invalid, clearing auth')
             // Token invalid, clear auth state
             localStorage.removeItem('jwt_token')
+            localStorage.removeItem('refresh_token')
             set({
               user: null,
               token: null,
               isLoading: false,
               error: null,
+              isInitialized: true,
             })
           }
         } catch (error) {
+          console.log('checkAuth: error verifying token', error)
           // On error, clear auth state
           localStorage.removeItem('jwt_token')
+          localStorage.removeItem('refresh_token')
           set({
             user: null,
             token: null,
             isLoading: false,
             error: null,
+            isInitialized: true,
           })
         }
       },
@@ -191,6 +231,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        isInitialized: state.isInitialized,
       }),
     }
   )

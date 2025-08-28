@@ -1,9 +1,14 @@
 package models
 
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
 // GridItem represents a grid item in the CAA system
 type GridItem struct {
-	ID             string `json:"id" gorm:"primaryKey"`
-	UserID         uint   `json:"user_id" gorm:"primaryKey;index"`
+	ID             string `json:"id" gorm:"primaryKey;type:varchar(36)"`
+	UserID         string `json:"user_id" gorm:"not null;type:varchar(36);index"`
 	ParentCategory string `json:"parent_category" gorm:"not null;index"`
 	ItemOrder      int    `json:"item_order"`
 	Type           string `json:"type" gorm:"not null"`
@@ -24,4 +29,12 @@ type GridItem struct {
 
 func (GridItem) TableName() string {
 	return "grid_items"
+}
+
+// BeforeCreate generates a UUID for the grid item before creating it
+func (g *GridItem) BeforeCreate(tx *gorm.DB) error {
+	if g.ID == "" {
+		g.ID = uuid.New().String()
+	}
+	return nil
 }

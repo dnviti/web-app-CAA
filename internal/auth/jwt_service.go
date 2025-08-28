@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"crypto/rsa"
 	"errors"
 	"fmt"
 	"strings"
@@ -17,22 +18,35 @@ var (
 	ErrInvalidSignature = errors.New("invalid token signature")
 )
 
-// JWTTokenService implements TokenService using JWT
+// JWTTokenService implements TokenService using JWT with RSA signing
 type JWTTokenService struct {
-	config *AuthConfig
+	signingKeyService SigningKeyService
 }
 
-// NewJWTTokenService creates a new JWT token service
-func NewJWTTokenService(config *AuthConfig) TokenService {
+// NewJWTTokenService creates a new JWT token service with RSA signing
+func NewJWTTokenService(signingKeyService SigningKeyService) TokenService {
 	return &JWTTokenService{
-		config: config,
+		signingKeyService: signingKeyService,
 	}
 }
 
-// GenerateToken generates a new JWT token for a user
-func (s *JWTTokenService) GenerateToken(userID uint) (string, error) {
+// GenerateToken generates a new JWT token for a user using RSA signing
+func (s *JWTTokenService) GenerateToken(userID interface{}) (string, error) {
+	// Get the signing key
+	privateKey, keyID, err := s.signingKeyService.GetSigningKey()
+	if err != nil {
+		return "", fmt.Errorf("failed to get signing key: %w", err)
+	}
+
+	// Ensure we have an RSA private key (explicit usage to avoid import warning)
+	if privateKey == nil {
+		return "", fmt.Errorf("invalid RSA private key")
+	}
+	_ = (*rsa.PrivateKey)(nil) // Explicit reference to avoid unused import warning
+
 	now := time.Now()
-	expiresAt := now.Add(s.config.TokenLifespan)
+	// Shorter expiration for access tokens (15 minutes)
+	expiresAt := now.Add(15 * time.Minute)
 
 	claims := jwt.MapClaims{
 		"user_id": userID,
@@ -40,17 +54,49 @@ func (s *JWTTokenService) GenerateToken(userID uint) (string, error) {
 		"exp":     expiresAt.Unix(),
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(s.config.JWTSecret))
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+
+	// Set key ID in header for key rotation support
+	token.Header["kid"] = keyID
+
+	return token.SignedString(privateKey)
 }
 
-// ValidateToken validates a JWT token and returns the claims
+// GenerateRefreshToken generates a new refresh token for a user
+// Note: This is a placeholder - the actual refresh token generation
+// and storage is handled by the AuthService
+func (s *JWTTokenService) GenerateRefreshToken(userID interface{}) (string, error) {
+	// This method exists to satisfy the TokenService interface
+	// The actual refresh token generation is handled by AuthService
+	// using models.GenerateRefreshToken() for secure random tokens
+	return "", fmt.Errorf("refresh token generation should be handled by AuthService")
+}
+
+// ValidateToken validates a JWT token and returns the claims using RSA verification
 func (s *JWTTokenService) ValidateToken(tokenString string) (*TokenClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		// Verify signing method is RSA
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(s.config.JWTSecret), nil
+
+		// Get key ID from token header
+		kidInterface, ok := token.Header["kid"]
+		if !ok {
+			return nil, fmt.Errorf("no key ID in token header")
+		}
+		keyID, ok := kidInterface.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid key ID in token header")
+		}
+
+		// Get verification key
+		publicKey, err := s.signingKeyService.GetVerificationKey(keyID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get verification key: %w", err)
+		}
+
+		return publicKey, nil
 	})
 
 	if err != nil {
@@ -69,8 +115,13 @@ func (s *JWTTokenService) ValidateToken(tokenString string) (*TokenClaims, error
 		return nil, ErrInvalidToken
 	}
 
-	userID, ok := claims["user_id"].(float64)
-	if !ok {
+	// Handle both string (UUID) and numeric user IDs
+	var userID interface{}
+	if uid, ok := claims["user_id"].(string); ok {
+		userID = uid
+	} else if uid, ok := claims["user_id"].(float64); ok {
+		userID = uint(uid)
+	} else {
 		return nil, ErrInvalidToken
 	}
 
@@ -85,7 +136,7 @@ func (s *JWTTokenService) ValidateToken(tokenString string) (*TokenClaims, error
 	}
 
 	return &TokenClaims{
-		UserID:    uint(userID),
+		UserID:    userID,
 		IssuedAt:  int64(iat),
 		ExpiresAt: int64(exp),
 	}, nil
@@ -111,10 +162,19 @@ func (s *JWTTokenService) ExtractTokenFromRequest(c *gin.Context) (string, error
 }
 
 // ExtractUserIDFromToken extracts user ID from a JWT token string
-func (s *JWTTokenService) ExtractUserIDFromToken(tokenString string) (uint, error) {
+func (s *JWTTokenService) ExtractUserIDFromToken(tokenString string) (string, error) {
 	claims, err := s.ValidateToken(tokenString)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
-	return claims.UserID, nil
+
+	// Handle both string and numeric user IDs for backward compatibility
+	switch v := claims.UserID.(type) {
+	case string:
+		return v, nil
+	case float64:
+		return fmt.Sprintf("%.0f", v), nil
+	default:
+		return fmt.Sprintf("%v", v), nil
+	}
 }

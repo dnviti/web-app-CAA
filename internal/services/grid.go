@@ -21,12 +21,12 @@ func NewGridService() *GridService {
 }
 
 // SaveGrid saves the entire grid for a user
-func (s *GridService) SaveGrid(gridData map[string][]models.GridItemResponse, userID uint) error {
-	log.Printf("Saving grid for user ID: %d", userID)
+func (s *GridService) SaveGrid(gridData map[string][]models.GridItemResponse, userID string) error {
+	log.Printf("Saving grid for user ID: %s", userID)
 
 	return database.DB.Transaction(func(tx *gorm.DB) error {
 		// Delete existing grid items for the user
-		log.Printf("Deleting existing grid items for user ID: %d", userID)
+		log.Printf("Deleting existing grid items for user ID: %s", userID)
 		if err := tx.Where("user_id = ?", userID).Delete(&models.GridItem{}).Error; err != nil {
 			return err
 		}
@@ -83,8 +83,8 @@ func (s *GridService) SaveGrid(gridData map[string][]models.GridItemResponse, us
 }
 
 // GetGrid retrieves the grid for a user
-func (s *GridService) GetGrid(userID uint) (map[string][]models.GridItemResponse, error) {
-	log.Printf("Getting grid for user ID: %d", userID)
+func (s *GridService) GetGrid(userID string) (map[string][]models.GridItemResponse, error) {
+	log.Printf("Getting grid for user ID: %s", userID)
 
 	var items []models.GridItem
 	result := database.DB.Where("user_id = ?", userID).
@@ -146,8 +146,8 @@ func (s *GridService) GetGrid(userID uint) (map[string][]models.GridItemResponse
 }
 
 // AddItem adds a new item to the grid
-func (s *GridService) AddItem(itemData models.GridItemResponse, parentCategory string, userID uint) (*models.GridItemResponse, error) {
-	log.Printf("Adding item to category %s for user %d", parentCategory, userID)
+func (s *GridService) AddItem(itemData models.GridItemResponse, parentCategory string, userID string) (*models.GridItemResponse, error) {
+	log.Printf("Adding item to category %s for user %s", parentCategory, userID)
 
 	// Generate a new UUID for the item - backend controls all IDs
 	newID := uuid.New().String()
@@ -223,9 +223,9 @@ func (s *GridService) AddItem(itemData models.GridItemResponse, parentCategory s
 	return &response, nil
 }
 
-// UpdateItem updates an existing item
-func (s *GridService) UpdateItem(itemID string, itemData models.GridItemResponse, userID uint) error {
-	log.Printf("Updating item %s for user %d", itemID, userID)
+// UpdateItem updates an existing grid item
+func (s *GridService) UpdateItem(itemID string, itemData models.GridItemResponse, userID string) error {
+	log.Printf("Updating item %s for user %s", itemID, userID)
 
 	// Process image if needed
 	iconData := itemData.Icon
@@ -294,8 +294,8 @@ func (s *GridService) UpdateItem(itemID string, itemData models.GridItemResponse
 }
 
 // DeleteItem deletes an item
-func (s *GridService) DeleteItem(itemID string, userID uint) error {
-	log.Printf("Deleting item %s for user %d", itemID, userID)
+func (s *GridService) DeleteItem(itemID string, userID string) error {
+	log.Printf("Deleting item %s for user %s", itemID, userID)
 
 	result := database.DB.Where("id = ? AND user_id = ?", itemID, userID).Delete(&models.GridItem{})
 
@@ -314,8 +314,8 @@ func (s *GridService) DeleteItem(itemID string, userID uint) error {
 }
 
 // DeleteCategoryContents deletes all items in a category
-func (s *GridService) DeleteCategoryContents(categoryTarget string, userID uint) error {
-	log.Printf("Deleting contents of category %s for user %d", categoryTarget, userID)
+func (s *GridService) DeleteCategoryContents(categoryTarget string, userID string) error {
+	log.Printf("Deleting contents of category %s for user %s", categoryTarget, userID)
 
 	result := database.DB.Where("parent_category = ? AND user_id = ?", categoryTarget, userID).Delete(&models.GridItem{})
 

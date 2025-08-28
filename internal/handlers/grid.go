@@ -43,14 +43,14 @@ func NewGridHandlers(cfg *config.Config) *GridHandlers {
 // @Router /setup [post]
 func (h *GridHandlers) Setup(c *gin.Context) {
 	// Extract user ID from token
-	userID, err := token.ExtractTokenID(c)
+	userID, err := token.ExtractUserIDFromContext(c)
 	if err != nil {
 		log.Printf("[SETUP] Error extracting user ID from token: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	log.Printf("[SETUP] Setup request started for userId: %d", userID)
+	log.Printf("[SETUP] Setup request started for userId: %s", userID)
 
 	var req models.SetupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -101,7 +101,7 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 		return
 	}
 
-	log.Printf("[SETUP] Setup completed successfully for userId: %d", userID)
+	log.Printf("[SETUP] Setup completed successfully for userId: %s", userID)
 	c.JSON(http.StatusOK, gin.H{"message": "Setup complete. Grid saved."})
 }
 
@@ -116,26 +116,25 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /complete-setup [post]
 func (h *GridHandlers) CompleteSetup(c *gin.Context) {
-	userID, err := token.ExtractTokenID(c)
+	// Extract user ID from token
+	userID, err := token.ExtractUserIDFromContext(c)
 	if err != nil {
-		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+		log.Printf("[COMPLETE-SETUP] Error extracting user ID from token: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	log.Printf("[COMPLETE-SETUP] Completing setup for userId: %d", userID)
+	log.Printf("[COMPLETE-SETUP] Complete setup request started for userId: %s", userID)
 
-	if err := h.userService.UpdateUserStatus(userID, "active"); err != nil {
+	// Update user status to completed
+	if err := h.userService.UpdateUserStatus(userID, "completed"); err != nil {
 		log.Printf("[COMPLETE-SETUP] Error updating user status: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Error updating user status.",
-			"error":   err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to complete setup"})
 		return
 	}
 
-	log.Printf("[COMPLETE-SETUP] User status updated to 'active' for userId: %d", userID)
-	c.JSON(http.StatusOK, gin.H{"message": "User status updated to active."})
+	log.Printf("[COMPLETE-SETUP] Setup completed successfully for userId: %s", userID)
+	c.JSON(http.StatusOK, gin.H{"message": "Setup completed successfully"})
 }
 
 // GetGrid retrieves the entire grid for a user
@@ -149,14 +148,14 @@ func (h *GridHandlers) CompleteSetup(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid [get]
 func (h *GridHandlers) GetGrid(c *gin.Context) {
-	userID, err := token.ExtractTokenID(c)
+	userID, err := token.ExtractUserIDFromContext(c)
 	if err != nil {
 		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	log.Printf("[GET-GRID] Retrieving grid for userId: %d", userID)
+	log.Printf("[GET-GRID] Retrieving grid for userId: %s", userID)
 
 	gridData, err := h.gridService.GetGrid(userID)
 	if err != nil {
@@ -189,14 +188,14 @@ func (h *GridHandlers) GetGrid(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid [post]
 func (h *GridHandlers) SaveGrid(c *gin.Context) {
-	userID, err := token.ExtractTokenID(c)
+	userID, err := token.ExtractUserIDFromContext(c)
 	if err != nil {
 		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	log.Printf("[SAVE-GRID] Saving grid for userId: %d", userID)
+	log.Printf("[SAVE-GRID] Saving grid for userId: %s", userID)
 
 	var gridData map[string][]models.GridItemResponse
 	if err := c.ShouldBindJSON(&gridData); err != nil {
@@ -229,14 +228,14 @@ func (h *GridHandlers) SaveGrid(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid/item [post]
 func (h *GridHandlers) AddItem(c *gin.Context) {
-	userID, err := token.ExtractTokenID(c)
+	userID, err := token.ExtractUserIDFromContext(c)
 	if err != nil {
 		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	log.Printf("[ADD-ITEM] Adding new item for userId: %d", userID)
+	log.Printf("[ADD-ITEM] Adding new item for userId: %s", userID)
 
 	var req models.AddItemRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -280,7 +279,7 @@ func (h *GridHandlers) AddItem(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid/item/{id} [put]
 func (h *GridHandlers) UpdateItem(c *gin.Context) {
-	userID, err := token.ExtractTokenID(c)
+	userID, err := token.ExtractUserIDFromContext(c)
 	if err != nil {
 		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
@@ -324,7 +323,7 @@ func (h *GridHandlers) UpdateItem(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid/item/{id} [delete]
 func (h *GridHandlers) DeleteItem(c *gin.Context) {
-	userID, err := token.ExtractTokenID(c)
+	userID, err := token.ExtractUserIDFromContext(c)
 	if err != nil {
 		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
@@ -333,7 +332,7 @@ func (h *GridHandlers) DeleteItem(c *gin.Context) {
 
 	itemID := c.Param("id")
 
-	log.Printf("[DELETE-ITEM] Deleting item %s for userId: %d", itemID, userID)
+	log.Printf("[DELETE-ITEM] Deleting item %s for userId: %s", itemID, userID)
 
 	var req struct {
 		CategoryTarget string `json:"categoryTarget"`
@@ -356,7 +355,7 @@ func (h *GridHandlers) DeleteItem(c *gin.Context) {
 		return
 	}
 
-	log.Printf("[DELETE-ITEM] Item deleted: %s for userId: %d", itemID, userID)
+	log.Printf("[DELETE-ITEM] Item deleted: %s for userId: %s", itemID, userID)
 
 	// Delete category contents if specified
 	if req.CategoryTarget != "" {

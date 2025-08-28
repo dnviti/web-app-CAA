@@ -21,15 +21,23 @@ type GridItemResponse struct {
 
 // AuthResponse represents the authentication response
 type AuthResponse struct {
-	Message string `json:"message"`
-	Token   string `json:"token"`
-	Status  string `json:"status"`
+	Message      string `json:"message"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	Status       string `json:"status"`
 }
 
 // LoginResponse represents the login response
 type LoginResponse struct {
-	Token  string `json:"token"`
-	Status string `json:"status"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+	Status       string `json:"status"`
+}
+
+// RefreshTokenResponse represents the refresh token response
+type RefreshTokenResponse struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 // ErrorResponse represents an error response

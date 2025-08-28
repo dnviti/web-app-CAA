@@ -14,7 +14,7 @@ import IconButton from '../components/ui/IconButton'
 import { GridItem, Symbol, Category } from '../types'
 
 const MainPage: React.FC = () => {
-  const { user, logout } = useAuthStore()
+  const { user, logout, token } = useAuthStore()
   const {
     categories,
     loading,
@@ -60,8 +60,15 @@ const MainPage: React.FC = () => {
   } | null>(null)
 
   useEffect(() => {
-    // Load grid data on component mount
-    loadGrid()
+    console.log('MainPage useEffect', { user: !!user, token: !!token })
+    
+    // Only load grid data if user is authenticated and we have a valid token
+    if (user && token) {
+      console.log('MainPage: loading grid data')
+      loadGrid()
+    } else {
+      console.log('MainPage: no user or token, skipping grid load')
+    }
     
     // Apply size class to HTML element
     document.documentElement.className = document.documentElement.className.replace(/size-\w+/, '') + ` size-${currentSize}`
@@ -70,7 +77,13 @@ const MainPage: React.FC = () => {
     const handleClickOutside = () => setContextMenu(null)
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
-  }, [loadGrid, currentSize])
+  }, [loadGrid, currentSize, user, token])
+
+  // Don't render the main page if there's no authenticated user
+  if (!user) {
+    console.log('MainPage: no user, returning null')
+    return null
+  }
 
   const handleSymbolClick = (item: GridItem) => {
     if (item.type === 'category') {

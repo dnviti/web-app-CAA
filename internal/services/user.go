@@ -75,7 +75,7 @@ func (s *UserService) CreateUser(username, password, editorPassword string) (*mo
 		return nil, result.Error
 	}
 
-	log.Printf("User created with ID: %d", user.ID)
+	log.Printf("User created with ID: %s", user.ID)
 	return user, nil
 }
 
@@ -150,8 +150,8 @@ func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 }
 
 // UpdateUserStatus updates the user status
-func (s *UserService) UpdateUserStatus(userID uint, status string) error {
-	log.Printf("Updating user status for ID %d to: %s", userID, status)
+func (s *UserService) UpdateUserStatus(userID string, status string) error {
+	log.Printf("Updating user status for ID %s to: %s", userID, status)
 
 	result := database.DB.Model(&models.User{}).Where("id = ?", userID).Update("status", status)
 	if result.Error != nil {

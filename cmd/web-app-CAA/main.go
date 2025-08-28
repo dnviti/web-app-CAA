@@ -3,11 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/daniele/web-app-caa/internal/auth"
 	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/database"
 	"github.com/daniele/web-app-caa/internal/handlers"
+	"github.com/daniele/web-app-caa/internal/middleware"
+	"github.com/daniele/web-app-caa/internal/migrations"
+	"github.com/daniele/web-app-caa/internal/services"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -62,6 +66,20 @@ func main() {
 	database.Initialize(cfg)
 	db := database.GetDB()
 
+	// Run database migrations
+	log.Printf("[STARTUP] Running database migrations...")
+	if err := migrations.RunDatabaseMigrations(db); err != nil {
+		log.Fatalf("Failed to run database migrations: %v", err)
+	}
+	log.Printf("[STARTUP] Database migrations completed successfully")
+
+	// Initialize RBAC service
+	rbacModelPath := filepath.Join("configs", "rbac_model.conf")
+	rbacService, err := services.NewRBACService(db, rbacModelPath)
+	if err != nil {
+		log.Fatalf("Failed to initialize RBAC service: %v", err)
+	}
+
 	// Initialize authentication system
 	authFactory := auth.NewFactory(db, cfg)
 	authHandler := authFactory.GetHandler()
@@ -98,6 +116,7 @@ func main() {
 	gridHandlers := handlers.NewGridHandlers(cfg)
 	aiHandlers := handlers.NewAIHandlers(cfg)
 	pageHandlers := handlers.NewPageHandlers()
+	rbacHandler := handlers.NewRBACHandler(rbacService)
 
 	// Page routes (serve templates instead of static files)
 	r.GET("/", pageHandlers.ServeIndex)
@@ -114,6 +133,8 @@ func main() {
 		{
 			auth.POST("/register", authHandler.Register)
 			auth.POST("/login", authHandler.Login)
+			auth.POST("/refresh", authHandler.RefreshToken)
+			auth.POST("/revoke", authHandler.RevokeToken)
 		}
 	}
 
@@ -125,6 +146,29 @@ func main() {
 		authProtected := protected.Group("/auth")
 		{
 			authProtected.GET("/verify", authHandler.CurrentUser)
+			authProtected.POST("/logout", authHandler.Logout)
+
+			// RBAC endpoints (admin only) - nested under /auth
+			rbac := authProtected.Group("/rbac")
+			rbac.Use(middleware.RequireRole(rbacService, "admin"))
+			{
+				// User role management
+				rbac.GET("/users/:user_id/roles", rbacHandler.GetUserRoles)
+				rbac.GET("/users/:user_id/permissions", rbacHandler.GetUserPermissions)
+				rbac.POST("/users/:user_id/roles/:role_name", rbacHandler.AssignUserRole)
+				rbac.DELETE("/users/:user_id/roles/:role_name", rbacHandler.RemoveUserRole)
+				rbac.GET("/users/:user_id/check-permission", rbacHandler.CheckPermission)
+
+				// Role management
+				rbac.GET("/roles", rbacHandler.GetAllRoles)
+				rbac.POST("/roles", rbacHandler.CreateRole)
+				rbac.POST("/roles/:role_name/permissions/:permission_name", rbacHandler.AssignPermissionToRole)
+				rbac.DELETE("/roles/:role_name/permissions/:permission_name", rbacHandler.RemovePermissionFromRole)
+
+				// Permission management
+				rbac.GET("/permissions", rbacHandler.GetAllPermissions)
+				rbac.POST("/permissions", rbacHandler.CreatePermission)
+			}
 		}
 		protected.POST("/check-editor-password", authHandler.CheckEditorPassword)
 
@@ -134,15 +178,15 @@ func main() {
 		protected.GET("/grid", gridHandlers.GetGrid)
 		protected.POST("/grid", gridHandlers.SaveGrid)
 
-		// Granular grid endpoints
-		protected.POST("/grid/item", gridHandlers.AddItem)
-		protected.PUT("/grid/item/:id", gridHandlers.UpdateItem)
-		protected.DELETE("/grid/item/:id", gridHandlers.DeleteItem)
+		// Granular grid endpoints with RBAC
+		protected.POST("/grid/item", middleware.RBACMiddleware(rbacService, "grids", "create"), gridHandlers.AddItem)
+		protected.PUT("/grid/item/:id", middleware.RBACMiddleware(rbacService, "grids", "update"), gridHandlers.UpdateItem)
+		protected.DELETE("/grid/item/:id", middleware.RBACMiddleware(rbacService, "grids", "delete"), gridHandlers.DeleteItem)
 
 		// AI endpoints
-		protected.POST("/conjugate", aiHandlers.Conjugate)
-		protected.POST("/correct", aiHandlers.Correct)
-		protected.GET("/ai/search-arasaac", aiHandlers.SearchArasaac)
+		protected.POST("/conjugate", middleware.RBACMiddleware(rbacService, "ai", "use"), aiHandlers.Conjugate)
+		protected.POST("/correct", middleware.RBACMiddleware(rbacService, "ai", "use"), aiHandlers.Correct)
+		protected.GET("/ai/search-arasaac", middleware.RBACMiddleware(rbacService, "ai", "use"), aiHandlers.SearchArasaac)
 	}
 
 	// Chrome DevTools endpoint (to avoid 404 logs)

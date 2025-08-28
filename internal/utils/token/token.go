@@ -12,8 +12,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// GenerateToken generates a JWT token for the given user ID
-func GenerateToken(userID uint) (string, error) {
+// GenerateToken generates a JWT token for the given user ID (now supports string UUIDs)
+func GenerateToken(userID interface{}) (string, error) {
 	tokenLifespan, err := getTokenLifespan()
 	if err != nil {
 		return "", err
@@ -58,7 +58,7 @@ func ExtractToken(c *gin.Context) string {
 	return ""
 }
 
-// ExtractTokenID extracts the user ID from the JWT token
+// ExtractTokenID extracts the user ID from the JWT token (legacy function for uint IDs)
 func ExtractTokenID(c *gin.Context) (uint, error) {
 	tokenString := ExtractToken(c)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -73,6 +73,7 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
+		// Try to parse as uint first (legacy)
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
 		if err != nil {
 			return 0, err
@@ -80,6 +81,44 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 		return uint(uid), nil
 	}
 	return 0, nil
+}
+
+// ExtractUserIDFromToken extracts the user ID from a token string (supports string UUIDs)
+func ExtractUserIDFromToken(tokenString string) (string, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(getAPISecret()), nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
+		userID, ok := claims["user_id"]
+		if !ok {
+			return "", fmt.Errorf("user_id not found in token")
+		}
+
+		// Handle both string and numeric user IDs
+		switch v := userID.(type) {
+		case string:
+			return v, nil
+		case float64:
+			return fmt.Sprintf("%.0f", v), nil
+		default:
+			return fmt.Sprintf("%v", v), nil
+		}
+	}
+	return "", fmt.Errorf("invalid token")
+}
+
+// ExtractUserIDFromContext extracts the user ID from the gin context (supports string UUIDs)
+func ExtractUserIDFromContext(c *gin.Context) (string, error) {
+	tokenString := ExtractToken(c)
+	return ExtractUserIDFromToken(tokenString)
 }
 
 // getAPISecret gets the API secret from environment variables
