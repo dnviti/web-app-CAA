@@ -18,7 +18,7 @@ docker-compose up --build
 make docker-up
 ```
 
-Access the application at `http://localhost:3000`
+Access the application at `http://localhost:6542`
 
 ## Docker Compose Configuration
 
@@ -35,9 +35,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "6542:6542"
     environment:
-      - APP_PORT=3000
+      - APP_PORT=6542
       - APP_HOST=0.0.0.0
       - JWT_SECRET=development-jwt-secret-key
       - DB_DRIVER=sqlite
@@ -81,9 +81,9 @@ services:
   webapp:
     image: ghcr.io/dnviti/web-app-caa:latest
     ports:
-      - "80:3000"
+      - "80:6542"
     environment:
-      - APP_PORT=3000
+      - APP_PORT=6542
       - APP_HOST=0.0.0.0
       - JWT_SECRET=${JWT_SECRET}
       - DB_DRIVER=mysql
@@ -144,7 +144,7 @@ The application uses a multi-stage Docker build:
 
 ```dockerfile
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git ca-certificates tzdata
@@ -199,11 +199,11 @@ RUN mkdir -p data && chown -R appuser:appgroup /app
 USER appuser
 
 # Expose port
-EXPOSE 3000
+EXPOSE 6542
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:6542/ping || exit 1
 
 # Start the application
 CMD ["./main"]
@@ -217,7 +217,7 @@ Create a `.env` file for development:
 
 ```env
 # Server Configuration
-APP_PORT=3000
+APP_PORT=6542
 APP_HOST=0.0.0.0
 JWT_SECRET=development-jwt-secret-change-in-production
 
@@ -241,7 +241,7 @@ Create a `.env.prod` file for production:
 
 ```env
 # Server Configuration
-APP_PORT=3000
+APP_PORT=6542
 APP_HOST=0.0.0.0
 JWT_SECRET=your-super-secure-production-jwt-secret
 
@@ -360,10 +360,10 @@ The application includes health check endpoints:
 
 ```bash
 # Basic health check
-curl http://localhost:3000/health
+curl http://localhost:6542/ping
 
 # Detailed health status
-curl http://localhost:3000/api/health
+curl http://localhost:6542/ping
 ```
 
 Response:
@@ -559,10 +559,10 @@ docker-compose exec mysql mysqladmin ping
 **Port conflicts:**
 ```bash
 # Check port usage
-netstat -tulpn | grep :3000
+netstat -tulpn | grep :6542
 
 # Use different ports
-docker-compose up --build -p 8080:3000
+docker-compose up --build -p 8080:6542
 ```
 
 **Volume permission issues:**
@@ -585,7 +585,7 @@ services:
 
 ---
 
-**Documentation completed!** The Web App CAA is now running in Docker containers.
+The Web App CAA is now running in Docker containers.
 
 For more information, see:
 - [Architecture Overview](../architecture/overview.md)  

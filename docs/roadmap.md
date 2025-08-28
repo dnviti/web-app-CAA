@@ -4,11 +4,11 @@
 
 This roadmap outlines the planned development phases for Web App CAA, building upon the completed backend infrastructure. All future features will be built on top of the existing RBAC (Role-Based Access Control) and authentication systems.
 
-## 🏗️ Current Foundation (Complete)
+## 🏗️ Foundation
 
 The following systems are fully implemented and provide the foundation for all future development:
 
-- ✅ **Authentication System**: Modern JWT-based auth with RSA signing
+- ✅ **Authentication System**: JWT-based auth with RSA signing
 - ✅ **RBAC System**: Complete role-based access control with Casbin
 - ✅ **Database Layer**: GORM with automatic migrations and seeding
 - ✅ **API Layer**: RESTful API with Swagger documentation
@@ -19,7 +19,7 @@ The following systems are fully implemented and provide the foundation for all f
 
 ## 🚀 Development Timeline Overview
 
-**Current Status (August 2025):** Backend Complete ✅  
+**Status:** Backend Complete ✅  
 **Next Phase Start:** Q4 2025 (October-December)  
 **Expected Frontend MVP:** Q2 2026  
 **Full Feature Set:** Q4 2026
@@ -140,7 +140,7 @@ PUT    /api/admin/users/:id          - Update user account
 DELETE /api/admin/users/:id          - Deactivate user account
 GET    /api/admin/users/:id/activity - User activity logs
 POST   /api/admin/users/bulk         - Bulk user operations
-GET    /api/admin/system/health      - System health status
+GET    /api/admin/system/ping        - System health status
 GET    /api/admin/analytics/users    - User analytics
 GET    /api/admin/analytics/grids    - Grid usage analytics
 ```
@@ -227,7 +227,7 @@ POST   /api/auth/2fa/backup          - Generate backup codes
 **Timeline**: Q2 - Q3 2026  
 **Status**: 📋 Planned
 
-#### 3.1 Modern Frontend Framework
+#### 3.1 Frontend Framework
 **Goal**: Complete user interface implementation
 
 **Features to Implement**:
@@ -250,14 +250,14 @@ POST   /api/auth/2fa/backup          - Generate backup codes
   - Analytics dashboard
 
 **Technical Stack**:
-- **Framework**: React 18 with TypeScript
+- **Framework**: React 19 with TypeScript
 - **Styling**: Tailwind CSS with accessibility features
 - **State Management**: Zustand or Redux Toolkit
 - **API Client**: TanStack Query (React Query)
 - **Routing**: React Router v6
 - **Forms**: React Hook Form with Zod validation
 - **Charts**: Chart.js or Recharts
-- **Testing**: Vitest + Testing Library
+- **Testing**: Vitest + Testing Library + Playwright
 
 #### 3.2 Progressive Web App (PWA)
 **Goal**: Mobile-friendly offline-capable application
@@ -371,7 +371,7 @@ CREATE TABLE user_2fa (
 ### API Versioning Strategy
 All new endpoints will use versioned APIs:
 
-- **Current**: `/api/v1/...` (default, backward compatible)
+- **API Versioning**: `/api/v1/...` (default, backward compatible)
 - **Future**: `/api/v2/...` (breaking changes)
 - **Admin**: `/api/admin/...` (administrative endpoints)
 
@@ -435,6 +435,5 @@ A comprehensive [AI Agent Guide](ai-agent-guide.md) provides complete system und
 
 ---
 
-**Last Updated**: August 28, 2025  
 **Backend Status**: ✅ Production Ready  
 **Next Milestone**: Phase 1.1 - Backoffice Implementation

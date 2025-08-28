@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Web App CAA follows a clean, layered architecture with SOLID principles that promotes maintainability, testability, and scalability. The authentication system has been completely refactored to implement clean architecture patterns with proper separation of concerns.
+Web App CAA follows a clean, layered architecture with SOLID principles that promotes maintainability, testability, and scalability. The authentication system implements clean architecture patterns with proper separation of concerns.
 
 ## System Architecture
 
@@ -179,7 +179,7 @@ type Middleware struct {
 - **Dependency Injection**: All dependencies injected via interfaces using factory pattern
 - **Interface-Based Design**: All components depend on abstractions, not concretions
 - **Comprehensive Error Handling**: Proper error types and HTTP status codes
-- **Modern Security**: Uses `golang-jwt/jwt/v5` with secure token implementation
+- **Security**: Uses `golang-jwt/jwt/v5` with secure token implementation
 
 **Responsibilities:**
 - **Handler**: HTTP request/response handling
@@ -501,7 +501,7 @@ log.Printf("[AI] Conjugation request processed in %v", duration)
 
 ```go
 // Health check endpoint
-GET /health
+GET /ping
 {
   "status": "healthy",
   "database": "connected",

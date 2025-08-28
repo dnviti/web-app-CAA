@@ -22,7 +22,7 @@ Welcome to the **Web App CAA** (Comunicazione Aumentativa e Alternativa) documen
 
 ## �🚀 What is Web App CAA?
 
-Web App CAA is a modern web application built in Go that provides:
+Web App CAA is a web application built in Go that provides:
 
 - **Interactive Communication Grids**: Create and customize visual communication boards with categories, items, and actions
 - **AI-Powered Language Support**: Italian verb conjugation and sentence correction using LLM services
@@ -51,7 +51,7 @@ Web App CAA is a modern web application built in Go that provides:
 - **Template-based Processing**: Uses Go templates with RAG knowledge
 - **Multiple LLM Backends**: Supports Ollama and OpenAI-compatible APIs
 
-### ✅ **Modern Architecture**
+### ✅ **Architecture**
 - Clean architecture with proper separation of concerns
 - RESTful API design
 - Middleware for logging and authentication
@@ -75,7 +75,7 @@ Web App CAA is a modern web application built in Go that provides:
 
 | Component | Technology |
 |-----------|------------|
-| **Backend** | Go 1.21+ with Gin web framework |
+| **Backend** | Go 1.24+ with Gin web framework |
 | **Database** | SQLite (dev) / MySQL (production) |
 | **ORM** | GORM with auto-migration |
 | **Authentication** | JWT tokens with bcrypt |
@@ -93,7 +93,7 @@ Web App CAA is a modern web application built in Go that provides:
 
 ## � Project Status
 
-### ✅ Backend Implementation (Complete)
+### ✅ Backend Implementation
 The Go backend is fully implemented and production-ready:
 - **Authentication & RBAC**: Complete JWT authentication with role-based access control
 - **Grid Management**: Full CRUD operations for communication grids
@@ -108,7 +108,7 @@ The Go backend is fully implemented and production-ready:
 Planned development phases for future features:
 - **Phase 1**: Administrative backend interfaces (backoffice, user dashboard, admin panel)
 - **Phase 2**: Enhanced authentication (registration control, email/SMS verification, 2FA)
-- **Phase 3**: Modern frontend implementation (React/TypeScript PWA)
+- **Phase 3**: Frontend implementation (React/TypeScript PWA)
 - **Phase 4**: Advanced features (multi-tenancy, advanced AI, integrations)
 
 📋 **[View Detailed Roadmap](roadmap.md)**

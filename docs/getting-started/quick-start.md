@@ -6,7 +6,7 @@ Get Web App CAA up and running in just a few minutes with this quick start guide
 
 Before you begin, ensure you have the following installed:
 
-- **Go 1.21 or higher** - [Download Go](https://golang.org/dl/)
+- **Go 1.24 or higher** - [Download Go](https://golang.org/dl/)
 - **Git** - For cloning the repository
 - **Make** (optional) - For using Makefile commands
 
@@ -62,7 +62,7 @@ go run ./cmd/web-app-caa/main.go
 Once the server is running, open your browser and navigate to:
 
 ```
-http://localhost:3000
+http://localhost:6542
 ```
 
 You should see the Web App CAA login page.
@@ -116,12 +116,12 @@ docker-compose up --build
 docker pull ghcr.io/dnviti/web-app-caa:latest
 
 # Run the container
-docker run -p 3000:3000 ghcr.io/dnviti/web-app-caa:latest
+docker run -p 6542:6542 ghcr.io/dnviti/web-app-caa:latest
 ```
 
 ### 3. Access the Application
 
-Navigate to `http://localhost:3000` in your browser.
+Navigate to `http://localhost:6542` in your browser.
 
 ## Verification
 
@@ -133,10 +133,10 @@ Look for these log messages when starting:
 
 ```
 [STARTUP] Server configuration loaded:
-[STARTUP] - PORT: 3000
+[STARTUP] - PORT: 6542
 [STARTUP] - HOST: localhost
 [STARTUP] - JWT_SECRET: [SET]
-[GIN-debug] Listening and serving HTTP on localhost:3000
+[GIN-debug] Listening and serving HTTP on localhost:6542
 ```
 
 ### 2. Test Core Functionality
@@ -172,7 +172,7 @@ Now that you have Web App CAA running:
 **Port Already in Use**
 ```bash
 # Change the port
-export APP_PORT=8080
+export APP_PORT=6542
 ./bin/web-app-caa
 ```
 

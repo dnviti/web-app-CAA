@@ -5,7 +5,7 @@ The AI Services API provides language processing capabilities for Web App CAA, i
 ## Base URL
 
 ```
-http://localhost:3000/api
+http://localhost:6542/api
 ```
 
 ## AI Service Overview

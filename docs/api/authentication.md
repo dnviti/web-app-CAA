@@ -15,13 +15,13 @@ The authentication system follows clean architecture patterns with:
 ## Base URL
 
 ```
-http://localhost:3000/api
+http://localhost:6542/api
 ```
 
 ## Security Features
 
 - **Secure Password Hashing**: bcrypt with configurable cost
-- **JWT Token Management**: Modern, secure token implementation
+- **JWT Token Management**: Secure token implementation
 - **Editor Password Protection**: Separate password for administrative functions
 - **Database User Verification**: Real-time user existence checks
 - **Comprehensive Error Handling**: Proper error messages and HTTP status codes

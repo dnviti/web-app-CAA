@@ -100,4 +100,4 @@ This application has evolved through different migration strategies:
 - **v2.0**: GORM AutoMigrate + manual data migrations  
 - **v3.0**: Full automation with AutoMigrate + automatic seeding (current)
 
-The old manual migration system has been removed for simplicity and reliability.
+The manual migration system is not used to ensure simplicity and reliability.

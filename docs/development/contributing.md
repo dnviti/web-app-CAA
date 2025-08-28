@@ -36,7 +36,7 @@ Examples of behavior that contributes to creating a positive environment:
 
 Before contributing, ensure you have:
 
-1. **Go 1.21+** installed
+1. **Go 1.24+** installed
 2. **Git** configured with your name and email
 3. **Make** installed (for build tasks)
 4. **Docker** (optional, for containerized development)
@@ -83,7 +83,7 @@ make setup-db
 make run
 ```
 
-The application should be available at `http://localhost:8080`.
+The application should be available at `http://localhost:6542`.
 
 ## Development Workflow
 
@@ -216,14 +216,14 @@ When making database changes:
 
 Example model change:
 ```go
-// Before
+// Original structure
 type User struct {
     ID       uint   `gorm:"primaryKey"`
     Username string `gorm:"unique;not null"`
     Password string `gorm:"not null"`
 }
 
-// After - adding email field
+// Modified - adding email field
 type User struct {
     ID       uint   `gorm:"primaryKey"`
     Username string `gorm:"unique;not null"`

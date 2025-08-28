@@ -5,7 +5,7 @@ The Grid Management API handles communication grid operations including setup, C
 ## Base URL
 
 ```
-http://localhost:3000/api
+http://localhost:6542/api
 ```
 
 ## Grid Structure

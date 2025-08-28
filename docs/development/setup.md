@@ -125,7 +125,7 @@ nano .env
 **Development `.env` file:**
 ```env
 # Server Configuration
-APP_PORT=3000
+APP_PORT=6542
 APP_HOST=localhost
 JWT_SECRET=development-jwt-secret-change-in-production
 
@@ -192,7 +192,7 @@ make dev
 go run ./cmd/web-app-caa/main.go
 ```
 
-The application will be available at: `http://localhost:3000`
+The application will be available at: `http://localhost:6542`
 
 ### 2. Watch for Changes
 
@@ -320,7 +320,7 @@ Create a development container configuration:
       ]
     }
   },
-  "forwardPorts": [3000],
+  "forwardPorts": [6542],
   "postCreateCommand": "go mod download"
 }
 ```
@@ -341,7 +341,7 @@ Create **.vscode/launch.json:**
       "mode": "auto",
       "program": "./cmd/web-app-caa",
       "env": {
-        "APP_PORT": "3000",
+        "APP_PORT": "6542",
         "GIN_MODE": "debug"
       },
       "console": "integratedTerminal"
@@ -579,11 +579,11 @@ This project requires CGO to be enabled for SQLite support. See [CGO_ENABLED=1 I
 
 **Port already in use:**
 ```bash
-# Kill process using port 3000
-lsof -ti:3000 | xargs kill -9
+# Kill process using port 6542
+lsof -ti:6542 | xargs kill -9
 
 # Or use different port
-APP_PORT=8080 make dev
+APP_PORT=6542 make dev
 ```
 
 **Module download failures:**

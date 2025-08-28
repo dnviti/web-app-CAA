@@ -76,7 +76,7 @@ Create a `.env` file in the project root:
 
 ```env
 # Development Configuration
-APP_PORT=3000
+APP_PORT=6542
 APP_HOST=localhost
 JWT_SECRET=development-secret-key
 
@@ -123,7 +123,7 @@ LLM_MODEL=gpt-3.5-turbo
 
 ```env
 # Docker environment
-APP_PORT=3000
+APP_PORT=6542
 APP_HOST=0.0.0.0
 JWT_SECRET=docker-secret-key
 
@@ -147,9 +147,9 @@ services:
   webapp:
     build: .
     ports:
-      - "3000:3000"
+      - "6542:6542"
     environment:
-      - APP_PORT=3000
+      - APP_PORT=6542
       - APP_HOST=0.0.0.0
       - JWT_SECRET=${JWT_SECRET}
       - DB_DRIVER=sqlite
@@ -362,7 +362,7 @@ The application performs these validation checks on startup:
 
 ```bash
 # Check application health
-curl http://localhost:3000/health
+curl http://localhost:6542/ping
 
 # Response includes configuration status
 {

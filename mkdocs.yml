@@ -85,7 +85,6 @@ nav:
       - Contributing: development/contributing.md
       - RBAC Migration: development/rbac-migration.md
       - Startup Migrations: development/startup-migrations.md
-      - Clean Auth Refactoring: development/clean-auth-refactoring.md
       - CGO Issues: development/cgo-issue.md
 
 copyright: Copyright &copy; 2025 Daniele

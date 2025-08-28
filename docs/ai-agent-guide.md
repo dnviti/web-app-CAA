@@ -546,8 +546,8 @@ func TestFeatureRepository_Create(t *testing.T) {
 ### Environment Variables
 ```bash
 # Server Configuration
-PORT=6542
-HOST=0.0.0.0
+APP_PORT=6542
+APP_HOST=0.0.0.0
 TRUSTED_PROXIES=127.0.0.1,::1
 
 # Authentication
@@ -577,7 +577,7 @@ ARASAAC_API_URL=https://api.arasaac.org
 
 ### Docker Deployment
 ```dockerfile
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 COPY go.mod go.sum ./

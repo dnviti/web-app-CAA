@@ -428,6 +428,6 @@ pip freeze > docs/requirements.txt
 
 ---
 
-Your documentation is now automatically deployed to GitHub Pages! Every time you update the documentation and push to the main branch, it will be automatically rebuilt and deployed.
+Your documentation is automatically deployed to GitHub Pages! Each time you update the documentation and push to the main branch, it will be automatically rebuilt and deployed.
 
 The documentation will be available at: `https://dnviti.github.io/web-app-CAA`

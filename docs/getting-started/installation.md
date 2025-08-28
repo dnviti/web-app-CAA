@@ -15,7 +15,7 @@ This comprehensive guide covers all installation methods and requirements for We
 
 #### Go Programming Language
 
-Web App CAA requires **Go 1.21 or higher**.
+Web App CAA requires **Go 1.24 or higher**.
 
 === "Linux (Ubuntu/Debian)"
     ```bash
@@ -149,11 +149,11 @@ make docker-up
 docker pull ghcr.io/dnviti/web-app-caa:latest
 
 # Run with default settings
-docker run -p 3000:3000 ghcr.io/dnviti/web-app-caa:latest
+docker run -p 6542:6542 ghcr.io/dnviti/web-app-caa:latest
 
 # Run with custom configuration
-docker run -p 8080:8080 \
-  -e APP_PORT=8080 \
+docker run -p 8080:6542 \
+  -e APP_PORT=6542 \
   -e JWT_SECRET=your-secret-key \
   ghcr.io/dnviti/web-app-caa:latest
 ```
@@ -165,7 +165,7 @@ docker run -p 8080:8080 \
 docker build -t web-app-caa .
 
 # Run the container
-docker run -p 3000:3000 web-app-caa
+docker run -p 6542:6542 web-app-caa
 ```
 
 ### Method 3: Binary Releases
@@ -191,7 +191,7 @@ Create a `.env` file in the project root:
 
 ```env
 # Server Configuration
-APP_PORT=3000
+APP_PORT=6542
 APP_HOST=localhost
 JWT_SECRET=your-super-secret-jwt-key
 
@@ -275,7 +275,7 @@ LLM_MODEL=gpt-3.5-turbo
 # Verify Go installation
 go version
 
-# Should output: go version go1.21.x...
+# Should output: go version go1.24.x...
 
 # Check application build
 ./bin/web-app-caa --help
@@ -288,7 +288,7 @@ go version
 ./bin/web-app-caa
 
 # In another terminal, test the health endpoint
-curl http://localhost:3000/api/health
+curl http://localhost:6542/ping
 ```
 
 ### 3. Verify Database Connection
@@ -298,7 +298,7 @@ Check the logs for successful database initialization:
 ```
 [INFO] Database initialized successfully
 [INFO] Auto-migration completed
-[INFO] Server starting on localhost:3000
+[INFO] Server starting on localhost:6542
 ```
 
 ## Troubleshooting
@@ -341,7 +341,7 @@ chmod +x bin/web-app-caa
 **Port already in use**
 ```bash
 # Change port
-export APP_PORT=8080
+export APP_PORT=6542
 ./bin/web-app-caa
 ```
 
@@ -371,7 +371,7 @@ sudo usermod -aG docker $USER
 **Port conflicts**
 ```bash
 # Use different port
-docker run -p 8080:3000 web-app-caa
+docker run -p 8080:6542 web-app-caa
 ```
 
 ### Performance Tuning

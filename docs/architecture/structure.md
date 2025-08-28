@@ -104,7 +104,7 @@ internal/
 │   ├── grid.go          # Grid management handlers
 │   ├── ai.go            # AI service handlers
 │   ├── pages.go         # Web page handlers
-│   └── auth_old.go      # Legacy auth handlers (backup)
+│   └── auth_old.go      # Legacy auth handlers
 ├── middleware/
 │   └── ollama.go        # Ollama-specific middleware
 ├── models/
@@ -121,7 +121,7 @@ internal/
 │   └── llm.go           # LLM service implementation
 └── utils/
     └── token/           # Legacy token utilities
-        └── token.go     # JWT utilities (updated to modern lib)
+        └── token.go     # JWT utilities
 ```
 
 #### Authentication Architecture (`/internal/auth`)
@@ -156,7 +156,7 @@ type JWTTokenService struct {
 }
 
 func (s *JWTTokenService) GenerateToken(userID uint) (string, error) {
-    // Modern JWT implementation with golang-jwt/jwt/v5
+    // JWT implementation with golang-jwt/jwt/v5
 }
 ```
 
@@ -272,7 +272,7 @@ func (h *GridHandlers) SaveGrid(c *gin.Context) {
 }
 ```
 
-**Note:** Authentication handlers have been moved to the clean architecture implementation in `internal/auth/handler.go`.
+**Note:** Authentication handlers are implemented in the clean architecture pattern in `internal/auth/handler.go`.
 
 #### Service Layer
 
@@ -390,7 +390,7 @@ deployments/
 #### Dockerfile
 
 ```dockerfile
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -418,9 +418,9 @@ services:
   webapp:
     build: .
     ports:
-      - "3000:3000"
+      - "6542:6542"
     environment:
-      - APP_PORT=3000
+      - APP_PORT=6542
       - APP_HOST=0.0.0.0
     volumes:
       - ./data:/app/data
@@ -477,7 +477,7 @@ clean:
 ```go
 module github.com/daniele/web-app-caa
 
-go 1.21
+go 1.24.6
 
 require (
     github.com/gin-gonic/gin v1.10.1
@@ -493,7 +493,7 @@ require (
 **`.env.example`**
 ```env
 # Server Configuration
-APP_PORT=3000
+APP_PORT=6542
 APP_HOST=localhost
 JWT_SECRET=your-jwt-secret-key
 
