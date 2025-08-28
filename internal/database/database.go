@@ -41,7 +41,7 @@ func Initialize(cfg *config.Config) {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Auto-migrate the models
+	// Auto-migrate the models (excluding SigningKey as it's handled by migration)
 	if err := DB.AutoMigrate(
 		&models.User{},
 		&models.GridItem{},
@@ -49,7 +49,7 @@ func Initialize(cfg *config.Config) {
 		&models.Permission{},
 		&models.UserRole{},
 		&models.RolePermission{},
-		&models.SigningKey{},
+		// SigningKey is handled by migration system for proper initialization
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

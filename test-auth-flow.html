@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Flow Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Authentication Flow Test</h1>
+    
+    <button onclick="clearStorage()">Clear LocalStorage</button>
+    <button onclick="login()">Login as Admin</button>
+    <button onclick="testGrid()">Test Grid API</button>
+    <button onclick="testWithFakeToken()">Test with Fake Token</button>
+    
+    <div id="output" style="background: #f0f0f0; padding: 10px; margin: 10px; white-space: pre-line;"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        
+        // Set up axios interceptor like the frontend
+        axios.interceptors.request.use(
+            (config) => {
+                const token = localStorage.getItem('jwt_token');
+                console.log('🌐 Axios interceptor triggered for:', config.url);
+                console.log('🌐 Token found:', !!token);
+                
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`;
+                    console.log('🌐 Added Authorization header');
+                }
+                
+                return config;
+            },
+            (error) => {
+                console.error('🌐 Request interceptor error:', error);
+                return Promise.reject(error);
+            }
+        );
+        
+        function log(message) {
+            output.textContent += new Date().toISOString() + ': ' + JSON.stringify(message, null, 2) + '\n\n';
+            console.log(message);
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            output.textContent = '';
+            log('LocalStorage cleared');
+        }
+        
+        async function login() {
+            log('Attempting login...');
+            try {
+                const response = await axios.post('http://localhost:6542/api/auth/login', {
+                    username: 'admin',
+                    password: 'admin123'
+                });
+                
+                log({ 
+                    status: response.status, 
+                    hasToken: !!response.data.token,
+                    hasRefreshToken: !!response.data.refresh_token,
+                    user: response.data.user?.username
+                });
+                
+                if (response.data.token) {
+                    localStorage.setItem('jwt_token', response.data.token);
+                    localStorage.setItem('refresh_token', response.data.refresh_token);
+                    log('Tokens stored in localStorage');
+                }
+                
+            } catch (error) {
+                log({ 
+                    error: error.message, 
+                    status: error.response?.status,
+                    data: error.response?.data 
+                });
+            }
+        }
+        
+        async function testGrid() {
+            log('Testing grid API...');
+            const token = localStorage.getItem('jwt_token');
+            log({ hasToken: !!token, tokenLength: token?.length });
+            
+            try {
+                const response = await axios.get('http://localhost:6542/api/grid');
+                log({ 
+                    status: response.status, 
+                    hasData: !!response.data,
+                    dataKeys: Object.keys(response.data || {})
+                });
+            } catch (error) {
+                log({ 
+                    error: error.message, 
+                    status: error.response?.status,
+                    data: error.response?.data 
+                });
+            }
+        }
+        
+        async function testWithFakeToken() {
+            log('Testing with fake token...');
+            localStorage.setItem('jwt_token', 'fake-token-12345');
+            
+            try {
+                const response = await axios.get('http://localhost:6542/api/grid');
+                log({ status: response.status, data: response.data });
+            } catch (error) {
+                log({ 
+                    error: error.message, 
+                    status: error.response?.status,
+                    data: error.response?.data 
+                });
+            }
+        }
+    </script>
+</body>
+</html>

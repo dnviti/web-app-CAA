@@ -61,13 +61,17 @@ const MainPage: React.FC = () => {
 
   useEffect(() => {
     console.log('MainPage useEffect', { user: !!user, token: !!token })
+    console.log('🏠 MainPage: localStorage tokens:', {
+      hasJwtToken: !!localStorage.getItem('jwt_token'),
+      hasRefreshToken: !!localStorage.getItem('refresh_token')
+    })
     
     // Only load grid data if user is authenticated and we have a valid token
     if (user && token) {
-      console.log('MainPage: loading grid data')
+      console.log('🏠 MainPage: loading grid data')
       loadGrid()
     } else {
-      console.log('MainPage: no user or token, skipping grid load')
+      console.log('🏠 MainPage: no user or token, skipping grid load', { user: !!user, token: !!token })
     }
     
     // Apply size class to HTML element
@@ -77,7 +81,7 @@ const MainPage: React.FC = () => {
     const handleClickOutside = () => setContextMenu(null)
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
-  }, [loadGrid, currentSize, user, token])
+  }, [currentSize, user, token]) // Removed loadGrid from dependencies to prevent infinite loop
 
   // Don't render the main page if there's no authenticated user
   if (!user) {

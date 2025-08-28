@@ -16,13 +16,42 @@ export const apiClient = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config) => {
+    console.log('🌐 API Request interceptor TRIGGERED for:', config.url)
+    
     const token = localStorage.getItem('jwt_token')
+    console.log('🌐 API Request interceptor:', { 
+      url: config.url, 
+      method: config.method,
+      hasToken: !!token,
+      tokenPrefix: token ? token.substring(0, 20) + '...' : 'none',
+      existingAuthHeader: !!config.headers?.Authorization,
+      headers: Object.keys(config.headers || {}),
+      headersObject: config.headers
+    })
+    
     if (token) {
+      // Ensure headers exist and set authorization header
+      config.headers = config.headers || {}
       config.headers.Authorization = `Bearer ${token}`
+      console.log('🌐 Authorization header ADDED')
+      console.log('🌐 Final request headers after setting auth:', Object.keys(config.headers))
+      console.log('🌐 Authorization header value:', config.headers.Authorization?.substring(0, 50) + '...')
+    } else {
+      console.log('🌐 NO TOKEN - request will be sent without Authorization header')
     }
+    
+    // Log final config before sending
+    console.log('🌐 Final request config:', {
+      url: config.url,
+      method: config.method,
+      hasAuthHeader: !!config.headers?.Authorization,
+      headerCount: Object.keys(config.headers || {}).length
+    })
+    
     return config
   },
   (error) => {
+    console.error('🌐 API Request interceptor ERROR:', error)
     return Promise.reject(error)
   }
 )
@@ -48,8 +77,20 @@ const processQueue = (error: any, token = null) => {
 
 // Response interceptor for error handling and token refresh
 apiClient.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    console.log('🌐 API Response success:', { 
+      url: response.config.url, 
+      status: response.status 
+    })
+    return response
+  },
   async (error) => {
+    console.log('🌐 API Response error:', { 
+      url: error.config?.url, 
+      status: error.response?.status,
+      message: error.response?.data?.message || error.response?.data?.error || error.message
+    })
+    
     const originalRequest = error.config
     
     if (error.response?.status === 401 && !originalRequest._retry) {

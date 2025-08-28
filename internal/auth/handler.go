@@ -81,7 +81,7 @@ func (h *Handler) Register(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body models.LoginRequest true "Login request"
-// @Success 200 {object} models.LoginResponse
+// @Success 200 {object} models.AuthResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 401 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
@@ -119,10 +119,12 @@ func (h *Handler) Login(c *gin.Context) {
 
 	log.Printf("[AUTH-HANDLER] Login successful for user: %s", user.Username)
 
-	c.JSON(http.StatusOK, models.LoginResponse{
+	c.JSON(http.StatusOK, models.AuthResponse{
+		Message:      "Login successful",
 		Token:        token,
 		RefreshToken: refreshToken,
 		Status:       user.Status,
+		User:         user,
 	})
 }
 

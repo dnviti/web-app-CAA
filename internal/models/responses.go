@@ -25,6 +25,7 @@ type AuthResponse struct {
 	Token        string `json:"token"`
 	RefreshToken string `json:"refresh_token"`
 	Status       string `json:"status"`
+	User         *User  `json:"user"`
 }
 
 // LoginResponse represents the login response

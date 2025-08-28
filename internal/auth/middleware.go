@@ -9,6 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// min returns the minimum of two integers
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 // Middleware creates authentication middleware
 type Middleware struct {
 	tokenService TokenService
@@ -33,7 +41,8 @@ func (m *Middleware) RequireAuth() gin.HandlerFunc {
 		// Extract token from request
 		tokenString, err := m.tokenService.ExtractTokenFromRequest(c)
 		if err != nil {
-			log.Printf("[AUTH-MIDDLEWARE] Token not found: %v", err)
+			log.Printf("[AUTH-MIDDLEWARE] Token extraction failed: %v", err)
+			log.Printf("[AUTH-MIDDLEWARE] Request headers: Authorization=%s", c.GetHeader("Authorization"))
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Authorization token required",
 			})
@@ -41,16 +50,21 @@ func (m *Middleware) RequireAuth() gin.HandlerFunc {
 			return
 		}
 
+		log.Printf("[AUTH-MIDDLEWARE] Token extracted successfully (length: %d)", len(tokenString))
+
 		// Validate token
 		claims, err := m.tokenService.ValidateToken(tokenString)
 		if err != nil {
 			log.Printf("[AUTH-MIDDLEWARE] Token validation failed: %v", err)
+			log.Printf("[AUTH-MIDDLEWARE] Token preview: %s...", tokenString[:min(50, len(tokenString))])
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Invalid or expired token",
 			})
 			c.Abort()
 			return
 		}
+
+		log.Printf("[AUTH-MIDDLEWARE] Token validated successfully, user ID: %v", claims.UserID)
 
 		// Convert UserID interface{} to string
 		var userIDStr string

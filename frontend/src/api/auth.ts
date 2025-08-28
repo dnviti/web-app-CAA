@@ -19,12 +19,8 @@ export const authApi = {
   /**
    * Verify JWT token and get user info
    */
-  verifyToken: async (token: string): Promise<ApiResponse<User>> => {
-    return apiRequest<User>('GET', '/api/auth/verify', null, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+  verifyToken: async (): Promise<ApiResponse<User>> => {
+    return apiRequest<User>('GET', '/api/auth/verify')
   },
 
   /**

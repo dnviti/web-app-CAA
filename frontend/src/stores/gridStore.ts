@@ -76,15 +76,38 @@ export const useGridStore = create<GridState>()(
 
       // Load grid from server
       loadGrid: async () => {
+        const { loading } = get()
+        
+        // Prevent concurrent requests
+        if (loading) {
+          console.log('📊 GridStore: loadGrid already in progress, skipping')
+          return
+        }
+        
+        // Check if we have a token before making the request
+        const token = localStorage.getItem('jwt_token')
+        if (!token) {
+          console.log('📊 GridStore: No JWT token found, skipping grid load')
+          set({ error: 'No authentication token available', loading: false })
+          return
+        }
+        
         set({ loading: true, error: null })
+        console.log('📊 GridStore: loadGrid starting')
+        console.log('📊 GridStore: localStorage token:', !!token)
+        
         try {
           const response = await gridApi.getGrid()
+          console.log('📊 GridStore: getGrid response:', response)
           if (response.success && response.data) {
+            console.log('📊 GridStore: Grid loaded successfully')
             set({ categories: response.data, loading: false })
           } else {
+            console.error('📊 GridStore: Failed to load grid:', response.error)
             set({ error: 'Failed to load grid data', loading: false })
           }
         } catch (error) {
+          console.error('📊 GridStore: Network error loading grid:', error)
           set({ error: 'Network error loading grid', loading: false })
         }
       },

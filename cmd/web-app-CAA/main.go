@@ -66,9 +66,9 @@ func main() {
 	database.Initialize(cfg)
 	db := database.GetDB()
 
-	// Run database migrations
+	// Run database migrations including signing keys
 	log.Printf("[STARTUP] Running database migrations...")
-	if err := migrations.RunDatabaseMigrations(db); err != nil {
+	if err := migrations.RunDatabaseMigrationsWithRSA(db, &cfg.RSAKeys); err != nil {
 		log.Fatalf("Failed to run database migrations: %v", err)
 	}
 	log.Printf("[STARTUP] Database migrations completed successfully")

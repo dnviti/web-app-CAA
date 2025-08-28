@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -76,8 +77,14 @@ func (s *JWTTokenService) GenerateRefreshToken(userID interface{}) (string, erro
 func (s *JWTTokenService) ValidateToken(tokenString string) (*TokenClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Verify signing method is RSA
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		method, ok := token.Method.(*jwt.SigningMethodRSA)
+		if !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v (expected RSA)", token.Header["alg"])
+		}
+
+		// Ensure it's RS256 specifically
+		if method.Alg() != "RS256" {
+			return nil, fmt.Errorf("unexpected RSA signing method: %v (expected RS256)", method.Alg())
 		}
 
 		// Get key ID from token header
@@ -93,9 +100,11 @@ func (s *JWTTokenService) ValidateToken(tokenString string) (*TokenClaims, error
 		// Get verification key
 		publicKey, err := s.signingKeyService.GetVerificationKey(keyID)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get verification key: %w", err)
+			log.Printf("[JWT-SERVICE] Failed to get verification key for key ID %s: %v", keyID, err)
+			return nil, fmt.Errorf("failed to get verification key for key ID %s: %w", keyID, err)
 		}
 
+		log.Printf("[JWT-SERVICE] Retrieved verification key for key ID: %s", keyID)
 		return publicKey, nil
 	})
 

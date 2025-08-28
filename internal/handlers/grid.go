@@ -4,10 +4,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/daniele/web-app-caa/internal/auth"
 	"github.com/daniele/web-app-caa/internal/config"
 	"github.com/daniele/web-app-caa/internal/models"
 	"github.com/daniele/web-app-caa/internal/services"
-	"github.com/daniele/web-app-caa/internal/utils/token"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,10 +42,10 @@ func NewGridHandlers(cfg *config.Config) *GridHandlers {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /setup [post]
 func (h *GridHandlers) Setup(c *gin.Context) {
-	// Extract user ID from token
-	userID, err := token.ExtractUserIDFromContext(c)
-	if err != nil {
-		log.Printf("[SETUP] Error extracting user ID from token: %v", err)
+	// Extract user ID from context
+	userID := auth.GetUserID(c)
+	if userID == "" {
+		log.Printf("[SETUP] Error extracting user ID from context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
@@ -116,10 +116,10 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /complete-setup [post]
 func (h *GridHandlers) CompleteSetup(c *gin.Context) {
-	// Extract user ID from token
-	userID, err := token.ExtractUserIDFromContext(c)
-	if err != nil {
-		log.Printf("[COMPLETE-SETUP] Error extracting user ID from token: %v", err)
+	// Extract user ID from context
+	userID := auth.GetUserID(c)
+	if userID == "" {
+		log.Printf("[COMPLETE-SETUP] Error extracting user ID from context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
@@ -148,9 +148,9 @@ func (h *GridHandlers) CompleteSetup(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid [get]
 func (h *GridHandlers) GetGrid(c *gin.Context) {
-	userID, err := token.ExtractUserIDFromContext(c)
-	if err != nil {
-		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+	userID := auth.GetUserID(c)
+	if userID == "" {
+		log.Printf("[ERROR] Error extracting user ID from context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
@@ -188,9 +188,9 @@ func (h *GridHandlers) GetGrid(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid [post]
 func (h *GridHandlers) SaveGrid(c *gin.Context) {
-	userID, err := token.ExtractUserIDFromContext(c)
-	if err != nil {
-		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+	userID := auth.GetUserID(c)
+	if userID == "" {
+		log.Printf("[ERROR] Error extracting user ID from context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
@@ -228,9 +228,9 @@ func (h *GridHandlers) SaveGrid(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid/item [post]
 func (h *GridHandlers) AddItem(c *gin.Context) {
-	userID, err := token.ExtractUserIDFromContext(c)
-	if err != nil {
-		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+	userID := auth.GetUserID(c)
+	if userID == "" {
+		log.Printf("[ERROR] Error extracting user ID from context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
@@ -279,9 +279,9 @@ func (h *GridHandlers) AddItem(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid/item/{id} [put]
 func (h *GridHandlers) UpdateItem(c *gin.Context) {
-	userID, err := token.ExtractUserIDFromContext(c)
-	if err != nil {
-		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+	userID := auth.GetUserID(c)
+	if userID == "" {
+		log.Printf("[ERROR] Error extracting user ID from context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
@@ -323,9 +323,9 @@ func (h *GridHandlers) UpdateItem(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /grid/item/{id} [delete]
 func (h *GridHandlers) DeleteItem(c *gin.Context) {
-	userID, err := token.ExtractUserIDFromContext(c)
-	if err != nil {
-		log.Printf("[ERROR] Error extracting user ID from token: %v", err)
+	userID := auth.GetUserID(c)
+	if userID == "" {
+		log.Printf("[ERROR] Error extracting user ID from context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}

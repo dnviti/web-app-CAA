@@ -27,10 +27,18 @@ export const useAuthStore = create<AuthState & AuthActions & { isInitialized: bo
       // Actions
       login: async (credentials) => {
         set({ isLoading: true, error: null })
+        console.log('🔐 Login starting with credentials:', { username: credentials.username })
         try {
           const response = await authApi.login(credentials)
+          console.log('🔐 Login API response:', response)
           
           if (response.success && response.data) {
+            console.log('🔐 Login successful, storing tokens:', {
+              hasToken: !!response.data.token,
+              hasRefreshToken: !!response.data.refresh_token,
+              hasUser: !!response.data.user
+            })
+            
             // Store both tokens in localStorage for API client
             localStorage.setItem('jwt_token', response.data.token)
             localStorage.setItem('refresh_token', response.data.refresh_token)
@@ -46,6 +54,7 @@ export const useAuthStore = create<AuthState & AuthActions & { isInitialized: bo
             return true
           } else {
             const errorMessage = response.error || 'Login fallito'
+            console.error('🔐 Login failed:', errorMessage)
             set({ error: errorMessage, isLoading: false })
             toast.error(errorMessage)
             return false
@@ -154,8 +163,8 @@ export const useAuthStore = create<AuthState & AuthActions & { isInitialized: bo
         
         try {
           console.log('checkAuth: calling verify API')
-          // Verify token with backend
-          const response = await authApi.verifyToken(token)
+          // Verify token with backend - the interceptor will add the token
+          const response = await authApi.verifyToken()
           
           if (response.success && response.data) {
             console.log('checkAuth: token valid, setting user')
