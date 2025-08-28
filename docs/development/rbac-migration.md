@@ -1,51 +1,30 @@
-# Database Migrations System
+# RBAC System Initialization
 
-This document describes the database migration system that automatically manages database schema changes and data initialization, including RBAC (Role-Based Access Control) setup.
+This document describes how the RBAC (Role-Based Access Control) system is automatically initialized when the application starts.
 
 ## Overview
 
-The application uses a dedicated migration system located in `internal/migrations/` that:
+The application uses **automatic RBAC seeding** that runs during database initialization. No manual migrations or commands are needed - the RBAC system is set up automatically on first run and maintained thereafter.
 
-1. **Tracks migration execution** in the `migration_records` table
-2. **Ensures idempotent operation** - migrations run only once
-3. **Provides detailed logging** with `[MIGRATIONS]` and specific migration prefixes
-4. **Supports rollback functionality** for each migration
-
-## Migration System Architecture
+## Automatic RBAC Setup
 
 ### Core Components
 
-- **`migration_runner.go`** - Core migration runner and tracking system
-- **`migrations.go`** - Registry of all available migrations  
-- **`001_rbac_setup.go`** - RBAC system initialization migration
-- **Migration tracking table** - `migration_records` stores executed migrations
+- **`internal/database/seeding.go`** - Contains all RBAC seeding logic
+- **`database.Initialize()`** - Calls seeding functions automatically
+- **Idempotent operations** - Safe to run multiple times
 
-### Migration Structure
+### What Gets Created Automatically
 
-```go
-type Migration struct {
-    ID          string
-    Name        string
-    Description string
-    Version     string
-    Execute     func(db *gorm.DB) error
-    Rollback    func(db *gorm.DB) error
-}
-```
-
-## RBAC Migration (001_rbac_setup)
-
-The first migration sets up the complete RBAC system:
-
-### What It Creates
+The system automatically creates:
 
 1. **3 Default Roles**: `admin`, `editor`, `user`
-2. **15 Default Permissions** covering all resources and actions
-3. **Initial User Accounts** with proper role assignments
-4. **Role-Permission relationships**
-5. **User-Role assignments**
+2. **Complete Permission Set** covering all resources and actions
+3. **Default User Accounts** with secure passwords
+4. **Role-Permission Relationships** 
+5. **User-Role Assignments**
 
-## Default Roles
+## Default Roles Created
 
 ### Admin Role
 - **Name**: `admin`
@@ -69,53 +48,73 @@ The first migration sets up the complete RBAC system:
 
 The migration creates three initial accounts:
 
-| Username | Password   | Role   | Email                    | Status |
-|----------|-----------|--------|--------------------------|--------|
-| admin    | admin123  | admin  | admin@webapp-caa.local   | active |
-| editor   | editor123 | editor | editor@webapp-caa.local  | active |
-| user     | user123   | user   | user@webapp-caa.local    | active |
+- **Full Administrative Access**: All permissions in the system
+- **User Management**: Create, read, update, delete users
+- **System Configuration**: All system settings and configuration
 
-## Migration Process
+### Editor Role
+- **Content Management**: Create, read, update, delete grid items
+- **Limited User Access**: Read-only access to users
+- **AI Services**: Access to AI-powered features
 
-The migration system runs automatically during application startup:
+### User Role  
+- **Basic Access**: Read access to their own grid items
+- **AI Services**: Access to AI-powered language features
+- **Limited Permissions**: Cannot modify system settings
 
-1. **Database Connection**: After GORM AutoMigrate completes
-2. **Migration Runner Initialization**: `RunDatabaseMigrations(db)` is called
-3. **Migration Tracking Setup**: Creates `migration_records` table if needed
-4. **Migration Execution**: Runs pending migrations in order
-5. **RBAC Policy Sync**: Casbin policies are synced with database after migrations
+## Default Users Created
 
-### Migration Logs
+The system automatically creates these default accounts:
 
-The system provides detailed logging for tracking:
+| Username | Password   | Editor Password | Role   | Email                     | Status        |
+|----------|-----------|-----------------|--------|---------------------------|---------------|
+| admin    | admin123  | editor123      | admin  | admin@caa-app.local       | active        |
+| editor   | editor123 | editor123      | editor | editor@caa-app.local      | active        |
+| user     | user123   | (none)         | user   | user@caa-app.local        | pending_setup |
+
+> **Security Note**: Change these default passwords in production!
+
+## Automatic Initialization Process
+
+The RBAC system initializes automatically during application startup:
+
+1. **Database Connection**: Established first
+2. **Schema Creation**: GORM AutoMigrate creates all tables
+3. **RBAC Seeding**: `SeedRBACData()` function executes
+4. **Idempotent Checks**: Existing data is preserved, missing data is added
+5. **Service Initialization**: RBAC service starts with fully populated database
+
+### Seeding Logs
+
+The system provides detailed logging:
 
 ```
-[MIGRATIONS] Starting database migrations...
-[MIGRATIONS] Executing migration: 001_create_rbac_system
-[RBAC MIGRATION] Executing RBAC setup migration...
-[RBAC MIGRATION] Created default role: admin
-[RBAC MIGRATION] Created default role: editor
-[RBAC MIGRATION] Created default role: user
-[RBAC MIGRATION] Assigned permission 'users:read' to role 'admin'
+[DATABASE SEEDING] Starting RBAC data seeding...
+[DATABASE SEEDING] Created default role: admin
+[DATABASE SEEDING] Created default role: editor
+[DATABASE SEEDING] Created default role: user
+[DATABASE SEEDING] Created permission: users:read
+[DATABASE SEEDING] Created permission: users:create
 ...
-[RBAC MIGRATION] Created default user: admin
-[RBAC MIGRATION] Assigned role 'admin' to user 'admin'
-...
-[RBAC MIGRATION] RBAC system setup completed successfully
-[MIGRATIONS] Completed migration: 001_create_rbac_system
-[MIGRATIONS] Successfully executed 1 migrations
+[DATABASE SEEDING] Created default user: admin
+[DATABASE SEEDING] Created default user: editor
+[DATABASE SEEDING] User user already exists, skipping
+[DATABASE SEEDING] RBAC data seeding completed successfully
 [RBAC] RBAC service initialized successfully
 ```
 
-### Idempotent Operation
+### Subsequent Runs
 
-On subsequent runs with existing data:
+On subsequent runs, the system intelligently skips existing data:
 
 ```
-[MIGRATIONS] Starting database migrations...
-[MIGRATIONS] Skipping migration 001_create_rbac_system (already executed)
-[MIGRATIONS] Skipped 1 already executed migrations
-[RBAC] RBAC service initialized successfully
+[DATABASE SEEDING] Starting RBAC data seeding...
+[DATABASE SEEDING] Role admin already exists, skipping
+[DATABASE SEEDING] Role editor already exists, skipping
+[DATABASE SEEDING] Role user already exists, skipping
+[DATABASE SEEDING] User admin already exists, skipping
+...
+[DATABASE SEEDING] RBAC data seeding completed successfully
 ```
 
 ## Security Notes
@@ -131,7 +130,7 @@ On subsequent runs with existing data:
 
 | Resource | Action | Admin | Editor | User |
 |----------|--------|-------|--------|------|
-| users    | read   | ✓     |        |      |
+| users    | read   | ✓     | ✓      |      |
 | users    | create | ✓     |        |      |
 | users    | update | ✓     |        |      |
 | users    | delete | ✓     |        |      |
@@ -139,138 +138,96 @@ On subsequent runs with existing data:
 | roles    | create | ✓     |        |      |
 | roles    | update | ✓     |        |      |
 | roles    | delete | ✓     |        |      |
-| grids    | read   | ✓     | ✓      |      |
+| grids    | read   | ✓     | ✓      | ✓    |
 | grids    | create | ✓     | ✓      |      |
 | grids    | update | ✓     | ✓      |      |
 | grids    | delete | ✓     | ✓      |      |
-| grids    | own    | ✓     | ✓      | ✓    |
+| ai       | read   | ✓     | ✓      | ✓    |
 | ai       | use    | ✓     | ✓      | ✓    |
 | system   | admin  | ✓     |        |      |
+| system   | config | ✓     |        |      |
 
-## Migration Logs
+## Testing the Setup
 
-The migration process logs its progress with the `[RBAC]` prefix:
-
-```
-[RBAC] Created default role: admin
-[RBAC] Created default role: editor  
-[RBAC] Created default role: user
-[RBAC] Created default user 'admin' with role 'admin'
-[RBAC] Created default user 'editor' with role 'editor'
-[RBAC] Created default user 'user' with role 'user'
-[RBAC] RBAC migration completed successfully
-[RBAC] RBAC service initialized successfully
-```
-
-## Testing the Migration
-
-To test the migration:
+To verify the RBAC system initialized correctly:
 
 1. Start with a fresh database
 2. Run the application
-3. Check the logs for migration messages
-4. Verify you can login with the default accounts
-5. Test role-based permissions
+3. Check the logs for seeding messages
+4. Verify you can login with the default accounts:
+   - Username: `admin`, Password: `admin123`
+   - Username: `editor`, Password: `editor123` 
+   - Username: `user`, Password: `user123`
+5. Test role-based permissions in the application
 
-## Adding New Migrations
+## Customizing Default Data
 
-To add a new migration:
+To modify the default RBAC setup, edit the seeding functions in `internal/database/seeding.go`:
 
-1. **Create Migration File**: `internal/migrations/002_your_migration.go`
-2. **Implement Migration Function**:
-
+### Adding New Roles
 ```go
-func CreateYourMigration() Migration {
-    return Migration{
-        ID:          "002-your-migration",
-        Name:        "002_your_migration_name", 
-        Description: "Description of what this migration does",
-        Version:     "1.0.0",
-        Execute:     executeYourMigration,
-        Rollback:    rollbackYourMigration,
-    }
-}
-
-func executeYourMigration(db *gorm.DB) error {
-    // Migration logic here
-    log.Printf("[YOUR MIGRATION] Starting migration...")
-    // ... implementation
-    return nil
-}
-
-func rollbackYourMigration(db *gorm.DB) error {
-    // Rollback logic here  
-    return nil
-}
+// Add to seedDefaultRoles() function
+{
+    Name:        "moderator",
+    DisplayName: "Moderator", 
+    Description: "Can moderate content and assist users",
+    IsActive:    true,
+},
 ```
 
-3. **Register Migration**: Add to `internal/migrations/migrations.go`:
-
+### Adding New Permissions
 ```go
-func GetAllMigrations() []Migration {
-    return []Migration{
-        CreateRBACMigration(),
-        CreateYourMigration(), // Add your migration here
-    }
-}
+// Add to seedDefaultPermissions() function
+{Name: "content:moderate", Resource: "content", Action: "moderate", Description: "Moderate content"},
 ```
 
-## Migration Best Practices
-
-- **Idempotent**: Always check if resources exist before creating
-- **Logged**: Use clear logging with migration-specific prefixes
-- **Reversible**: Implement rollback functionality when possible
-- **Versioned**: Use semantic versioning for migrations
-- **Tested**: Test both execution and rollback scenarios
-
-## Migration Management
-
-### Manual Migration Control
-
-You can disable automatic migrations by modifying the RBAC service initialization if needed, but this is not recommended for production.
-
-### Database Schema
-
-The `migration_records` table structure:
-
-```sql
-CREATE TABLE migration_records (
-    id VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL,
-    description TEXT,
-    version VARCHAR(255) NOT NULL,
-    executed_at BIGINT NOT NULL
-);
+### Adding New Default Users
+```go
+// Add to seedDefaultUsers() function
+{
+    Username: "moderator",
+    Email:    "moderator@caa-app.local",
+    Password: "moderator123",
+    Status:   "active",
+    IsActive: true,
+},
 ```
+
+> **Note**: After modifying seeding functions, restart the application. The system will automatically create any missing data.
 
 ## Troubleshooting
 
-- **Migrations not running**: Check database connection and GORM AutoMigrate success
-- **Duplicate data**: Ensure migration logic checks for existing resources
-- **Missing permissions**: Verify Casbin policy sync after migration completion  
-- **Migration stuck**: Check `migration_records` table for execution status
-- **Rollback needed**: Implement and test rollback functions for safe reversal
-
 ### Common Issues
 
-1. **Migration executed but resources missing**: Check migration logs for errors during execution
-2. **Casbin policies not working**: Ensure RBAC service syncs policies after migration
-3. **Default users can't login**: Verify password hashing in user creation
-4. **Permission denied errors**: Check role-permission assignments in database
+1. **No default users created**: Check seeding logs for errors during user creation
+2. **Can't login with default credentials**: Verify password hashing is working
+3. **Permission denied errors**: Check role-permission assignments
+4. **Missing roles/permissions**: Restart application to trigger seeding
 
 ### Debugging Commands
 
 ```bash
-# Check migration status
-sqlite3 database.sqlite "SELECT * FROM migration_records;"
+# Check RBAC setup (SQLite example)
+sqlite3 data/database.sqlite "SELECT * FROM roles;"
+sqlite3 data/database.sqlite "SELECT * FROM permissions;" 
+sqlite3 data/database.sqlite "SELECT * FROM users;"
 
-# Verify RBAC setup
-sqlite3 database.sqlite "SELECT COUNT(*) FROM roles;"
-sqlite3 database.sqlite "SELECT COUNT(*) FROM permissions;" 
-sqlite3 database.sqlite "SELECT COUNT(*) FROM users;"
-
-# Check relationships
-sqlite3 database.sqlite "SELECT u.username, r.name FROM users u 
+# Check role assignments
+sqlite3 data/database.sqlite "SELECT u.username, r.name FROM users u 
 JOIN user_roles ur ON u.id = ur.user_id 
 JOIN roles r ON ur.role_id = r.id;"
+
+# Check permission assignments
+sqlite3 data/database.sqlite "SELECT r.name as role, p.name as permission FROM roles r
+JOIN role_permissions rp ON r.id = rp.role_id
+JOIN permissions p ON rp.permission_id = p.id
+ORDER BY r.name, p.name;"
 ```
+
+## Benefits of Automatic Seeding
+
+- **Zero Configuration**: Works out of the box
+- **Consistent**: Same setup in dev, staging, and production
+- **Self-Healing**: Missing data is automatically recreated
+- **Idempotent**: Safe to restart multiple times
+- **No Manual Steps**: No migration commands to remember

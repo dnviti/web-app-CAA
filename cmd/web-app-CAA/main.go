@@ -10,7 +10,6 @@ import (
 	"github.com/daniele/web-app-caa/internal/database"
 	"github.com/daniele/web-app-caa/internal/handlers"
 	"github.com/daniele/web-app-caa/internal/middleware"
-	"github.com/daniele/web-app-caa/internal/migrations"
 	"github.com/daniele/web-app-caa/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -62,16 +61,9 @@ func main() {
 	log.Printf("[STARTUP] - TOKEN_HOUR_LIFESPAN: %d", cfg.TokenHourLifespan)
 	log.Printf("[STARTUP] - TRUSTED_PROXIES: %v", cfg.TrustedProxies)
 
-	// Initialize database
+	// Initialize database (now includes automatic migration and seeding)
 	database.Initialize(cfg)
 	db := database.GetDB()
-
-	// Run database migrations including signing keys
-	log.Printf("[STARTUP] Running database migrations...")
-	if err := migrations.RunDatabaseMigrationsWithRSA(db, &cfg.RSAKeys); err != nil {
-		log.Fatalf("Failed to run database migrations: %v", err)
-	}
-	log.Printf("[STARTUP] Database migrations completed successfully")
 
 	// Initialize RBAC service
 	rbacModelPath := filepath.Join("configs", "rbac_model.conf")

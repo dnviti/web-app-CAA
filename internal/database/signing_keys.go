@@ -1,11 +1,10 @@
-package migrations
+package database
 
 import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
 	"log"
 	"time"
 
@@ -15,14 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-// SigningKeyMigration creates the signing_keys table and generates initial key
-func SigningKeyMigration(db *gorm.DB, cfg *config.RSAKeyConfig) error {
-	// Create the table
-	if err := db.AutoMigrate(&models.SigningKey{}); err != nil {
-		return err
-	}
-
-	log.Printf("[MIGRATION] Signing keys table created/verified")
+// SeedSigningKeys ensures there's always at least one active signing key
+// This function is idempotent - it can be run multiple times safely
+func SeedSigningKeys(db *gorm.DB, cfg *config.RSAKeyConfig) error {
+	log.Printf("[DATABASE SEEDING] Verifying signing keys setup...")
 
 	// Check if we have any signing keys
 	var count int64
@@ -32,27 +27,23 @@ func SigningKeyMigration(db *gorm.DB, cfg *config.RSAKeyConfig) error {
 
 	// If no keys exist, create the initial key
 	if count == 0 {
-		log.Printf("[MIGRATION] No signing keys found, creating initial RSA key pair")
+		log.Printf("[DATABASE SEEDING] No signing keys found, creating initial RSA key pair")
 
-		// Import the auth package functions we need
-		keyRepo := &SigningKeyRepositoryImpl{db: db}
 		expiresAt := time.Now().Add(cfg.RotationPeriod)
-
-		// Create initial signing key
-		initialKey, err := keyRepo.CreateKey(cfg.KeySize, cfg.Algorithm, expiresAt)
+		initialKey, err := createSigningKey(db, cfg.KeySize, cfg.Algorithm, expiresAt)
 		if err != nil {
 			return err
 		}
 
 		// Activate the initial key
-		if err := keyRepo.ActivateKey(initialKey.KeyID); err != nil {
+		if err := activateSigningKey(db, initialKey.KeyID); err != nil {
 			return err
 		}
 
-		log.Printf("[MIGRATION] Initial RSA signing key created and activated: %s (algorithm: %s, key size: %d bits)",
+		log.Printf("[DATABASE SEEDING] Initial RSA signing key created and activated: %s (algorithm: %s, key size: %d bits)",
 			initialKey.KeyID, initialKey.Algorithm, initialKey.KeySize)
 	} else {
-		log.Printf("[MIGRATION] Found %d existing signing keys", count)
+		log.Printf("[DATABASE SEEDING] Found %d existing signing keys", count)
 
 		// Verify we have at least one active, non-expired key
 		var activeCount int64
@@ -63,44 +54,37 @@ func SigningKeyMigration(db *gorm.DB, cfg *config.RSAKeyConfig) error {
 		}
 
 		if activeCount == 0 {
-			log.Printf("[MIGRATION] No active signing keys found, creating new one")
-			keyRepo := &SigningKeyRepositoryImpl{db: db}
+			log.Printf("[DATABASE SEEDING] No active signing keys found, creating new one")
 			expiresAt := time.Now().Add(cfg.RotationPeriod)
 
 			// Create new signing key
-			newKey, err := keyRepo.CreateKey(cfg.KeySize, cfg.Algorithm, expiresAt)
+			newKey, err := createSigningKey(db, cfg.KeySize, cfg.Algorithm, expiresAt)
 			if err != nil {
 				return err
 			}
 
 			// Activate the new key
-			if err := keyRepo.ActivateKey(newKey.KeyID); err != nil {
+			if err := activateSigningKey(db, newKey.KeyID); err != nil {
 				return err
 			}
 
-			log.Printf("[MIGRATION] New active RSA signing key created: %s", newKey.KeyID)
+			log.Printf("[DATABASE SEEDING] New active RSA signing key created: %s", newKey.KeyID)
+		} else {
+			log.Printf("[DATABASE SEEDING] Found %d active signing keys", activeCount)
 		}
 	}
 
 	return nil
 }
 
-// SigningKeyRepositoryImpl minimal implementation for migration
-type SigningKeyRepositoryImpl struct {
-	db *gorm.DB
-}
-
-// CreateKey implementation for migration (simplified version)
-func (r *SigningKeyRepositoryImpl) CreateKey(keySize int, algorithm string, expiresAt time.Time) (*models.SigningKey, error) {
-	// This implementation is duplicated here to avoid circular imports during migration
-	// It matches the implementation in auth/signing_key_repository.go
-
-	log.Printf("[MIGRATION] Generating new RSA key pair (size: %d bits, algorithm: %s)", keySize, algorithm)
+// createSigningKey generates a new RSA key pair and stores it in the database
+func createSigningKey(db *gorm.DB, keySize int, algorithm string, expiresAt time.Time) (*models.SigningKey, error) {
+	log.Printf("[DATABASE SEEDING] Generating new RSA key pair (size: %d bits, algorithm: %s)", keySize, algorithm)
 
 	// Generate RSA key pair
 	privateKey, err := rsa.GenerateKey(rand.Reader, keySize)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate RSA key pair: %w", err)
+		return nil, err
 	}
 
 	// Encode private key to PEM format
@@ -114,7 +98,7 @@ func (r *SigningKeyRepositoryImpl) CreateKey(keySize int, algorithm string, expi
 	publicKey := &privateKey.PublicKey
 	publicKeyPKIX, err := x509.MarshalPKIXPublicKey(publicKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal public key: %w", err)
+		return nil, err
 	}
 
 	publicKeyPEM := &pem.Block{
@@ -135,17 +119,17 @@ func (r *SigningKeyRepositoryImpl) CreateKey(keySize int, algorithm string, expi
 	}
 
 	// Save to database
-	if err := r.db.Create(signingKey).Error; err != nil {
-		return nil, fmt.Errorf("failed to save signing key: %w", err)
+	if err := db.Create(signingKey).Error; err != nil {
+		return nil, err
 	}
 
-	log.Printf("[MIGRATION] Generated and stored new signing key with ID: %s", signingKey.KeyID)
+	log.Printf("[DATABASE SEEDING] Generated and stored new signing key with ID: %s", signingKey.KeyID)
 	return signingKey, nil
 }
 
-// ActivateKey implementation for migration
-func (r *SigningKeyRepositoryImpl) ActivateKey(keyID string) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
+// activateSigningKey activates a specific key and deactivates all others
+func activateSigningKey(db *gorm.DB, keyID string) error {
+	return db.Transaction(func(tx *gorm.DB) error {
 		// First mark all currently active keys as rotated and deactivate them
 		now := time.Now()
 		if err := tx.Model(&models.SigningKey{}).
@@ -154,19 +138,19 @@ func (r *SigningKeyRepositoryImpl) ActivateKey(keyID string) error {
 				"is_active":  false,
 				"rotated_at": &now,
 			}).Error; err != nil {
-			return fmt.Errorf("failed to deactivate and mark existing keys as rotated: %w", err)
+			return err
 		}
 
 		// Activate the specified key
 		result := tx.Model(&models.SigningKey{}).Where("key_id = ?", keyID).Update("is_active", true)
 		if result.Error != nil {
-			return fmt.Errorf("failed to activate key %s: %w", keyID, result.Error)
+			return result.Error
 		}
 		if result.RowsAffected == 0 {
-			return fmt.Errorf("key with ID %s not found", keyID)
+			return gorm.ErrRecordNotFound
 		}
 
-		log.Printf("[MIGRATION] Activated signing key: %s", keyID)
+		log.Printf("[DATABASE SEEDING] Activated signing key: %s", keyID)
 		return nil
 	})
 }

@@ -1,3 +1,21 @@
+// Package database provides database initialization and connection management.
+//
+// DATABASE MIGRATION & SEEDING STRATEGY:
+// This application uses a fully automated approach for both schema and data management:
+//
+// 1. AUTOMATIC SCHEMA MIGRATION (GORM AutoMigrate):
+//   - All table creation, column addition/modification, index creation
+//   - Handled automatically by GORM based on struct tags in models
+//   - Includes: User, GridItem, Role, Permission, UserRole, RolePermission, RefreshToken, SigningKey
+//   - Benefits: No manual migration files needed, automatic schema updates, reduced errors
+//
+// 2. AUTOMATIC DATA SEEDING (database seeding functions):
+//   - RBAC setup: Creating default roles, permissions, users, and relationships
+//   - SigningKey initialization: Generating initial RSA key pairs for JWT signing
+//   - Idempotent operations - can be run multiple times safely
+//   - Benefits: Zero-configuration setup, consistent environments, no manual setup
+//
+// This fully automated approach eliminates migration errors and provides zero-configuration database setup.
 package database
 
 import (
@@ -17,7 +35,7 @@ import (
 
 var DB *gorm.DB
 
-// Initialize initializes the database connection
+// Initialize initializes the database connection and performs automatic seeding
 func Initialize(cfg *config.Config) {
 	var err error
 	dbConfig := cfg.Database
@@ -41,7 +59,7 @@ func Initialize(cfg *config.Config) {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Auto-migrate the models (excluding SigningKey as it's handled by migration)
+	// Auto-migrate all models - GORM handles table creation, constraints, and schema updates automatically
 	if err := DB.AutoMigrate(
 		&models.User{},
 		&models.GridItem{},
@@ -49,12 +67,23 @@ func Initialize(cfg *config.Config) {
 		&models.Permission{},
 		&models.UserRole{},
 		&models.RolePermission{},
-		// SigningKey is handled by migration system for proper initialization
+		&models.RefreshToken{},
+		&models.SigningKey{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
-	log.Printf("[DATABASE] Connected and migrated successfully using %s driver", dbConfig.Driver)
+	// Automatically seed RBAC data (roles, permissions, default users)
+	if err := SeedRBACData(DB); err != nil {
+		log.Fatalf("Failed to seed RBAC data: %v", err)
+	}
+
+	// Automatically seed signing keys
+	if err := SeedSigningKeys(DB, &cfg.RSAKeys); err != nil {
+		log.Fatalf("Failed to seed signing keys: %v", err)
+	}
+
+	log.Printf("[DATABASE] Connected, migrated, and seeded successfully using %s driver", dbConfig.Driver)
 }
 
 // GetDB returns the database connection
