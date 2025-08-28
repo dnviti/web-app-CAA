@@ -59,6 +59,10 @@ plugins:
 
 nav:
   - Home: index.md
+  - Project Status:
+      - Implementation Status: status.md
+      - Development Roadmap: roadmap.md
+      - AI Agent Guide: ai-agent-guide.md
   - Getting Started:
       - Quick Start: getting-started/quick-start.md
       - Installation: getting-started/installation.md
@@ -71,6 +75,7 @@ nav:
       - Authentication: api/authentication.md
       - Grid Management: api/grid.md
       - AI Services: api/ai.md
+      - Swagger Implementation: api/swagger-implementation.md
   - Deployment:
       - Docker: deployment/docker.md
       - GitHub Pages: deployment/github-pages.md
@@ -78,7 +83,9 @@ nav:
       - Setup: development/setup.md
       - Testing: development/testing.md
       - Contributing: development/contributing.md
-      - CGO Issues: development/cgo-issue.md
+      - RBAC Migration: development/rbac-migration.md
+      - Startup Migrations: development/startup-migrations.md
       - Clean Auth Refactoring: development/clean-auth-refactoring.md
+      - CGO Issues: development/cgo-issue.md
 
 copyright: Copyright &copy; 2025 Daniele
