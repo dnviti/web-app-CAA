@@ -58,7 +58,7 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 		return
 	}
 
-	log.Printf("[SETUP] Grid type requested: %s for userId: %d", req.GridType, userID)
+	log.Printf("[SETUP] Grid type requested: %s for userId: %s", req.GridType, userID)
 
 	// Determine the grid structure
 	var selectedGrid map[string][]models.GridItemResponse
@@ -80,7 +80,7 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 	}
 
 	// Save grid
-	log.Printf("[SETUP] Saving grid to database for userId: %d", userID)
+	log.Printf("[SETUP] Saving grid to database for userId: %s", userID)
 	if err := h.gridService.SaveGrid(selectedGrid, userID); err != nil {
 		log.Printf("[SETUP] Error saving grid: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -91,7 +91,7 @@ func (h *GridHandlers) Setup(c *gin.Context) {
 	}
 
 	// Update user status
-	log.Printf("[SETUP] Updating user status to 'active' for userId: %d", userID)
+	log.Printf("[SETUP] Updating user status to 'active' for userId: %s", userID)
 	if err := h.userService.UpdateUserStatus(userID, "active"); err != nil {
 		log.Printf("[SETUP] Error updating user status: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -168,7 +168,7 @@ func (h *GridHandlers) GetGrid(c *gin.Context) {
 		gridData = make(map[string][]models.GridItemResponse)
 	}
 
-	log.Printf("[GET-GRID] Grid retrieved successfully for userId: %d, has data: %t",
+	log.Printf("[GET-GRID] Grid retrieved successfully for userId: %s, has data: %t",
 		userID, len(gridData) > 0)
 
 	c.JSON(http.StatusOK, gridData)
@@ -210,7 +210,7 @@ func (h *GridHandlers) SaveGrid(c *gin.Context) {
 		return
 	}
 
-	log.Printf("[SAVE-GRID] Grid saved successfully for userId: %d", userID)
+	log.Printf("[SAVE-GRID] Grid saved successfully for userId: %s", userID)
 	c.JSON(http.StatusOK, gin.H{"message": "Grid saved successfully!"})
 }
 
@@ -259,7 +259,7 @@ func (h *GridHandlers) AddItem(c *gin.Context) {
 		return
 	}
 
-	log.Printf("[ADD-ITEM] Item added successfully for userId: %d: %s", userID, newItem.ID)
+	log.Printf("[ADD-ITEM] Item added successfully for userId: %s: %s", userID, newItem.ID)
 	c.JSON(http.StatusCreated, newItem)
 }
 
@@ -306,7 +306,7 @@ func (h *GridHandlers) UpdateItem(c *gin.Context) {
 		return
 	}
 
-	log.Printf("[UPDATE-ITEM] Item updated successfully: %s for userId: %d", itemID, userID)
+	log.Printf("[UPDATE-ITEM] Item updated successfully: %s for userId: %s", itemID, userID)
 	c.JSON(http.StatusOK, gin.H{"message": "Item updated successfully!"})
 }
 

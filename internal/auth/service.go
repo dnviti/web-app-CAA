@@ -69,14 +69,14 @@ func (s *AuthServiceImpl) Register(req *models.RegisterRequest) (*models.User, s
 	// Generate access token
 	token, err := s.tokenService.GenerateToken(user.ID)
 	if err != nil {
-		log.Printf("[AUTH-SERVICE] Error generating token for user %d: %v", user.ID, err)
+		log.Printf("[AUTH-SERVICE] Error generating token for user %s: %v", user.ID, err)
 		return nil, "", "", fmt.Errorf("failed to generate token: %w", err)
 	}
 
 	// Generate refresh token
 	refreshTokenString, err := models.GenerateRefreshToken()
 	if err != nil {
-		log.Printf("[AUTH-SERVICE] Error generating refresh token for user %d: %v", user.ID, err)
+		log.Printf("[AUTH-SERVICE] Error generating refresh token for user %s: %v", user.ID, err)
 		return nil, "", "", fmt.Errorf("failed to generate refresh token: %w", err)
 	}
 
@@ -88,7 +88,7 @@ func (s *AuthServiceImpl) Register(req *models.RegisterRequest) (*models.User, s
 	}
 
 	if err := s.refreshTokenRepo.Create(refreshToken); err != nil {
-		log.Printf("[AUTH-SERVICE] Error storing refresh token for user %d: %v", user.ID, err)
+		log.Printf("[AUTH-SERVICE] Error storing refresh token for user %s: %v", user.ID, err)
 		return nil, "", "", fmt.Errorf("failed to store refresh token: %w", err)
 	}
 
