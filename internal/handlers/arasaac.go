@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/daniele/web-app-caa/internal/auth"
+	"github.com/daniele/web-app-caa/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,17 +57,35 @@ func (h *ArasaacHandlers) getCachedIconFromFile(iconID string) ([]byte, string, 
 	h.cacheMutex.RLock()
 	defer h.cacheMutex.RUnlock()
 
-	cachePath := filepath.Join(h.cacheDir, iconID+".cache")
+	metadataPath := filepath.Join(h.cacheDir, iconID+".meta")
 
-	// Check if file exists and is not too old (24 hours)
+	// Try to read metadata first to get the correct file extension
+	var mimeType string = "image/png" // Default fallback
+	var cachePath string
+
+	if metaData, err := os.ReadFile(metadataPath); err == nil {
+		var metadata ArasaacCacheEntry
+		if err := json.Unmarshal(metaData, &metadata); err == nil {
+			mimeType = metadata.MimeType
+			// Get proper file extension based on stored mime type
+			ext := utils.GetFileExtensionFromMimeType(mimeType, ".png")
+			cachePath = filepath.Join(h.cacheDir, iconID+ext+".cache")
+		} else {
+			// Fallback to old naming scheme
+			cachePath = filepath.Join(h.cacheDir, iconID+".cache")
+		}
+	} else {
+		// Fallback to old naming scheme
+		cachePath = filepath.Join(h.cacheDir, iconID+".cache")
+	}
+
+	// Check if cache file exists and is not too old (24 hours)
 	if info, err := os.Stat(cachePath); err == nil {
 		if time.Since(info.ModTime()) < 24*time.Hour {
 			// Read the cached file
 			data, err := os.ReadFile(cachePath)
 			if err == nil {
-				// For simplicity, assume PNG mime type for cached files
-				// In a more robust implementation, you might store metadata separately
-				return data, "image/png", true
+				return data, mimeType, true
 			}
 		}
 	}
@@ -79,11 +98,30 @@ func (h *ArasaacHandlers) setCachedIconToFile(iconID string, data []byte, mimeTy
 	h.cacheMutex.Lock()
 	defer h.cacheMutex.Unlock()
 
-	cachePath := filepath.Join(h.cacheDir, iconID+".cache")
+	// Get proper file extension based on mime type
+	ext := utils.GetFileExtensionFromMimeType(mimeType, ".png")
+	cachePath := filepath.Join(h.cacheDir, iconID+ext+".cache")
+	metadataPath := filepath.Join(h.cacheDir, iconID+".meta")
 
 	// Write the data to file
 	if err := os.WriteFile(cachePath, data, 0644); err != nil {
 		log.Printf("[ARASAAC-CACHE] Failed to cache icon %s: %v", iconID, err)
+		return
+	}
+
+	// Create and store metadata
+	metadata := ArasaacCacheEntry{
+		Timestamp: time.Now(),
+		MimeType:  mimeType,
+		FileSize:  int64(len(data)),
+	}
+
+	if metadataBytes, err := json.Marshal(metadata); err == nil {
+		if err := os.WriteFile(metadataPath, metadataBytes, 0644); err != nil {
+			log.Printf("[ARASAAC-CACHE] Failed to cache metadata for icon %s: %v", iconID, err)
+		}
+	} else {
+		log.Printf("[ARASAAC-CACHE] Failed to marshal metadata for icon %s: %v", iconID, err)
 	}
 }
 
@@ -110,12 +148,19 @@ func (h *ArasaacHandlers) cleanExpiredCache() {
 	}
 
 	for _, file := range files {
-		if !file.IsDir() && filepath.Ext(file.Name()) == ".cache" {
-			filePath := filepath.Join(h.cacheDir, file.Name())
-			if info, err := os.Stat(filePath); err == nil {
-				if time.Since(info.ModTime()) >= 24*time.Hour {
-					if err := os.Remove(filePath); err != nil {
-						log.Printf("[ARASAAC-CACHE] Failed to remove expired cache file %s: %v", file.Name(), err)
+		if !file.IsDir() {
+			fileName := file.Name()
+			filePath := filepath.Join(h.cacheDir, fileName)
+
+			// Check for both .cache and .meta files
+			if filepath.Ext(fileName) == ".cache" || filepath.Ext(fileName) == ".meta" {
+				if info, err := os.Stat(filePath); err == nil {
+					if time.Since(info.ModTime()) >= 24*time.Hour {
+						if err := os.Remove(filePath); err != nil {
+							log.Printf("[ARASAAC-CACHE] Failed to remove expired cache file %s: %v", fileName, err)
+						} else {
+							log.Printf("[ARASAAC-CACHE] Removed expired cache file: %s", fileName)
+						}
 					}
 				}
 			}
