@@ -12,6 +12,7 @@ interface AuthActions {
   checkEditorPassword: (password: string) => Promise<boolean>
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
+  debugAuthState: () => any
 }
 
 export const useAuthStore = create<AuthState & AuthActions & { isInitialized: boolean }>()(
@@ -232,6 +233,45 @@ export const useAuthStore = create<AuthState & AuthActions & { isInitialized: bo
 
       setError: (error) => {
         set({ error })
+      },
+
+      // Debug method to check current auth state
+      debugAuthState: () => {
+        const state = get()
+        const jwt = localStorage.getItem('jwt_token')
+        const refresh = localStorage.getItem('refresh_token')
+        
+        console.log('🔍 Current Auth State Debug:')
+        console.log('Store state:', {
+          hasUser: !!state.user,
+          username: state.user?.username,
+          hasToken: !!state.token,
+          isLoading: state.isLoading,
+          isInitialized: state.isInitialized,
+          error: state.error
+        })
+        console.log('LocalStorage:', {
+          jwt: jwt ? `Present (${jwt.length} chars)` : 'Missing',
+          refresh: refresh ? `Present (${refresh.length} chars)` : 'Missing'
+        })
+        
+        if (jwt) {
+          try {
+            const payload = JSON.parse(atob(jwt.split('.')[1]))
+            const now = Math.floor(Date.now() / 1000)
+            console.log('JWT Payload:', {
+              user_id: payload.user_id,
+              exp: new Date(payload.exp * 1000).toLocaleString(),
+              iat: new Date(payload.iat * 1000).toLocaleString(),
+              isExpired: payload.exp < now,
+              timeToExpiry: payload.exp - now
+            })
+          } catch (e) {
+            console.log('JWT Token appears to be malformed')
+          }
+        }
+        
+        return { state, jwt, refresh }
       },
     }),
     {

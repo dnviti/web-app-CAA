@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { Search, Loader2 } from 'lucide-react'
 import { arasaacApi } from '../api/arasaac'
 import { ArasaacIcon } from '../types'
+import LazyImage from './LazyImage'
 
 interface ArasaacIconPickerProps {
   onIconSelect: (iconUrl: string, iconId: number) => void
@@ -147,7 +148,7 @@ const ArasaacIconPicker: React.FC<ArasaacIconPickerProps> = ({
       {/* Icons Grid */}
       {icons.length > 0 && (
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-64 overflow-y-auto border border-gray-200 rounded-md p-2">
-          {icons.map((icon) => {
+          {icons.map((icon, index) => {
             const iconUrl = arasaacApi.getIconUrl(icon._id)
             const isSelected = selectedIconUrl === iconUrl
             
@@ -165,11 +166,12 @@ const ArasaacIconPicker: React.FC<ArasaacIconPickerProps> = ({
                 `}
                 title={getIconKeywords(icon)}
               >
-                <img
+                <LazyImage
                   src={iconUrl}
                   alt={getIconKeywords(icon)}
                   className="w-full h-full object-contain"
                   loading="lazy"
+                  delay={index * 50} // Stagger loading by 50ms per icon
                   onError={(e) => {
                     // Hide broken images
                     (e.target as HTMLImageElement).style.display = 'none'

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/daniele/web-app-caa/internal/auth"
@@ -19,10 +20,29 @@ import (
 	_ "github.com/daniele/web-app-caa/docs" // Import generated docs
 )
 
+// getSwaggerFilePath returns the absolute path to swagger files
+func getSwaggerFilePath(filename string) string {
+	// Get current working directory
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Printf("Error getting working directory: %v", err)
+		return filepath.Join("docs", filename)
+	}
+	return filepath.Join(cwd, "docs", filename)
+}
+
 // @title           Web App CAA API
 // @version         1.0
 // @description     This is a CAA (Communication and Alternative Augmentative) web application API.
 // @description     It provides endpoints for grid management, user authentication, and AI-powered language services.
+// @description
+// @description     ## Auto-Discovery
+// @description     This API supports standard OpenAPI auto-discovery patterns:
+// @description     - OpenAPI 2.0/Swagger JSON: `/openapi.json`
+// @description     - OpenAPI 2.0/Swagger YAML: `/openapi.yaml`
+// @description     - Interactive Documentation: `/swagger/index.html`
+// @description     - API Information: `/api`
+// @description     - Well-known OpenAPI Discovery: `/.well-known/openapi_description`
 
 // @contact.name   API Support
 // @contact.url    http://www.swagger.io/support
@@ -39,6 +59,9 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
+
 func main() {
 	// Load configuration
 	cfg := config.Load()
@@ -48,12 +71,6 @@ func main() {
 	log.Printf("[STARTUP] - HOST: %s", cfg.Host)
 	log.Printf("[STARTUP] - JWT_SECRET: %s", func() string {
 		if cfg.JWTSecret != "" {
-			return "[SET]"
-		}
-		return "[NOT SET]"
-	}())
-	log.Printf("[STARTUP] - API_SECRET: %s", func() string {
-		if cfg.APISecret != "" {
 			return "[SET]"
 		}
 		return "[NOT SET]"
@@ -107,11 +124,11 @@ func main() {
 	// Create other handlers (keeping existing ones for now)
 	gridHandlers := handlers.NewGridHandlers(cfg)
 	aiHandlers := handlers.NewAIHandlers(cfg)
+	arasaacHandlers := handlers.NewArasaacHandlers()
 	pageHandlers := handlers.NewPageHandlers()
 	rbacHandler := handlers.NewRBACHandler(rbacService)
 
-	// Page routes (serve templates instead of static files)
-	r.GET("/", pageHandlers.ServeIndex)
+	// Page routes (serve templates for specific paths)
 	r.GET("/login", pageHandlers.ServeLogin)
 	r.GET("/register", pageHandlers.ServeRegister)
 	r.GET("/setup", pageHandlers.ServeSetup)
@@ -178,12 +195,111 @@ func main() {
 		// AI endpoints
 		protected.POST("/conjugate", middleware.RBACMiddleware(rbacService, "ai", "use"), aiHandlers.Conjugate)
 		protected.POST("/correct", middleware.RBACMiddleware(rbacService, "ai", "use"), aiHandlers.Correct)
-		protected.GET("/ai/search-arasaac", middleware.RBACMiddleware(rbacService, "ai", "use"), aiHandlers.SearchArasaac)
+
+		// ARASAAC endpoints (moved from AI, requires basic authentication but no special AI permissions)
+		protected.GET("/arasaac/search", arasaacHandlers.SearchArasaac)
 	}
+
+	// Public ARASAAC icon endpoint (no auth required for image serving)
+	r.GET("/api/arasaac/icon/:id", arasaacHandlers.GetIcon)
 
 	// Chrome DevTools endpoint (to avoid 404 logs)
 	r.GET("/.well-known/appspecific/com.chrome.devtools.json", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{})
+	})
+
+	// API discovery and information endpoint
+	r.GET("/api", func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.JSON(http.StatusOK, gin.H{
+			"name":        "Web App CAA API",
+			"version":     "1.0",
+			"description": "CAA (Communication and Alternative Augmentative) web application API providing endpoints for grid management, user authentication, and AI-powered language services.",
+			"documentation": gin.H{
+				"swagger_ui":   "http://" + cfg.Host + ":" + cfg.Port + "/swagger/index.html",
+				"openapi_json": "http://" + cfg.Host + ":" + cfg.Port + "/openapi.json",
+				"openapi_yaml": "http://" + cfg.Host + ":" + cfg.Port + "/openapi.yaml",
+			},
+			"endpoints": gin.H{
+				"base_url": "http://" + cfg.Host + ":" + cfg.Port + "/api",
+				"health":   "http://" + cfg.Host + ":" + cfg.Port + "/ping",
+			},
+			"openapi": "2.0",
+			"contact": gin.H{
+				"name":  "API Support",
+				"url":   "http://www.swagger.io/support",
+				"email": "support@swagger.io",
+			},
+		})
+	})
+
+	// API root with HTML response for browser users
+	r.GET("/", func(c *gin.Context) {
+		// Check if request accepts HTML (from browser)
+		if c.GetHeader("Accept") != "" && c.GetHeader("Accept") != "application/json" {
+			pageHandlers.ServeIndex(c)
+			return
+		}
+
+		// For API clients, return JSON discovery info
+		c.Header("Content-Type", "application/json")
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Welcome to Web App CAA API",
+			"version": "1.0",
+			"documentation": gin.H{
+				"swagger_ui":   "http://" + cfg.Host + ":" + cfg.Port + "/swagger/index.html",
+				"openapi_json": "http://" + cfg.Host + ":" + cfg.Port + "/openapi.json",
+				"openapi_yaml": "http://" + cfg.Host + ":" + cfg.Port + "/openapi.yaml",
+			},
+			"api_base": "http://" + cfg.Host + ":" + cfg.Port + "/api",
+		})
+	})
+
+	// Additional OpenAPI discovery endpoints (common patterns)
+	r.GET("/swagger.json", func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
+		c.Header("Access-Control-Allow-Origin", "*")
+		swaggerPath := getSwaggerFilePath("swagger.json")
+		if _, err := os.Stat(swaggerPath); os.IsNotExist(err) {
+			log.Printf("Swagger JSON file not found at: %s", swaggerPath)
+			c.JSON(http.StatusNotFound, gin.H{"error": "OpenAPI specification not found"})
+			return
+		}
+		c.File(swaggerPath)
+	})
+
+	r.GET("/swagger.yaml", func(c *gin.Context) {
+		c.Header("Content-Type", "application/x-yaml")
+		c.Header("Access-Control-Allow-Origin", "*")
+		swaggerPath := getSwaggerFilePath("swagger.yaml")
+		if _, err := os.Stat(swaggerPath); os.IsNotExist(err) {
+			log.Printf("Swagger YAML file not found at: %s", swaggerPath)
+			c.JSON(http.StatusNotFound, gin.H{"error": "OpenAPI specification not found"})
+			return
+		}
+		c.File(swaggerPath)
+	})
+
+	r.GET("/api-docs", func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
+		c.Header("Access-Control-Allow-Origin", "*")
+		swaggerPath := getSwaggerFilePath("swagger.json")
+		if _, err := os.Stat(swaggerPath); os.IsNotExist(err) {
+			log.Printf("API docs file not found at: %s", swaggerPath)
+			c.JSON(http.StatusNotFound, gin.H{"error": "OpenAPI specification not found"})
+			return
+		}
+		c.File(swaggerPath)
+	})
+
+	r.GET("/docs", func(c *gin.Context) {
+		c.Redirect(http.StatusPermanentRedirect, "/swagger/index.html")
+	})
+
+	r.GET("/documentation", func(c *gin.Context) {
+		c.Redirect(http.StatusPermanentRedirect, "/swagger/index.html")
 	})
 
 	// Test endpoint
@@ -197,9 +313,99 @@ func main() {
 		c.String(http.StatusOK, "pong")
 	})
 
-	// Swagger documentation
+	// OpenAPI/Swagger documentation endpoints for auto-discovery
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// Standard OpenAPI endpoints for auto-discovery
+	r.GET("/openapi.json", func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
+		c.Header("Access-Control-Allow-Origin", "*")
+		swaggerPath := getSwaggerFilePath("swagger.json")
+		if _, err := os.Stat(swaggerPath); os.IsNotExist(err) {
+			log.Printf("OpenAPI JSON file not found at: %s", swaggerPath)
+			c.JSON(http.StatusNotFound, gin.H{"error": "OpenAPI specification not found"})
+			return
+		}
+		c.File(swaggerPath)
+	})
+
+	r.GET("/openapi.yaml", func(c *gin.Context) {
+		c.Header("Content-Type", "application/x-yaml")
+		c.Header("Access-Control-Allow-Origin", "*")
+		swaggerPath := getSwaggerFilePath("swagger.yaml")
+		if _, err := os.Stat(swaggerPath); os.IsNotExist(err) {
+			log.Printf("OpenAPI YAML file not found at: %s", swaggerPath)
+			c.JSON(http.StatusNotFound, gin.H{"error": "OpenAPI specification not found"})
+			return
+		}
+		c.File(swaggerPath)
+	})
+
+	// Alternative OpenAPI discovery endpoints
+	r.GET("/api/openapi.json", func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
+		c.Header("Access-Control-Allow-Origin", "*")
+		swaggerPath := getSwaggerFilePath("swagger.json")
+		if _, err := os.Stat(swaggerPath); os.IsNotExist(err) {
+			log.Printf("OpenAPI JSON file not found at: %s", swaggerPath)
+			c.JSON(http.StatusNotFound, gin.H{"error": "OpenAPI specification not found"})
+			return
+		}
+		c.File(swaggerPath)
+	})
+
+	r.GET("/api/openapi.yaml", func(c *gin.Context) {
+		c.Header("Content-Type", "application/x-yaml")
+		c.Header("Access-Control-Allow-Origin", "*")
+		swaggerPath := getSwaggerFilePath("swagger.yaml")
+		if _, err := os.Stat(swaggerPath); os.IsNotExist(err) {
+			log.Printf("OpenAPI YAML file not found at: %s", swaggerPath)
+			c.JSON(http.StatusNotFound, gin.H{"error": "OpenAPI specification not found"})
+			return
+		}
+		c.File(swaggerPath)
+	})
+
+	// OpenAPI discovery endpoint (follows OpenAPI 3.0 specification)
+	r.GET("/.well-known/openapi_description", func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.JSON(http.StatusOK, gin.H{
+			"openapi_description": gin.H{
+				"openapi": "3.0.0",
+				"info": gin.H{
+					"title":       "Web App CAA API",
+					"version":     "1.0",
+					"description": "This is a CAA (Communication and Alternative Augmentative) web application API. It provides endpoints for grid management, user authentication, and AI-powered language services.",
+				},
+				"servers": []gin.H{
+					{
+						"url":         "http://" + cfg.Host + ":" + cfg.Port + "/api",
+						"description": "Development server",
+					},
+				},
+				"paths": gin.H{
+					"/openapi.json": gin.H{
+						"description": "OpenAPI 2.0/Swagger specification in JSON format",
+						"url":         "http://" + cfg.Host + ":" + cfg.Port + "/openapi.json",
+					},
+					"/openapi.yaml": gin.H{
+						"description": "OpenAPI 2.0/Swagger specification in YAML format",
+						"url":         "http://" + cfg.Host + ":" + cfg.Port + "/openapi.yaml",
+					},
+					"/swagger/index.html": gin.H{
+						"description": "Interactive Swagger UI documentation",
+						"url":         "http://" + cfg.Host + ":" + cfg.Port + "/swagger/index.html",
+					},
+				},
+			},
+		})
+	})
+
 	log.Printf("[SWAGGER] Swagger documentation available at http://%s:%s/swagger/index.html", cfg.Host, cfg.Port)
+	log.Printf("[OPENAPI] OpenAPI JSON specification available at http://%s:%s/openapi.json", cfg.Host, cfg.Port)
+	log.Printf("[OPENAPI] OpenAPI YAML specification available at http://%s:%s/openapi.yaml", cfg.Host, cfg.Port)
+	log.Printf("[OPENAPI] OpenAPI auto-discovery available at http://%s:%s/.well-known/openapi_description", cfg.Host, cfg.Port)
 
 	log.Printf("[STARTUP] Server is running on http://%s:%s", cfg.Host, cfg.Port)
 	log.Printf("[STARTUP] Server startup completed successfully")

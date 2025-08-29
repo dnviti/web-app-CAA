@@ -8,6 +8,7 @@ import TenseButtons from '../components/TenseButtons'
 import Navigation from '../components/Navigation'
 import EditorPanel from '../components/EditorPanel'
 import AddItemModal from '../components/AddItemModal'
+import AuthStatus from '../components/AuthStatus'
 import Modal from '../components/ui/Modal'
 import Button from '../components/ui/Button'
 import IconButton from '../components/ui/IconButton'
@@ -206,6 +207,9 @@ const MainPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-yellow-400 ${sessionActive ? 'session-active' : ''}`}>
+      {/* Auth Status Component */}
+      <AuthStatus />
+      
       {/* Account Info Bar */}
       <header className="flex justify-between items-center px-4 py-2 bg-black bg-opacity-20 text-white relative z-30">
         <div className="flex items-center gap-3">

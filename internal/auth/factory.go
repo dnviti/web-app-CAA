@@ -33,7 +33,7 @@ type AuthConfig struct {
 func NewFactory(db *gorm.DB, cfg *config.Config) *Factory {
 	// Create auth-specific config from main config
 	authConfig := &AuthConfig{
-		JWTSecret:     cfg.APISecret,
+		JWTSecret:     cfg.JWTSecret,
 		TokenLifespan: time.Duration(cfg.TokenHourLifespan) * time.Hour,
 		BcryptCost:    cfg.BcryptCost,
 	}

@@ -19,7 +19,6 @@ type Config struct {
 
 	// Authentication configuration
 	JWTSecret         string
-	APISecret         string
 	TokenHourLifespan int
 	BcryptCost        int
 	RSAKeys           RSAKeyConfig
@@ -93,7 +92,6 @@ func Load() *Config {
 
 		// Authentication configuration
 		JWTSecret:         getJWTSecret(),
-		APISecret:         getAPISecret(),
 		TokenHourLifespan: getEnvInt("TOKEN_HOUR_LIFESPAN", 24),
 		BcryptCost:        getEnvInt("BCRYPT_COST", 12),
 		RSAKeys:           loadRSAKeyConfig(),
@@ -190,19 +188,6 @@ func getJWTSecret() string {
 		log.Printf("[CONFIG] Warning: JWT_SECRET not set, using default")
 	}
 	return jwtSecret
-}
-
-func getAPISecret() string {
-	apiSecret := os.Getenv("API_SECRET")
-	if apiSecret == "" {
-		// Fallback to JWT_SECRET for backwards compatibility
-		apiSecret = os.Getenv("JWT_SECRET")
-		if apiSecret == "" {
-			apiSecret = "your-default-secret-key"
-			log.Printf("[CONFIG] Warning: API_SECRET and JWT_SECRET not set, using default")
-		}
-	}
-	return apiSecret
 }
 
 func parseTrustedProxies() []string {

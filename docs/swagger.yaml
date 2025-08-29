@@ -41,10 +41,14 @@ definitions:
     properties:
       message:
         type: string
+      refresh_token:
+        type: string
       status:
         type: string
       token:
         type: string
+      user:
+        $ref: '#/definitions/models.User'
     type: object
   models.CheckEditorPasswordRequest:
     properties:
@@ -132,13 +136,6 @@ definitions:
     - password
     - username
     type: object
-  models.LoginResponse:
-    properties:
-      status:
-        type: string
-      token:
-        type: string
-    type: object
   models.Permission:
     properties:
       action:
@@ -161,6 +158,20 @@ definitions:
           $ref: '#/definitions/models.Role'
         type: array
       updated_at:
+        type: string
+    type: object
+  models.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  models.RefreshTokenResponse:
+    properties:
+      refresh_token:
+        type: string
+      token:
         type: string
     type: object
   models.RegisterRequest:
@@ -240,6 +251,9 @@ definitions:
       username:
         type: string
     type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
 host: localhost:6542
 info:
   contact:
@@ -249,23 +263,74 @@ info:
   description: |-
     This is a CAA (Communication and Alternative Augmentative) web application API.
     It provides endpoints for grid management, user authentication, and AI-powered language services.
+
+    ## Auto-Discovery
+    This API supports standard OpenAPI auto-discovery patterns:
+    - OpenAPI 2.0/Swagger JSON: `/openapi.json`
+    - OpenAPI 2.0/Swagger YAML: `/openapi.yaml`
+    - Interactive Documentation: `/swagger/index.html`
+    - API Information: `/api`
+    - Well-known OpenAPI Discovery: `/.well-known/openapi_description`
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Web App CAA API
   version: "1.0"
 paths:
-  /ai/search-arasaac:
+  /arasaac/icon/{id}:
+    get:
+      description: Retrieve an ARASAAC icon by its ID, with file-based caching (public
+        endpoint)
+      parameters:
+      - description: Icon ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: Icon image
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get ARASAAC icon by ID
+      tags:
+      - ARASAAC
+  /arasaac/search:
     get:
       consumes:
       - application/json
-      description: Search for ARASAAC icons by keyword
+      description: Search for ARASAAC icons by keyword with optional parallel preloading
       parameters:
       - description: Search query
         in: query
         name: query
         required: true
         type: string
+      - description: Whether to preload icon data in parallel
+        in: query
+        name: preload
+        type: boolean
+      - description: Limit number of icons for preloading (max 20)
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -277,20 +342,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            additionalProperties: true
+            type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            additionalProperties: true
+            type: object
       security:
       - BearerAuth: []
       summary: Search ARASAAC icons
       tags:
-      - AI
+      - ARASAAC
   /auth/login:
     post:
       consumes:
@@ -309,7 +377,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.LoginResponse'
+            $ref: '#/definitions/models.AuthResponse'
         "400":
           description: Bad Request
           schema:
@@ -323,6 +391,29 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Login user
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      description: Revoke all refresh tokens for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout user
       tags:
       - Auth
   /auth/rbac/permissions:
@@ -732,6 +823,40 @@ paths:
       summary: Assign role to user
       tags:
       - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Generate new access and refresh tokens using a refresh token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RefreshTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Refresh access token
+      tags:
+      - Auth
   /auth/register:
     post:
       consumes:
@@ -765,6 +890,40 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Register a new user
+      tags:
+      - Auth
+  /auth/revoke:
+    post:
+      consumes:
+      - application/json
+      description: Revoke a refresh token to prevent further use
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Revoke refresh token
       tags:
       - Auth
   /auth/verify:

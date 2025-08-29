@@ -183,10 +183,23 @@ export const useGridStore = create<GridState>()(
             // Reload grid to get updated data
             await get().loadGrid()
           } else {
-            set({ error: 'Failed to add item' })
+            // Check for specific authentication/authorization errors
+            if (response.error && response.error.includes('401')) {
+              set({ error: 'Authentication required. Please login again.' })
+            } else if (response.error && response.error.includes('403')) {
+              set({ error: 'Permission denied. You need admin or editor role to add items.' })
+            } else if (response.error && response.error.includes('Authorization token required')) {
+              set({ error: 'Please login to add items.' })
+            } else if (response.error && response.error.includes('Insufficient permissions')) {
+              set({ error: 'You don\'t have permission to add items. Contact an administrator.' })
+            } else {
+              set({ error: response.error || 'Failed to add item' })
+            }
+            console.error('Add grid item failed:', response.error)
           }
         } catch (error) {
-          set({ error: 'Network error adding item' })
+          console.error('Network error adding item:', error)
+          set({ error: 'Network error adding item. Please check your connection.' })
         }
       },
 
@@ -197,10 +210,19 @@ export const useGridStore = create<GridState>()(
             // Reload grid to get updated data
             await get().loadGrid()
           } else {
-            set({ error: 'Failed to update item' })
+            // Check for specific authentication/authorization errors
+            if (response.error && response.error.includes('401')) {
+              set({ error: 'Authentication required. Please login again.' })
+            } else if (response.error && response.error.includes('403')) {
+              set({ error: 'Permission denied. You need admin or editor role to update items.' })
+            } else {
+              set({ error: response.error || 'Failed to update item' })
+            }
+            console.error('Update grid item failed:', response.error)
           }
         } catch (error) {
-          set({ error: 'Network error updating item' })
+          console.error('Network error updating item:', error)
+          set({ error: 'Network error updating item. Please check your connection.' })
         }
       },
 
@@ -211,10 +233,19 @@ export const useGridStore = create<GridState>()(
             // Reload grid to get updated data
             await get().loadGrid()
           } else {
-            set({ error: 'Failed to delete item' })
+            // Check for specific authentication/authorization errors
+            if (response.error && response.error.includes('401')) {
+              set({ error: 'Authentication required. Please login again.' })
+            } else if (response.error && response.error.includes('403')) {
+              set({ error: 'Permission denied. You need admin or editor role to delete items.' })
+            } else {
+              set({ error: response.error || 'Failed to delete item' })
+            }
+            console.error('Delete grid item failed:', response.error)
           }
         } catch (error) {
-          set({ error: 'Network error deleting item' })
+          console.error('Network error deleting item:', error)
+          set({ error: 'Network error deleting item. Please check your connection.' })
         }
       },
 
