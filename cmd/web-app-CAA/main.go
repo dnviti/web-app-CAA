@@ -128,6 +128,10 @@ func main() {
 	pageHandlers := handlers.NewPageHandlers()
 	rbacHandler := handlers.NewRBACHandler(rbacService)
 
+	// Initialize LLM service and RAG knowledge handler
+	llmService := services.NewLLMService(cfg)
+	ragKnowledgeHandler := handlers.NewRagKnowledgeHandler(llmService)
+
 	// Page routes (serve templates for specific paths)
 	r.GET("/login", pageHandlers.ServeLogin)
 	r.GET("/register", pageHandlers.ServeRegister)
@@ -195,6 +199,19 @@ func main() {
 		// AI endpoints
 		protected.POST("/conjugate", middleware.RBACMiddleware(rbacService, "ai", "use"), aiHandlers.Conjugate)
 		protected.POST("/correct", middleware.RBACMiddleware(rbacService, "ai", "use"), aiHandlers.Correct)
+
+		// RAG Knowledge management endpoints (admin only)
+		ragKnowledge := protected.Group("/rag-knowledge")
+		ragKnowledge.Use(middleware.RequireRole(rbacService, "admin"))
+		{
+			ragKnowledge.GET("", ragKnowledgeHandler.GetRagKnowledge)
+			ragKnowledge.PUT("", ragKnowledgeHandler.UpdateRagKnowledge)
+			ragKnowledge.POST("/reload", ragKnowledgeHandler.ReloadRagKnowledge)
+			ragKnowledge.POST("/backup", ragKnowledgeHandler.BackupRagKnowledge)
+			ragKnowledge.GET("/backups", ragKnowledgeHandler.ListRagKnowledgeBackups)
+			ragKnowledge.POST("/restore/:backup_key", ragKnowledgeHandler.RestoreRagKnowledgeFromBackup)
+			ragKnowledge.GET("/health", ragKnowledgeHandler.CheckS3Health)
+		}
 
 		// ARASAAC endpoints (moved from AI, requires basic authentication but no special AI permissions)
 		protected.GET("/arasaac/search", arasaacHandlers.SearchArasaac)

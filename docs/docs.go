@@ -164,7 +164,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.LoginRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.LoginRequest"
                         }
                     }
                 ],
@@ -172,25 +172,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.AuthResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.AuthResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -215,19 +215,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -257,7 +257,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Permission"
+                                "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Permission"
                             }
                         }
                     },
@@ -296,7 +296,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.CreatePermissionRequest"
+                            "$ref": "#/definitions/internal_handlers.CreatePermissionRequest"
                         }
                     }
                 ],
@@ -304,7 +304,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Permission"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Permission"
                         }
                     },
                     "400": {
@@ -352,7 +352,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Role"
+                                "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
                             }
                         }
                     },
@@ -391,7 +391,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.CreateRoleRequest"
+                            "$ref": "#/definitions/internal_handlers.CreateRoleRequest"
                         }
                     }
                 ],
@@ -399,7 +399,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Role"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
                         }
                     },
                     "400": {
@@ -656,7 +656,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Permission"
+                                "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Permission"
                             }
                         }
                     },
@@ -714,7 +714,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Role"
+                                "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
                             }
                         }
                     },
@@ -887,7 +887,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RefreshTokenRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest"
                         }
                     }
                 ],
@@ -895,25 +895,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.RefreshTokenResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -939,7 +939,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RegisterRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.RegisterRequest"
                         }
                     }
                 ],
@@ -947,25 +947,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.AuthResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.AuthResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -991,7 +991,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RefreshTokenRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest"
                         }
                     }
                 ],
@@ -999,25 +999,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1042,19 +1042,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1085,7 +1085,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CheckEditorPasswordRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.CheckEditorPasswordRequest"
                         }
                     }
                 ],
@@ -1093,25 +1093,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1136,19 +1136,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1179,7 +1179,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ConjugateRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ConjugateRequest"
                         }
                     }
                 ],
@@ -1187,25 +1187,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ConjugateResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ConjugateResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1236,7 +1236,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CorrectRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.CorrectRequest"
                         }
                     }
                 ],
@@ -1244,25 +1244,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.CorrectResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.CorrectResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1287,19 +1287,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.GridResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.GridResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1328,7 +1328,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.GridResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.GridResponse"
                         }
                     }
                 ],
@@ -1336,25 +1336,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1385,7 +1385,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.AddItemRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.AddItemRequest"
                         }
                     }
                 ],
@@ -1393,25 +1393,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.GridItemResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1449,7 +1449,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.GridItemResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse"
                         }
                     }
                 ],
@@ -1457,31 +1457,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1513,25 +1513,316 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/rag-knowledge": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve the current RAG knowledge data used by the AI system for language processing",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rag-knowledge"
+                ],
+                "summary": "Get RAG knowledge",
+                "responses": {
+                    "200": {
+                        "description": "RAG knowledge data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the RAG knowledge data and optionally save to S3 storage. Requires admin privileges.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rag-knowledge"
+                ],
+                "summary": "Update RAG knowledge",
+                "parameters": [
+                    {
+                        "description": "RAG knowledge data structure",
+                        "name": "knowledge",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Whether to save the updated knowledge to S3 storage",
+                        "name": "save_to_s3",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success message with S3 save status",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid JSON format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/rag-knowledge/backup": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a timestamped backup of the current RAG knowledge in S3 storage. Requires S3 to be enabled and admin privileges.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rag-knowledge"
+                ],
+                "summary": "Create RAG knowledge backup",
+                "responses": {
+                    "200": {
+                        "description": "Success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - S3 not enabled or backup failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/rag-knowledge/backups": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "List all available RAG knowledge backups in S3 storage with timestamps and metadata. Requires S3 to be enabled and admin privileges.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rag-knowledge"
+                ],
+                "summary": "List RAG knowledge backups",
+                "responses": {
+                    "200": {
+                        "description": "Object containing backups array",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - S3 not enabled or list failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/rag-knowledge/health": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Check the health and connectivity of S3 storage service. Verifies bucket access and connectivity. Requires admin privileges.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rag-knowledge"
+                ],
+                "summary": "Check S3 health",
+                "responses": {
+                    "200": {
+                        "description": "S3 health status with connection details",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "S3 health check failed or S3 not enabled",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/rag-knowledge/reload": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Reload RAG knowledge from S3 storage or fall back to local file if S3 is unavailable. Requires admin privileges.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rag-knowledge"
+                ],
+                "summary": "Reload RAG knowledge",
+                "responses": {
+                    "200": {
+                        "description": "Success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/rag-knowledge/restore/{backup_key}": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Restore RAG knowledge from a specific timestamped backup stored in S3. This will replace the current knowledge. Requires S3 to be enabled and admin privileges.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rag-knowledge"
+                ],
+                "summary": "Restore RAG knowledge from backup",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "S3 backup key (e.g., 'caa/backups/rag_knowledge_20240829_143052.json')",
+                        "name": "backup_key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success message with backup key",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - backup key required",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - restore failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -1562,7 +1853,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SetupRequest"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SetupRequest"
                         }
                     }
                 ],
@@ -1570,25 +1861,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
                         }
                     }
                 }
@@ -1596,47 +1887,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.CreatePermissionRequest": {
-            "type": "object",
-            "required": [
-                "action",
-                "name",
-                "resource"
-            ],
-            "properties": {
-                "action": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "resource": {
-                    "type": "string"
-                }
-            }
-        },
-        "handlers.CreateRoleRequest": {
-            "type": "object",
-            "required": [
-                "display_name",
-                "name"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "display_name": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.AddItemRequest": {
+        "github_com_daniele_web-app-caa_internal_models.AddItemRequest": {
             "type": "object",
             "required": [
                 "item",
@@ -1644,14 +1895,14 @@ const docTemplate = `{
             ],
             "properties": {
                 "item": {
-                    "$ref": "#/definitions/models.GridItemResponse"
+                    "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse"
                 },
                 "parentCategory": {
                     "type": "string"
                 }
             }
         },
-        "models.AuthResponse": {
+        "github_com_daniele_web-app-caa_internal_models.AuthResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -1667,11 +1918,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/models.User"
+                    "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.User"
                 }
             }
         },
-        "models.CheckEditorPasswordRequest": {
+        "github_com_daniele_web-app-caa_internal_models.CheckEditorPasswordRequest": {
             "type": "object",
             "required": [
                 "password"
@@ -1682,7 +1933,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ConjugateRequest": {
+        "github_com_daniele_web-app-caa_internal_models.ConjugateRequest": {
             "type": "object",
             "properties": {
                 "base_forms": {
@@ -1705,13 +1956,13 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ConjugateResponse": {
+        "github_com_daniele_web-app-caa_internal_models.ConjugateResponse": {
             "type": "object",
             "properties": {
                 "conjugations": {}
             }
         },
-        "models.CorrectRequest": {
+        "github_com_daniele_web-app-caa_internal_models.CorrectRequest": {
             "type": "object",
             "properties": {
                 "sentence": {
@@ -1719,7 +1970,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.CorrectResponse": {
+        "github_com_daniele_web-app-caa_internal_models.CorrectResponse": {
             "type": "object",
             "properties": {
                 "correction": {
@@ -1727,7 +1978,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ErrorResponse": {
+        "github_com_daniele_web-app-caa_internal_models.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1738,7 +1989,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.GridItemResponse": {
+        "github_com_daniele_web-app-caa_internal_models.GridItemResponse": {
             "type": "object",
             "properties": {
                 "action": {
@@ -1779,16 +2030,16 @@ const docTemplate = `{
                 }
             }
         },
-        "models.GridResponse": {
+        "github_com_daniele_web-app-caa_internal_models.GridResponse": {
             "type": "object",
             "additionalProperties": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/definitions/models.GridItemResponse"
+                    "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse"
                 }
             }
         },
-        "models.LoginRequest": {
+        "github_com_daniele_web-app-caa_internal_models.LoginRequest": {
             "type": "object",
             "required": [
                 "password",
@@ -1803,7 +2054,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Permission": {
+        "github_com_daniele_web-app-caa_internal_models.Permission": {
             "type": "object",
             "properties": {
                 "action": {
@@ -1831,7 +2082,7 @@ const docTemplate = `{
                     "description": "Many-to-many relationship with roles",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Role"
+                        "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
                     }
                 },
                 "updated_at": {
@@ -1839,7 +2090,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.RefreshTokenRequest": {
+        "github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest": {
             "type": "object",
             "required": [
                 "refresh_token"
@@ -1850,7 +2101,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.RefreshTokenResponse": {
+        "github_com_daniele_web-app-caa_internal_models.RefreshTokenResponse": {
             "type": "object",
             "properties": {
                 "refresh_token": {
@@ -1861,7 +2112,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.RegisterRequest": {
+        "github_com_daniele_web-app-caa_internal_models.RegisterRequest": {
             "type": "object",
             "required": [
                 "editorPassword",
@@ -1884,7 +2135,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Role": {
+        "github_com_daniele_web-app-caa_internal_models.Role": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -1909,7 +2160,7 @@ const docTemplate = `{
                     "description": "Many-to-many relationship with permissions",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Permission"
+                        "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Permission"
                     }
                 },
                 "updated_at": {
@@ -1919,12 +2170,12 @@ const docTemplate = `{
                     "description": "Many-to-many relationship with users",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.User"
+                        "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.User"
                     }
                 }
             }
         },
-        "models.SetupRequest": {
+        "github_com_daniele_web-app-caa_internal_models.SetupRequest": {
             "type": "object",
             "required": [
                 "gridType"
@@ -1935,7 +2186,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.SuccessResponse": {
+        "github_com_daniele_web-app-caa_internal_models.SuccessResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -1943,7 +2194,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.User": {
+        "github_com_daniele_web-app-caa_internal_models.User": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -1962,7 +2213,7 @@ const docTemplate = `{
                     "description": "Many-to-many relationship with roles",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Role"
+                        "$ref": "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
                     }
                 },
                 "status": {
@@ -1972,6 +2223,46 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handlers.CreatePermissionRequest": {
+            "type": "object",
+            "required": [
+                "action",
+                "name",
+                "resource"
+            ],
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handlers.CreateRoleRequest": {
+            "type": "object",
+            "required": [
+                "display_name",
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }

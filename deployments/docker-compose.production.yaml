@@ -1,0 +1,25 @@
+# Docker Compose configuration for production deployment
+# Minimal setup with only the web application
+# Uses SQLite by default and external AI services
+
+version: '3.8'
+
+services:
+  web-app:
+    environment:
+      - DB_DRIVER=sqlite
+      - BACKEND_TYPE=openai
+      - S3_ENABLED=false
+      - GIN_MODE=release
+    # Production-specific configurations
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

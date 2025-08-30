@@ -30,6 +30,7 @@ type LLMService struct {
 	openaiClient *openai.Client // For OpenAI requests
 	ragData      map[string]interface{}
 	templates    map[string]*template.Template
+	s3Storage    *S3StorageService // S3 storage service for RAG knowledge
 }
 
 // TemplateData represents the data structure for template rendering
@@ -60,6 +61,7 @@ func NewLLMService(cfg *config.Config) *LLMService {
 		openaiKey:   cfg.LLM.OpenAIKey,
 		llmModel:    cfg.LLM.Model,
 		templates:   make(map[string]*template.Template),
+		s3Storage:   NewS3StorageService(cfg),
 	}
 
 	// Initialize Ollama client if using Ollama backend
@@ -100,8 +102,25 @@ func NewLLMService(cfg *config.Config) *LLMService {
 	return service
 }
 
-// loadRagData loads the RAG knowledge from JSON file
+// loadRagData loads the RAG knowledge from S3 or local file as fallback
 func (s *LLMService) loadRagData() error {
+	ctx := context.Background()
+
+	// Try to load from S3 if enabled
+	if s.s3Storage.IsEnabled() {
+		log.Printf("Loading RAG data from S3...")
+		knowledge, err := s.s3Storage.GetRagKnowledge(ctx)
+		if err != nil {
+			log.Printf("Failed to load RAG data from S3: %v, falling back to local file", err)
+		} else {
+			s.ragData = knowledge
+			log.Printf("RAG knowledge loaded successfully from S3")
+			return nil
+		}
+	}
+
+	// Fallback to local file
+	log.Printf("Loading RAG data from local file...")
 	file, err := os.Open("rag_knowledge.json")
 	if err != nil {
 		return fmt.Errorf("error opening rag_knowledge.json: %w", err)
@@ -117,7 +136,7 @@ func (s *LLMService) loadRagData() error {
 		return fmt.Errorf("error decoding RAG data: %w", err)
 	}
 
-	log.Printf("RAG knowledge loaded successfully")
+	log.Printf("RAG knowledge loaded successfully from local file")
 	return nil
 }
 
@@ -398,4 +417,91 @@ func (s *LLMService) CorrectWithTemplate(req models.CorrectRequest) (map[string]
 	return map[string]interface{}{
 		"corrected_sentence": correctedSentence,
 	}, nil
+}
+
+// UpdateRagKnowledge updates the RAG knowledge in memory and optionally saves to S3
+func (s *LLMService) UpdateRagKnowledge(knowledge map[string]interface{}, saveToS3 bool) error {
+	// Update in-memory knowledge
+	s.ragData = knowledge
+	log.Printf("RAG knowledge updated in memory")
+
+	// Save to S3 if enabled and requested
+	if saveToS3 && s.s3Storage.IsEnabled() {
+		ctx := context.Background()
+		if err := s.s3Storage.PutRagKnowledge(ctx, knowledge); err != nil {
+			return fmt.Errorf("error saving RAG knowledge to S3: %w", err)
+		}
+		log.Printf("RAG knowledge saved to S3")
+	}
+
+	return nil
+}
+
+// BackupRagKnowledge creates a timestamped backup of the current RAG knowledge
+func (s *LLMService) BackupRagKnowledge() error {
+	if !s.s3Storage.IsEnabled() {
+		return fmt.Errorf("S3 storage is not enabled for backups")
+	}
+
+	if s.ragData == nil {
+		return fmt.Errorf("no RAG knowledge to backup")
+	}
+
+	ctx := context.Background()
+	return s.s3Storage.BackupRagKnowledge(ctx, s.ragData)
+}
+
+// ListRagKnowledgeBackups lists all available RAG knowledge backups
+func (s *LLMService) ListRagKnowledgeBackups() ([]S3Object, error) {
+	if !s.s3Storage.IsEnabled() {
+		return nil, fmt.Errorf("S3 storage is not enabled")
+	}
+
+	ctx := context.Background()
+	return s.s3Storage.ListRagKnowledgeVersions(ctx)
+}
+
+// RestoreRagKnowledgeFromBackup restores RAG knowledge from a specific backup
+func (s *LLMService) RestoreRagKnowledgeFromBackup(backupKey string) error {
+	if !s.s3Storage.IsEnabled() {
+		return fmt.Errorf("S3 storage is not enabled")
+	}
+
+	ctx := context.Background()
+	knowledge, err := s.s3Storage.RestoreRagKnowledge(ctx, backupKey)
+	if err != nil {
+		return fmt.Errorf("error restoring from backup: %w", err)
+	}
+
+	s.ragData = knowledge
+	log.Printf("RAG knowledge restored from backup: %s", backupKey)
+	return nil
+}
+
+// GetRagKnowledge returns a copy of the current RAG knowledge
+func (s *LLMService) GetRagKnowledge() map[string]interface{} {
+	if s.ragData == nil {
+		return nil
+	}
+
+	// Return a copy to prevent external modifications
+	data, _ := json.Marshal(s.ragData)
+	var copy map[string]interface{}
+	json.Unmarshal(data, &copy)
+	return copy
+}
+
+// ReloadRagKnowledge reloads RAG knowledge from S3 or local file
+func (s *LLMService) ReloadRagKnowledge() error {
+	return s.loadRagData()
+}
+
+// CheckS3Health checks the health of S3 connection
+func (s *LLMService) CheckS3Health() error {
+	if !s.s3Storage.IsEnabled() {
+		return fmt.Errorf("S3 storage is not enabled")
+	}
+
+	ctx := context.Background()
+	return s.s3Storage.CheckHealth(ctx)
 }

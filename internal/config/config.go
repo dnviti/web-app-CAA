@@ -30,6 +30,7 @@ type Config struct {
 	Ollama OllamaConfig
 	LLM    LLMConfig
 	APIs   APIConfig
+	S3     S3Config
 }
 
 // RSAKeyConfig holds RSA signing key configuration
@@ -75,6 +76,18 @@ type LLMConfig struct {
 // APIConfig holds external API configuration
 type APIConfig struct {
 	ArasaacBaseURL string
+}
+
+// S3Config holds AWS S3 configuration
+type S3Config struct {
+	Enabled         bool
+	Region          string
+	BucketName      string
+	AccessKeyID     string
+	SecretAccessKey string
+	Endpoint        string // For LocalStack, RustFS, etc.
+	KeyPrefix       string // Optional prefix for S3 keys
+	ForcePathStyle  bool   // For S3-compatible services
 }
 
 // Load loads the application configuration
@@ -129,6 +142,17 @@ func Load() *Config {
 
 		APIs: APIConfig{
 			ArasaacBaseURL: getEnv("ARASAAC_BASE_URL", "https://api.arasaac.org/api/pictograms"),
+		},
+
+		S3: S3Config{
+			Enabled:         getEnvBool("S3_ENABLED", false),
+			Region:          getEnv("S3_REGION", "us-east-1"),
+			BucketName:      getEnv("S3_BUCKET_NAME", ""),
+			AccessKeyID:     getEnv("S3_ACCESS_KEY_ID", ""),
+			SecretAccessKey: getEnv("S3_SECRET_ACCESS_KEY", ""),
+			Endpoint:        getEnv("S3_ENDPOINT", ""),
+			KeyPrefix:       getEnv("S3_KEY_PREFIX", "caa"),
+			ForcePathStyle:  getEnvBool("S3_FORCE_PATH_STYLE", true),
 		},
 	}
 }

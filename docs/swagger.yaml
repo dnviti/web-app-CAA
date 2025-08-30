@@ -1,43 +1,16 @@
 basePath: /api
 definitions:
-  handlers.CreatePermissionRequest:
-    properties:
-      action:
-        type: string
-      description:
-        type: string
-      name:
-        type: string
-      resource:
-        type: string
-    required:
-    - action
-    - name
-    - resource
-    type: object
-  handlers.CreateRoleRequest:
-    properties:
-      description:
-        type: string
-      display_name:
-        type: string
-      name:
-        type: string
-    required:
-    - display_name
-    - name
-    type: object
-  models.AddItemRequest:
+  github_com_daniele_web-app-caa_internal_models.AddItemRequest:
     properties:
       item:
-        $ref: '#/definitions/models.GridItemResponse'
+        $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse'
       parentCategory:
         type: string
     required:
     - item
     - parentCategory
     type: object
-  models.AuthResponse:
+  github_com_daniele_web-app-caa_internal_models.AuthResponse:
     properties:
       message:
         type: string
@@ -48,16 +21,16 @@ definitions:
       token:
         type: string
       user:
-        $ref: '#/definitions/models.User'
+        $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.User'
     type: object
-  models.CheckEditorPasswordRequest:
+  github_com_daniele_web-app-caa_internal_models.CheckEditorPasswordRequest:
     properties:
       password:
         type: string
     required:
     - password
     type: object
-  models.ConjugateRequest:
+  github_com_daniele_web-app-caa_internal_models.ConjugateRequest:
     properties:
       base_forms:
         items:
@@ -72,28 +45,28 @@ definitions:
           type: string
         type: array
     type: object
-  models.ConjugateResponse:
+  github_com_daniele_web-app-caa_internal_models.ConjugateResponse:
     properties:
       conjugations: {}
     type: object
-  models.CorrectRequest:
+  github_com_daniele_web-app-caa_internal_models.CorrectRequest:
     properties:
       sentence:
         type: string
     type: object
-  models.CorrectResponse:
+  github_com_daniele_web-app-caa_internal_models.CorrectResponse:
     properties:
       correction:
         type: string
     type: object
-  models.ErrorResponse:
+  github_com_daniele_web-app-caa_internal_models.ErrorResponse:
     properties:
       error:
         type: string
       message:
         type: string
     type: object
-  models.GridItemResponse:
+  github_com_daniele_web-app-caa_internal_models.GridItemResponse:
     properties:
       action:
         type: string
@@ -120,13 +93,13 @@ definitions:
       type:
         type: string
     type: object
-  models.GridResponse:
+  github_com_daniele_web-app-caa_internal_models.GridResponse:
     additionalProperties:
       items:
-        $ref: '#/definitions/models.GridItemResponse'
+        $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse'
       type: array
     type: object
-  models.LoginRequest:
+  github_com_daniele_web-app-caa_internal_models.LoginRequest:
     properties:
       password:
         type: string
@@ -136,7 +109,7 @@ definitions:
     - password
     - username
     type: object
-  models.Permission:
+  github_com_daniele_web-app-caa_internal_models.Permission:
     properties:
       action:
         type: string
@@ -155,26 +128,26 @@ definitions:
       roles:
         description: Many-to-many relationship with roles
         items:
-          $ref: '#/definitions/models.Role'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
         type: array
       updated_at:
         type: string
     type: object
-  models.RefreshTokenRequest:
+  github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest:
     properties:
       refresh_token:
         type: string
     required:
     - refresh_token
     type: object
-  models.RefreshTokenResponse:
+  github_com_daniele_web-app-caa_internal_models.RefreshTokenResponse:
     properties:
       refresh_token:
         type: string
       token:
         type: string
     type: object
-  models.RegisterRequest:
+  github_com_daniele_web-app-caa_internal_models.RegisterRequest:
     properties:
       editorPassword:
         type: string
@@ -190,7 +163,7 @@ definitions:
     - password
     - username
     type: object
-  models.Role:
+  github_com_daniele_web-app-caa_internal_models.Role:
     properties:
       created_at:
         type: string
@@ -207,29 +180,29 @@ definitions:
       permissions:
         description: Many-to-many relationship with permissions
         items:
-          $ref: '#/definitions/models.Permission'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Permission'
         type: array
       updated_at:
         type: string
       users:
         description: Many-to-many relationship with users
         items:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.User'
         type: array
     type: object
-  models.SetupRequest:
+  github_com_daniele_web-app-caa_internal_models.SetupRequest:
     properties:
       gridType:
         type: string
     required:
     - gridType
     type: object
-  models.SuccessResponse:
+  github_com_daniele_web-app-caa_internal_models.SuccessResponse:
     properties:
       message:
         type: string
     type: object
-  models.User:
+  github_com_daniele_web-app-caa_internal_models.User:
     properties:
       created_at:
         type: string
@@ -242,7 +215,7 @@ definitions:
       roles:
         description: Many-to-many relationship with roles
         items:
-          $ref: '#/definitions/models.Role'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
         type: array
       status:
         type: string
@@ -250,6 +223,33 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  internal_handlers.CreatePermissionRequest:
+    properties:
+      action:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      resource:
+        type: string
+    required:
+    - action
+    - name
+    - resource
+    type: object
+  internal_handlers.CreateRoleRequest:
+    properties:
+      description:
+        type: string
+      display_name:
+        type: string
+      name:
+        type: string
+    required:
+    - display_name
+    - name
     type: object
 externalDocs:
   description: OpenAPI
@@ -370,26 +370,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.LoginRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AuthResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.AuthResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       summary: Login user
       tags:
       - Auth
@@ -402,15 +402,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Logout user
@@ -428,7 +428,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Permission'
+              $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Permission'
             type: array
         "500":
           description: Internal Server Error
@@ -451,14 +451,14 @@ paths:
         name: permission
         required: true
         schema:
-          $ref: '#/definitions/handlers.CreatePermissionRequest'
+          $ref: '#/definitions/internal_handlers.CreatePermissionRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Permission'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Permission'
         "400":
           description: Bad Request
           schema:
@@ -488,7 +488,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Role'
+              $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
             type: array
         "500":
           description: Internal Server Error
@@ -511,14 +511,14 @@ paths:
         name: role
         required: true
         schema:
-          $ref: '#/definitions/handlers.CreateRoleRequest'
+          $ref: '#/definitions/internal_handlers.CreateRoleRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Role'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
         "400":
           description: Bad Request
           schema:
@@ -684,7 +684,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Permission'
+              $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Permission'
             type: array
         "400":
           description: Bad Request
@@ -721,7 +721,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Role'
+              $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
             type: array
         "400":
           description: Bad Request
@@ -834,26 +834,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.RefreshTokenRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.RefreshTokenResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       summary: Refresh access token
       tags:
       - Auth
@@ -869,26 +869,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.RegisterRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.AuthResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.AuthResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       summary: Register a new user
       tags:
       - Auth
@@ -903,26 +903,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.RefreshTokenRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       summary: Revoke refresh token
       tags:
       - Auth
@@ -935,15 +935,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.User'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get current user
@@ -960,26 +960,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.CheckEditorPasswordRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.CheckEditorPasswordRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Check editor password
@@ -994,15 +994,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Complete setup
@@ -1019,26 +1019,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.ConjugateRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ConjugateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ConjugateResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ConjugateResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Conjugate verbs
@@ -1055,26 +1055,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.CorrectRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.CorrectRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.CorrectResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.CorrectResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Correct sentences
@@ -1089,15 +1089,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.GridResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get grid
@@ -1113,26 +1113,26 @@ paths:
         name: grid
         required: true
         schema:
-          $ref: '#/definitions/models.GridResponse'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridResponse'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Save grid
@@ -1149,26 +1149,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.AddItemRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.AddItemRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.GridItemResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Add grid item
@@ -1189,19 +1189,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete grid item
@@ -1222,35 +1222,231 @@ paths:
         name: item
         required: true
         schema:
-          $ref: '#/definitions/models.GridItemResponse'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update grid item
       tags:
       - Grid
+  /rag-knowledge:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the current RAG knowledge data used by the AI system for
+        language processing
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: RAG knowledge data
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get RAG knowledge
+      tags:
+      - rag-knowledge
+    put:
+      consumes:
+      - application/json
+      description: Update the RAG knowledge data and optionally save to S3 storage.
+        Requires admin privileges.
+      parameters:
+      - description: RAG knowledge data structure
+        in: body
+        name: knowledge
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      - description: Whether to save the updated knowledge to S3 storage
+        in: query
+        name: save_to_s3
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message with S3 save status
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request - invalid JSON format
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update RAG knowledge
+      tags:
+      - rag-knowledge
+  /rag-knowledge/backup:
+    post:
+      consumes:
+      - application/json
+      description: Create a timestamped backup of the current RAG knowledge in S3
+        storage. Requires S3 to be enabled and admin privileges.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error - S3 not enabled or backup failed
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create RAG knowledge backup
+      tags:
+      - rag-knowledge
+  /rag-knowledge/backups:
+    get:
+      consumes:
+      - application/json
+      description: List all available RAG knowledge backups in S3 storage with timestamps
+        and metadata. Requires S3 to be enabled and admin privileges.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Object containing backups array
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error - S3 not enabled or list failed
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List RAG knowledge backups
+      tags:
+      - rag-knowledge
+  /rag-knowledge/health:
+    get:
+      consumes:
+      - application/json
+      description: Check the health and connectivity of S3 storage service. Verifies
+        bucket access and connectivity. Requires admin privileges.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: S3 health status with connection details
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: S3 health check failed or S3 not enabled
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Check S3 health
+      tags:
+      - rag-knowledge
+  /rag-knowledge/reload:
+    post:
+      consumes:
+      - application/json
+      description: Reload RAG knowledge from S3 storage or fall back to local file
+        if S3 is unavailable. Requires admin privileges.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Reload RAG knowledge
+      tags:
+      - rag-knowledge
+  /rag-knowledge/restore/{backup_key}:
+    post:
+      consumes:
+      - application/json
+      description: Restore RAG knowledge from a specific timestamped backup stored
+        in S3. This will replace the current knowledge. Requires S3 to be enabled
+        and admin privileges.
+      parameters:
+      - description: S3 backup key (e.g., 'caa/backups/rag_knowledge_20240829_143052.json')
+        in: path
+        name: backup_key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message with backup key
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request - backup key required
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error - restore failed
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Restore RAG knowledge from backup
+      tags:
+      - rag-knowledge
   /setup:
     post:
       consumes:
@@ -1263,26 +1459,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.SetupRequest'
+          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SetupRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Setup grid

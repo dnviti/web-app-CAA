@@ -1,0 +1,14 @@
+# Docker Compose configuration for RustFS (S3-compatible storage)
+# Usage: docker-compose --profile rustfs up
+# or: docker-compose -f docker-compose.yaml -f docker-compose.rustfs.yaml up
+
+version: '3.8'
+
+# This file is used to enable RustFS service specifically
+# It extends the main docker-compose.yaml file
+
+services:
+  web-app:
+    environment:
+      - S3_ENABLED=true
+      - S3_ENDPOINT=http://rustfs:9000

@@ -7,62 +7,126 @@ services:
       - APP_HOST=0.0.0.0
       - APP_PORT=6542
       - JWT_SECRET=${JWT_SECRET:-your-default-secret-key}
-      - PUBLIC_URL=http://localhost:6542
-      - DB_TYPE=${DB_TYPE:-sqlite}
+      - PUBLIC_URL=${PUBLIC_URL:-http://localhost:6542}
+      - DB_DRIVER=${DB_DRIVER:-sqlite}
       # OpenAI backend configuration
       - BACKEND_TYPE=${BACKEND_TYPE:-openai}
       - LLM_HOST=${LLM_HOST}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LLM_MODEL=${LLM_MODEL:-gpt-3.5-turbo}
-      # MySQL configuration (if using external MySQL)
-      - DB_HOST=${DB_HOST}
+      # MySQL configuration (if using MySQL)
+      - DB_HOST=${DB_HOST:-mysql}
       - DB_PORT=${DB_PORT:-3306}
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       # Ollama configuration (if using Ollama)
-      - OLLAMA_HOST=${OLLAMA_HOST}
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://ollama:11434}
       - OLLAMA_MODEL=${OLLAMA_MODEL}
+      # S3 configuration
+      - S3_ENABLED=${S3_ENABLED:-false}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_REGION=${S3_REGION}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
     volumes:
       # Mount data directory to persist SQLite database
       - ./data:/root/data
     restart: unless-stopped
     networks:
       - app-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+        required: false
+      ollama:
+        condition: service_started
+        required: false
+      rustfs:
+        condition: service_healthy
+        required: false
 
-  # Optional: MySQL database service (uncomment if you want to run MySQL in Docker)
-  # mysql:
-  #   image: mysql:8.0
-  #   environment:
-  #     MYSQL_DATABASE: ${DB_NAME:-caa_database}
-  #     MYSQL_USER: ${DB_USER:-caa}
-  #     MYSQL_PASSWORD: ${DB_PASSWORD:-caa}
-  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
-  #   ports:
-  #     - "3306:3306"
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
-  #   restart: unless-stopped
-  #   networks:
-  #     - app-network
+  # MySQL database service - enabled with profile "mysql"
+  mysql:
+    image: mysql:8.0
+    profiles:
+      - mysql
+      - database
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-caa_database}
+      MYSQL_USER: ${DB_USER:-caa}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-caa}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
-  # Optional: Ollama service (uncomment if you want to run Ollama locally)
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   ports:
-  #     - "11434:11434"
-  #   volumes:
-  #     - ollama_data:/root/.ollama
-  #   restart: unless-stopped
-  #   networks:
-  #     - app-network
+  # Ollama service - enabled with profile "ollama"
+  ollama:
+    image: ollama/ollama:latest
+    profiles:
+      - ollama
+      - ai
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - app-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
-# volumes:
-  # Uncomment when using MySQL or Ollama services
-  # mysql_data:
-  #   driver: local
-  # ollama_data:
-  #   driver: local
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs
+    profiles:
+      - rustfs
+      - storage
+      - s3
+    ports:
+      - "${RUSTFS_API_PORT:-9000}:9000"      # API port
+      - "${RUSTFS_CONSOLE_PORT:-9001}:9001"  # Console port
+    environment:
+      - RUSTFS_ACCESS_KEY=${RUSTFS_ACCESS_KEY:-admin}
+      - RUSTFS_SECRET_KEY=${RUSTFS_SECRET_KEY:-admin}
+    volumes:
+      - rustfs_data:/data
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  mysql_data:
+    driver: local
+  ollama_data:
+    driver: local
+  rustfs_data:
+    driver: local
 
 networks:
   app-network:

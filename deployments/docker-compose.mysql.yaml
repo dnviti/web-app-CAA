@@ -1,0 +1,14 @@
+# Docker Compose configuration for MySQL database
+# Usage: docker-compose --profile mysql up
+# or: docker-compose -f docker-compose.yaml -f docker-compose.mysql.yaml up
+
+version: '3.8'
+
+# This file is used to enable MySQL database service specifically
+# It extends the main docker-compose.yaml file
+
+services:
+  web-app:
+    environment:
+      - DB_DRIVER=mysql
+      - DB_HOST=mysql

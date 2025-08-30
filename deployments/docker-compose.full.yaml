@@ -1,0 +1,31 @@
+# Docker Compose configuration for full development stack
+# This includes all optional services: MySQL, Ollama, and RustFS
+# Usage: docker-compose -f docker-compose.yaml -f docker-compose.full.yaml up
+
+version: '3.8'
+
+# This file enables all optional services for a complete development environment
+
+services:
+  web-app:
+    environment:
+      - DB_DRIVER=mysql
+      - DB_HOST=mysql
+      - BACKEND_TYPE=ollama
+      - OLLAMA_HOST=http://ollama:11434
+      - S3_ENABLED=true
+      - S3_ENDPOINT=http://rustfs:9000
+    profiles:
+      - ""  # Always enabled when using this compose file
+  
+  mysql:
+    profiles:
+      - ""  # Always enabled when using this compose file
+  
+  ollama:
+    profiles:
+      - ""  # Always enabled when using this compose file
+  
+  rustfs:
+    profiles:
+      - ""  # Always enabled when using this compose file

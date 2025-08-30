@@ -51,6 +51,13 @@ Web App CAA is a web application built in Go that provides:
 - **Template-based Processing**: Uses Go templates with RAG knowledge
 - **Multiple LLM Backends**: Supports Ollama and OpenAI-compatible APIs
 
+### ✅ **S3 Storage Integration** 🆕
+- **RAG Knowledge Management**: Store and manage AI knowledge base in S3
+- **Automatic Backups**: Timestamped backups with restore functionality
+- **Fallback Strategy**: Graceful fallback to local files when S3 unavailable
+- **Multi-Environment Support**: Separate S3 prefixes for dev/staging/prod
+- **Development-Friendly**: LocalStack and RustFS support for local development
+
 ### ✅ **Architecture**
 - Clean architecture with proper separation of concerns
 - RESTful API design
@@ -64,6 +71,8 @@ Web App CAA is a web application built in Go that provides:
 |--------------|----------|
 | Install and try the app | [Quick Start Guide](getting-started/quick-start.md) |
 | Deploy to production | [Docker Deployment](deployment/docker.md) |
+| Set up S3 storage | [S3 Integration Guide](s3-integration.md) |
+| Manage RAG knowledge | [RAG Knowledge API](api/rag-knowledge.md) |
 | Contribute code | [Contributing Guide](development/contributing.md) |
 | Understand the API | [Authentication API](api/authentication.md) |
 | Set up development environment | [Development Setup](development/setup.md) |
@@ -80,6 +89,7 @@ Web App CAA is a web application built in Go that provides:
 | **ORM** | GORM with auto-migration |
 | **Authentication** | JWT tokens with bcrypt |
 | **AI Integration** | Ollama / OpenAI APIs |
+| **Storage** | AWS S3 / LocalStack / RustFS |
 | **Frontend** | HTML5, CSS3, Vanilla JavaScript |
 | **Containerization** | Docker & Docker Compose |
 | **Documentation** | MkDocs with Material theme |

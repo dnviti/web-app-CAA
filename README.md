@@ -214,6 +214,14 @@ docker run -p 3000:3000 -e APP_PORT=3000 ghcr.io/dnviti/web-app-caa:latest
 - Item ordering and visibility controls
 - Image processing placeholder (ready for implementation)
 
+### ✅ S3 Storage Integration
+- RAG knowledge storage and management in AWS S3 or S3-compatible services
+- Automatic fallback to local files when S3 is unavailable
+- Timestamped backups with restore functionality
+- Support for LocalStack and RustFS for development
+- Admin-only API endpoints for knowledge management
+- Health checks and monitoring for S3 connectivity
+
 ### ✅ API Endpoints
 All original Node.js endpoints have been implemented:
 
@@ -234,6 +242,15 @@ All original Node.js endpoints have been implemented:
 **AI Services (Direct LLM Integration):**
 - `POST /api/conjugate` - Verb conjugation service
 - `POST /api/correct` - Sentence correction service
+
+**RAG Knowledge Management (Admin Only):**
+- `GET /api/rag-knowledge` - Retrieve current RAG knowledge
+- `PUT /api/rag-knowledge` - Update RAG knowledge (with optional S3 save)
+- `POST /api/rag-knowledge/reload` - Reload RAG knowledge from storage
+- `POST /api/rag-knowledge/backup` - Create timestamped backup
+- `GET /api/rag-knowledge/backups` - List available backups
+- `POST /api/rag-knowledge/restore/:backup_key` - Restore from backup
+- `GET /api/rag-knowledge/health` - Check S3 storage health
 
 ### ✅ Middleware & Infrastructure
 - Request logging with timestamps and response times
@@ -278,6 +295,18 @@ Environment variables (with defaults):
 - `DB_USER`: MySQL username (default: root)
 - `DB_PASSWORD`: MySQL password (default: empty)
 - `DB_NAME`: MySQL database name (default: webapp_caa)
+
+### S3 Storage Configuration (Optional)
+- `S3_ENABLED`: Enable S3 storage for RAG knowledge (default: false)
+- `S3_REGION`: AWS S3 region (default: us-east-1)
+- `S3_BUCKET_NAME`: S3 bucket name (required if S3_ENABLED=true)
+- `S3_ACCESS_KEY_ID`: AWS access key ID
+- `S3_SECRET_ACCESS_KEY`: AWS secret access key
+- `S3_ENDPOINT`: Custom S3 endpoint for LocalStack/RustFS (optional)
+- `S3_KEY_PREFIX`: Key prefix for organization (default: caa)
+- `S3_FORCE_PATH_STYLE`: Force path-style URLs (default: true)
+
+> **Note:** When S3 is enabled, the application will load RAG knowledge from S3 and fallback to local files if S3 is unavailable. See [S3 Integration Guide](docs/s3-integration.md) for detailed setup instructions.
 - `DB_CHARSET`: MySQL charset (default: utf8mb4)
 - `DB_PARSE_TIME`: Parse time values (default: true)
 - `DB_LOC`: MySQL timezone location (default: Local)

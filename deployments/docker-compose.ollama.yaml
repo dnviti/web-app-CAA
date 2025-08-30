@@ -1,0 +1,14 @@
+# Docker Compose configuration for Ollama AI service
+# Usage: docker-compose --profile ollama up
+# or: docker-compose -f docker-compose.yaml -f docker-compose.ollama.yaml up
+
+version: '3.8'
+
+# This file is used to enable Ollama service specifically
+# It extends the main docker-compose.yaml file
+
+services:
+  web-app:
+    environment:
+      - BACKEND_TYPE=ollama
+      - OLLAMA_HOST=http://ollama:11434

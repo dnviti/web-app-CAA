@@ -26,7 +26,7 @@ func NewRBACHandler(rbacService *services.RBACService) *RBACHandler {
 // @Accept json
 // @Produce json
 // @Param user_id path string true "User ID"
-// @Success 200 {array} models.Role
+// @Success 200 {array} github_com_daniele_web-app-caa_internal_models.Role
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -54,7 +54,7 @@ func (h *RBACHandler) GetUserRoles(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param user_id path string true "User ID"
-// @Success 200 {array} models.Permission
+// @Success 200 {array} github_com_daniele_web-app-caa_internal_models.Permission
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -141,7 +141,7 @@ func (h *RBACHandler) RemoveUserRole(c *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Success 200 {array} models.Role
+// @Success 200 {array} github_com_daniele_web-app-caa_internal_models.Role
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
 // @Router /auth/rbac/roles [get]
@@ -161,7 +161,7 @@ func (h *RBACHandler) GetAllRoles(c *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Success 200 {array} models.Permission
+// @Success 200 {array} github_com_daniele_web-app-caa_internal_models.Permission
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
 // @Router /auth/rbac/permissions [get]
@@ -189,7 +189,7 @@ type CreateRoleRequest struct {
 // @Accept json
 // @Produce json
 // @Param role body CreateRoleRequest true "Role data"
-// @Success 201 {object} models.Role
+// @Success 201 {object} github_com_daniele_web-app-caa_internal_models.Role
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
@@ -225,7 +225,7 @@ type CreatePermissionRequest struct {
 // @Accept json
 // @Produce json
 // @Param permission body CreatePermissionRequest true "Permission data"
-// @Success 201 {object} models.Permission
+// @Success 201 {object} github_com_daniele_web-app-caa_internal_models.Permission
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Security BearerAuth
