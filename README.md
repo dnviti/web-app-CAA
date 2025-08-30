@@ -1,6 +1,6 @@
-# Web App CAA - Go Implementation
+# Web App CAA - Augmentative and Alternative Communication
 
-This is the Go implementation of the Web App CAA (Comunicazione Aumentativa e Alternativa), originally implemented in Node.js and Python. This Go server maintains exact functional parity with the original implementation while using modern Go frameworks and libraries.
+A modern web application for Augmentative and Alternative Communication (CAA/AAC), built with Go backend and React frontend. This application provides a comprehensive communication grid system with AI-powered language processing, user management, and administrative features.
 
 ## Project Structure
 
@@ -8,43 +8,47 @@ This project follows the [Standard Go Project Layout](https://github.com/golang-
 
 ```
 ├── cmd/
-│   └── web-app-caa/        # Main application entry point
-│       └── main.go
+│   └── web-app-CAA/        # Main application entry point
 ├── internal/               # Private application code
+│   ├── auth/              # Authentication and JWT handling
 │   ├── config/            # Configuration management
-│   ├── database/          # Database layer
+│   ├── database/          # Database layer with GORM
 │   ├── handlers/          # HTTP request handlers
-│   ├── middleware/        # Authentication and logging middleware
-│   ├── models/            # Data models and structures
-│   ├── prompts/           # AI prompt templates
-│   └── services/          # Business logic layer
-├── pkg/                   # Public library code
-│   └── ollama/            # Ollama client library
-├── web/                   # Web application assets
-│   ├── static/            # Static files (CSS, JS, images)
-│   └── templates/         # HTML templates
-├── deployments/           # Docker and deployment configs
-├── docs/                  # Documentation
-├── data/                  # Application data (gitignored)
-├── configs/               # Configuration files
-├── Makefile              # Build automation
-├── go.mod                # Go module definition
-└── README.md
+│   ├── middleware/        # RBAC, authentication, logging
+│   ├── models/            # Data models and API structures
+│   └── services/          # Business logic (grid, AI, RBAC, user management)
+├── frontend/              # Modern React TypeScript frontend
+│   ├── src/
+│   │   ├── components/    # Reusable UI components and admin panel
+│   │   ├── pages/         # Application pages
+│   │   ├── api/           # API client functions
+│   │   ├── types/         # TypeScript type definitions
+│   │   └── store/         # State management
+│   ├── package.json
+│   └── vite.config.ts
+├── web/                   # Legacy HTML templates and static assets
+├── docs/                  # Documentation and API specs
+├── Makefile               # Build automation
+└── docker-compose.yml     # Container orchestration
 ```
 
 ## Architecture
 
-The Go implementation follows a clean architecture with proper separation of concerns:
+### Backend (Go)
+Clean architecture with separation of concerns:
+- **Authentication**: JWT with refresh tokens, signing key rotation, RBAC with role-based permissions
+- **Database**: SQLite/MySQL with GORM, automatic migrations and seeding
+- **API**: RESTful endpoints with comprehensive Swagger documentation
+- **Services**: Business logic for grid management, AI processing, user management
+- **Middleware**: Request logging, CORS, authentication, authorization
 
-- **cmd/web-app-caa/**: Application entry point and server setup
-- **internal/models/**: Data models and request/response structures
-- **internal/database/**: Database connection and configuration
-- **internal/services/**: Business logic layer
-- **internal/handlers/**: HTTP request handlers
-- **internal/middleware/**: Authentication and logging middleware
-- **internal/config/**: Configuration management
-- **pkg/ollama/**: Reusable Ollama client library
-- **web/**: Static web assets and HTML templates
+### Frontend (React + TypeScript)
+Modern single-page application with:
+- **Components**: Reusable UI components with Tailwind CSS
+- **State Management**: Zustand for global state
+- **API Integration**: Axios with React Query for data fetching
+- **Admin Panel**: User management, system health monitoring, analytics
+- **Authentication**: JWT token management with auto-refresh
 
 ## Quick Start
 
@@ -58,16 +62,14 @@ The Go implementation follows a clean architecture with proper separation of con
 
 ### Important: CGO Configuration
 
-This application uses SQLite with the `mattn/go-sqlite3` driver, which requires CGO to be enabled. The build system automatically handles this, but if you encounter CGO-related issues, please see the [CGO_ENABLED=1 Issue Documentation](docs/development/cgo-issue.md).
+This application uses SQLite with the `mattn/go-sqlite3` driver, which requires CGO to be enabled. The Makefile automatically handles this configuration.
 
-**Quick reference:**
-- Building with `make build` or `task build` automatically sets `CGO_ENABLED=1`
-- For static binaries (no SQLite): use `make build-nocgo` 
-- In CI/CD environments, ensure build dependencies are installed
+**Build Requirements:**
+- C compiler (gcc, clang, or equivalent)
+- CGO_ENABLED=1 (automatically set by Makefile)
+- For static binaries without SQLite: use `make build-nocgo`
 
-### Build and Run
-
-#### Using Make (Recommended)
+### Backend (Go)
 ```bash
 # Install dependencies
 make deps
@@ -78,32 +80,48 @@ make build
 # Run the application
 make run
 
-# Or run in development mode (without building binary)
+# Development mode (hot reload)
 make dev
 
 # Run tests
 make test
 
-# Format code
-make fmt
+# Generate Swagger docs
+make swagger
 
-# Clean build artifacts
-make clean
+# Code formatting and linting
+make fmt
+make lint
 ```
 
-#### Manual Build
+### Frontend (React)
 ```bash
+cd frontend
+
 # Install dependencies
-go mod tidy
+npm install
 
-# Build the application
-go build -o bin/web-app-caa ./cmd/web-app-caa
+# Development server
+npm run dev
 
-# Run the application
-./bin/web-app-caa
+# Build for production
+npm run build
 
-# Or run directly
-go run ./cmd/web-app-caa/main.go
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+```
+
+### Docker
+```bash
+# Build and run with Docker Compose
+make docker-build
+make docker-up
+
+# Stop containers
+make docker-down
 ```
 
 ## API Documentation (Swagger/OpenAPI)
@@ -187,95 +205,101 @@ docker pull ghcr.io/dnviti/web-app-caa:latest
 docker run -p 3000:3000 -e APP_PORT=3000 ghcr.io/dnviti/web-app-caa:latest
 ```
 
-## Features Implemented
+## Features
 
-### ✅ Authentication System
-- User registration with automatic password hashing (bcrypt + GORM hooks)
-- JWT-based authentication using industry-standard practices
-  - Secure token generation with configurable lifespan
-  - HMAC-SHA256 signing with secret key rotation support
-  - Automatic token extraction from Authorization header
-  - User ID extraction directly from JWT claims
-- Editor password verification with separate hashing
-- User status management (pending_setup/active)
-- Enhanced security with input sanitization and validation
+### 🔐 Authentication & Authorization
+- JWT authentication with refresh tokens and signing key rotation
+- Role-Based Access Control (RBAC) with Casbin integration
+- User registration, login, and password management
+- Protected routes and API endpoints
+- Admin panel with user management capabilities
 
-### ✅ Database Layer
-- SQLite database with GORM ORM
-- User management (create, find, update)
-- Grid item management (CRUD operations)
-- Transaction support for data consistency
-- Auto-migration of database schema
+### 📊 Communication Grid System
+- Interactive CAA communication grids with drag-and-drop
+- Multiple grid templates (default, simplified, empty)
+- Category management with hierarchical structure
+- Symbol and item customization
+- User-specific grid configurations
 
-### ✅ Grid Management
-- Default, simplified, and empty grid templates
-- Full CRUD operations on grid items
-- Category management with proper hierarchical structure
-- Item ordering and visibility controls
-- Image processing placeholder (ready for implementation)
+### 🤖 AI Language Processing
+- Italian verb conjugation with contextual awareness
+- Sentence correction and grammar assistance
+- Direct LLM integration (Ollama/OpenAI compatible)
+- RAG knowledge management with S3 storage
 
-### ✅ S3 Storage Integration
-- RAG knowledge storage and management in AWS S3 or S3-compatible services
-- Automatic fallback to local files when S3 is unavailable
-- Timestamped backups with restore functionality
-- Support for LocalStack and RustFS for development
-- Admin-only API endpoints for knowledge management
-- Health checks and monitoring for S3 connectivity
+### 👨‍💼 Admin Dashboard
+- User management (create, update, delete, bulk operations)
+- System health monitoring with real database status
+- User analytics and role distribution
+- Comprehensive admin controls
 
-### ✅ API Endpoints
-All original Node.js endpoints have been implemented:
+### 🛠️ Technical Features
+- Dual frontend support (modern React + legacy HTML)
+- SQLite/MySQL database with automatic migrations
+- Comprehensive API documentation (Swagger/OpenAPI)
+- Docker containerization with GitHub Actions CI/CD
+- S3-compatible storage integration
+
+## API Documentation
+
+Comprehensive API documentation is available via Swagger UI when the server is running:
+```
+http://localhost:6542/swagger/index.html
+```
+
+### Key API Endpoints
 
 **Authentication:**
-- `POST /api/register` - User registration
-- `POST /api/login` - User login
-- `POST /api/check-editor-password` - Editor password verification
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login with JWT tokens
+- `POST /api/auth/refresh` - Token refresh
+- `POST /api/auth/logout` - User logout
 
 **Grid Management:**
-- `POST /api/setup` - Initial grid setup
-- `POST /api/complete-setup` - Mark setup as complete
-- `GET /api/grid` - Retrieve user's grid
-- `POST /api/grid` - Save entire grid
+- `GET /api/grid` - Retrieve user's communication grid
+- `POST /api/grid/setup` - Initial grid setup with templates
 - `POST /api/grid/item` - Add new grid item
 - `PUT /api/grid/item/:id` - Update grid item
 - `DELETE /api/grid/item/:id` - Delete grid item
 
-**AI Services (Direct LLM Integration):**
-- `POST /api/conjugate` - Verb conjugation service
-- `POST /api/correct` - Sentence correction service
+**AI Services:**
+- `POST /api/ai/conjugate` - Italian verb conjugation
+- `POST /api/ai/correct` - Sentence correction and grammar
 
-**RAG Knowledge Management (Admin Only):**
-- `GET /api/rag-knowledge` - Retrieve current RAG knowledge
-- `PUT /api/rag-knowledge` - Update RAG knowledge (with optional S3 save)
-- `POST /api/rag-knowledge/reload` - Reload RAG knowledge from storage
-- `POST /api/rag-knowledge/backup` - Create timestamped backup
-- `GET /api/rag-knowledge/backups` - List available backups
-- `POST /api/rag-knowledge/restore/:backup_key` - Restore from backup
-- `GET /api/rag-knowledge/health` - Check S3 storage health
+**Admin Panel (RBAC Protected):**
+- `GET /api/admin/users` - List and manage users
+- `POST /api/admin/users` - Create new user
+- `PUT /api/admin/users/:id` - Update user details
+- `DELETE /api/admin/users/:id` - Delete user
+- `POST /api/admin/users/bulk` - Bulk user operations
+- `GET /api/admin/analytics/users` - User analytics
+- `GET /api/admin/system/ping` - System health check
 
-### ✅ Middleware & Infrastructure
-- Request logging with timestamps and response times
-- CORS configuration matching original Node.js setup
-- Static file serving for web assets
-- JWT token validation with user verification
-- Database connection management
-- Error handling and recovery
 
-### ✅ Static Web Interface
-- All original HTML, CSS, and JavaScript files
-- Login and registration pages
-- Setup wizard
-- Main CAA interface
+## Technology Stack
 
-## Dependencies
+### Backend
+- **Go 1.21+**: Core language
+- **Gin**: Web framework and routing
+- **GORM**: Database ORM with auto-migration
+- **JWT**: Authentication with refresh tokens
+- **Casbin**: Role-Based Access Control (RBAC)
+- **Swagger**: API documentation generation
+- **Docker**: Containerization
 
-The Go implementation uses the following key dependencies:
+### Frontend
+- **React 19**: UI framework
+- **TypeScript**: Type safety
+- **Vite**: Build tool and development server
+- **Tailwind CSS**: Styling framework
+- **React Query**: Data fetching and caching
+- **Zustand**: State management
+- **React Router**: Client-side routing
 
-- **Gin**: Web framework for HTTP routing and middleware
-- **GORM**: ORM for database operations
-- **SQLite**: Database driver
-- **JWT-Go**: JWT token handling
-- **bcrypt**: Password hashing
-- **Standard Go libraries**: HTTP client, JSON, logging, etc.
+### Database
+- **SQLite**: Default embedded database
+- **MySQL**: Optional production database
+- **GORM**: Automatic migrations and seeding
 
 ## Configuration
 
@@ -289,7 +313,7 @@ Environment variables (with defaults):
 ### Database Configuration
 - `DB_DRIVER`: Database driver - `sqlite` or `mysql` (default: sqlite)
 
-#### MySQL Configuration (when DB_DRIVER=mysql)
+##### MySQL Configuration (when DB_DRIVER=mysql)
 - `DB_HOST`: MySQL host (default: localhost)
 - `DB_PORT`: MySQL port (default: 3306)
 - `DB_USER`: MySQL username (default: root)
@@ -302,11 +326,12 @@ Environment variables (with defaults):
 - `S3_BUCKET_NAME`: S3 bucket name (required if S3_ENABLED=true)
 - `S3_ACCESS_KEY_ID`: AWS access key ID
 - `S3_SECRET_ACCESS_KEY`: AWS secret access key
-- `S3_ENDPOINT`: Custom S3 endpoint for LocalStack/RustFS (optional)
+- `S3_ENDPOINT`: Custom S3 endpoint for LocalStack (optional)
 - `S3_KEY_PREFIX`: Key prefix for organization (default: caa)
 - `S3_FORCE_PATH_STYLE`: Force path-style URLs (default: true)
 
-> **Note:** When S3 is enabled, the application will load RAG knowledge from S3 and fallback to local files if S3 is unavailable. See [S3 Integration Guide](docs/s3-integration.md) for detailed setup instructions.
+> **Note:** When S3 is enabled, the application loads RAG knowledge from S3 with automatic fallback to local files.
+
 - `DB_CHARSET`: MySQL charset (default: utf8mb4)
 - `DB_PARSE_TIME`: Parse time values (default: true)
 - `DB_LOC`: MySQL timezone location (default: Local)
@@ -323,109 +348,152 @@ Environment variables (with defaults):
 - `BACKEND_TYPE`: AI backend type (`ollama` or `openai`)
 - `OPENAI_API_KEY`: OpenAI API key (for OpenAI-compatible APIs)
 
+### RBAC Configuration
+- `RBAC_POLICY_FILE`: Path to Casbin policy file (default: configs/rbac_policy.conf)
+- `RBAC_MODEL_FILE`: Path to Casbin model file (default: configs/rbac_model.conf)
+
 ## Database
 
-The application supports both SQLite and MySQL databases:
+### Automatic Database Setup
+The application uses a fully automated approach:
 
-### SQLite (Default)
-- File-based database stored in `./data/database.sqlite`
-- No additional setup required
-- Perfect for development and small deployments
+**Schema Migration (GORM AutoMigrate):**
+- Automatic table creation and schema updates
+- Includes: users, grid_items, roles, permissions, user_roles, role_permissions, refresh_tokens, signing_keys, user_activities
+- No manual migration files needed
 
-### MySQL
-- Full-featured relational database
-- Connection pooling and optimization
-- Suitable for production environments
+**Data Seeding:**
+- RBAC setup with default roles (admin, editor, user) and permissions
+- Default admin user creation
+- SigningKey initialization for JWT security
+- Idempotent operations - safe to run multiple times
 
-Both databases support:
-- Automatic schema migration on startup
-- Foreign key constraints
-- Transaction support for data integrity
+### Supported Databases
+**SQLite (Default):**
+- File-based database in `./data/database.sqlite`
+- Zero configuration required
+- Ideal for development and small deployments
+
+**MySQL:**
+- Production-ready with connection pooling
+- Full relational database features
+- Horizontal scaling support
 
 ## AI Integration
 
-The Go server provides direct AI functionality using integrated LLM services with template-based processing:
+Direct LLM integration for language processing:
+- **Italian Verb Conjugation**: Context-aware conjugation with tense support
+- **Sentence Correction**: Grammar and syntax correction
+- **RAG Knowledge**: Enhanced responses using stored knowledge base
+- **Multi-Backend Support**: Ollama and OpenAI-compatible APIs
 
-- Italian verb conjugation with RAG knowledge
-- Sentence correction and completion  
-- Tense-specific grammar processing
+Supported models: Llama, Mistral, OpenAI GPT, and other compatible LLMs.
 
-## Key Implementation Details
+## Development
+
+### Database Models
+**Core Models:**
+- **users**: Authentication, status, and profile information
+- **grid_items**: CAA communication grid items with user association
+- **roles/permissions**: RBAC authorization system
+- **user_roles/role_permissions**: Many-to-many RBAC relationships
+- **refresh_tokens**: Secure token refresh mechanism
+- **signing_keys**: JWT signing key rotation for security
+- **user_activities**: Activity tracking and audit logs
 
 ### Authentication Flow
-1. **User Registration**: Creates account with GORM BeforeSave hooks automatically hashing passwords using bcrypt
-2. **Login Process**: Validates credentials and returns JWT token with configurable expiration time
-3. **Token Validation**: Protected endpoints extract user ID directly from JWT claims without database lookup
-4. **Database Verification**: Final verification ensures user still exists and is active
-5. **Editor Security**: Additional password layer for administrative functions with separate hash storage
+1. User registration with bcrypt password hashing
+2. Login returns JWT access token + refresh token
+3. Automatic signing key rotation for enhanced security
+4. RBAC middleware validates permissions
+5. Token refresh mechanism for session management
 
-**JWT Configuration:**
-- `API_SECRET`: Secret key for JWT signing (falls back to JWT_SECRET for compatibility)
-- `TOKEN_HOUR_LIFESPAN`: Token expiration time in hours (default: 24)
-- Tokens include authorized flag, user_id, and expiration timestamp
-- Automatic token extraction from `Authorization: Bearer <token>` header
+### Admin Panel Features
+- User management with bulk operations
+- Real-time system health monitoring
+- Database connection status and type detection
+- User analytics and role distribution
+- Activity logging and audit trails
 
-### Grid System
-1. Three grid templates: default (full), simplified, empty
-2. Hierarchical category structure with parent-child relationships
-3. Items have properties: type, label, icon, color, text, speak, action
-4. System controls for speech, deletion, and tense selection
-5. Proper ordering and visibility management
+## Deployment
 
-### Database Design
-- **users**: User accounts with status tracking
-- **grid_items**: Grid items with user association and category organization
-- Composite primary key (id, user_id) for grid items
-- Foreign key constraints with cascade deletion
+### Production Checklist
+- [ ] Set `JWT_SECRET` to a secure random value
+- [ ] Configure database (MySQL recommended for production)
+- [ ] Set up S3 storage for RAG knowledge (optional)
+- [ ] Configure RBAC policies as needed
+- [ ] Enable HTTPS with reverse proxy (nginx/apache)
+- [ ] Set up monitoring and logging
+- [ ] Configure backup strategy
 
-## Compatibility
+### Container Deployment
+The application is automatically built and published to GitHub Container Registry:
+```bash
+# Pull and run the latest container
+docker pull ghcr.io/dnviti/web-app-caa:latest
+docker run -p 6542:6542 -e JWT_SECRET=your-secret ghcr.io/dnviti/web-app-caa:latest
+```
 
-This Go implementation maintains 100% API compatibility with the original Node.js server:
-- Same endpoint paths and HTTP methods
-- Identical request/response formats
-- Same authentication mechanisms
-- Compatible database schema
-- Identical static web assets
+## Getting Started
 
-## Running the Application
+1. **Clone and build:**
+   ```bash
+   git clone https://github.com/dnviti/web-app-CAA.git
+   cd web-app-CAA
+   make build
+   ```
 
-1. Build: `go build -o web-app-caa main.go`
-2. Run: `./web-app-caa`
-3. Access: http://localhost:3000
+2. **Run the application:**
+   ```bash
+   make run
+   ```
 
-The application will:
-- Create database directory and file if needed
-- Auto-migrate database schema
+3. **Access the application:**
+   - Backend API: http://localhost:6542
+   - Swagger UI: http://localhost:6542/swagger/index.html
+   - Frontend dev server: http://localhost:5173 (if running `npm run dev`)
+
+4. **Default admin user:**
+   - Username: `admin`
+   - Password: `admin123`
+   - (Change password after first login)
+
+The application will automatically:
+- Create database and migrate schema
+- Seed default roles and admin user
+- Generate JWT signing keys
 - Start HTTP server with all endpoints
-- Serve static files from public directory
 
 ## Testing
 
-### JWT Authentication Testing
-A comprehensive test script is provided to verify JWT authentication:
+Comprehensive testing scripts are available:
 
 ```bash
-# Run the test script (requires server to be running)
-./test_jwt.sh
+# Test JWT authentication flow
+./scripts/test_jwt.sh
+
+# Test admin panel functionality
+./scripts/test_admin_flow.sh
+
+# Run Go unit tests
+make test
+
+# Run frontend tests
+cd frontend && npm test
 ```
 
-The test script verifies:
-- User registration with JWT token generation
-- User login with credential validation
-- Protected endpoint access with valid tokens
-- Proper rejection of invalid tokens
-- Proper rejection of requests without tokens
-
 ### Manual Testing
-You can also test the authentication manually:
+Use the Swagger UI at `/swagger/index.html` for interactive API testing with built-in authentication support.
 
-The implementation has been tested with:
-- User registration and login flows
-- Grid retrieval and manipulation
-- Authentication token validation
-- Editor password verification
-- Item CRUD operations
-- Error handling and recovery
-- Static file serving
+## Contributing
 
-All core functionality matches the original Node.js implementation exactly.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Ensure all tests pass
+6. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
