@@ -128,6 +128,11 @@ func main() {
 	pageHandlers := handlers.NewPageHandlers()
 	rbacHandler := handlers.NewRBACHandler(rbacService)
 
+	// Initialize user management service and handlers
+	userManagementService := services.NewUserManagementService(database.DB, rbacService)
+	userHandler := handlers.NewUserHandler(userManagementService)
+	adminHandler := handlers.NewAdminHandler(userManagementService, rbacService, cfg)
+
 	// Initialize LLM service and RAG knowledge handler
 	llmService := services.NewLLMService(cfg)
 	ragKnowledgeHandler := handlers.NewRagKnowledgeHandler(llmService)
@@ -183,6 +188,28 @@ func main() {
 				rbac.POST("/permissions", rbacHandler.CreatePermission)
 			}
 		}
+
+		// Admin endpoints (admin only)
+		admin := protected.Group("/admin")
+		admin.Use(middleware.RequireRole(rbacService, "admin"))
+		{
+			// User management endpoints
+			admin.GET("/users", userHandler.GetAllUsers)
+			admin.POST("/users", userHandler.CreateUser)
+			admin.GET("/users/:id", userHandler.GetUser)
+			admin.PUT("/users/:id", userHandler.UpdateUser)
+			admin.DELETE("/users/:id", userHandler.DeleteUser)
+			admin.GET("/users/:id/activity", userHandler.GetUserActivity)
+			admin.POST("/users/bulk", userHandler.BulkUserOperations)
+
+			// System endpoints
+			admin.GET("/system/ping", adminHandler.SystemPing)
+
+			// Analytics endpoints
+			admin.GET("/analytics/users", adminHandler.GetUserAnalytics)
+			admin.GET("/analytics/grids", adminHandler.GetGridAnalytics)
+		}
+
 		protected.POST("/check-editor-password", authHandler.CheckEditorPassword)
 
 		// Grid endpoints (keeping existing handlers for now)

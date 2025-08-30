@@ -32,7 +32,7 @@ func (r *GormUserRepository) Create(user *models.User) error {
 // FindByID finds a user by ID
 func (r *GormUserRepository) FindByID(id string) (*models.User, error) {
 	var user models.User
-	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := r.db.Preload("Roles").Where("id = ?", id).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrUserNotFound
 		}
@@ -44,7 +44,7 @@ func (r *GormUserRepository) FindByID(id string) (*models.User, error) {
 // FindByUsername finds a user by username
 func (r *GormUserRepository) FindByUsername(username string) (*models.User, error) {
 	var user models.User
-	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
+	if err := r.db.Preload("Roles").Where("username = ?", username).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrUserNotFound
 		}

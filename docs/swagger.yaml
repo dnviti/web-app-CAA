@@ -3,12 +3,12 @@ definitions:
   github_com_daniele_web-app-caa_internal_models.AddItemRequest:
     properties:
       item:
-        $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse'
+        $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse"
       parentCategory:
         type: string
     required:
-    - item
-    - parentCategory
+      - item
+      - parentCategory
     type: object
   github_com_daniele_web-app-caa_internal_models.AuthResponse:
     properties:
@@ -21,14 +21,14 @@ definitions:
       token:
         type: string
       user:
-        $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.User'
+        $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.User"
     type: object
   github_com_daniele_web-app-caa_internal_models.CheckEditorPasswordRequest:
     properties:
       password:
         type: string
     required:
-    - password
+      - password
     type: object
   github_com_daniele_web-app-caa_internal_models.ConjugateRequest:
     properties:
@@ -96,7 +96,7 @@ definitions:
   github_com_daniele_web-app-caa_internal_models.GridResponse:
     additionalProperties:
       items:
-        $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse'
+        $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse"
       type: array
     type: object
   github_com_daniele_web-app-caa_internal_models.LoginRequest:
@@ -106,8 +106,8 @@ definitions:
       username:
         type: string
     required:
-    - password
-    - username
+      - password
+      - username
     type: object
   github_com_daniele_web-app-caa_internal_models.Permission:
     properties:
@@ -128,7 +128,7 @@ definitions:
       roles:
         description: Many-to-many relationship with roles
         items:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
+          $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
         type: array
       updated_at:
         type: string
@@ -138,7 +138,7 @@ definitions:
       refresh_token:
         type: string
     required:
-    - refresh_token
+      - refresh_token
     type: object
   github_com_daniele_web-app-caa_internal_models.RefreshTokenResponse:
     properties:
@@ -158,10 +158,10 @@ definitions:
       username:
         type: string
     required:
-    - editorPassword
-    - gridType
-    - password
-    - username
+      - editorPassword
+      - gridType
+      - password
+      - username
     type: object
   github_com_daniele_web-app-caa_internal_models.Role:
     properties:
@@ -180,14 +180,14 @@ definitions:
       permissions:
         description: Many-to-many relationship with permissions
         items:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Permission'
+          $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Permission"
         type: array
       updated_at:
         type: string
       users:
         description: Many-to-many relationship with users
         items:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.User'
+          $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.User"
         type: array
     type: object
   github_com_daniele_web-app-caa_internal_models.SetupRequest:
@@ -195,7 +195,7 @@ definitions:
       gridType:
         type: string
     required:
-    - gridType
+      - gridType
     type: object
   github_com_daniele_web-app-caa_internal_models.SuccessResponse:
     properties:
@@ -215,7 +215,7 @@ definitions:
       roles:
         description: Many-to-many relationship with roles
         items:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
+          $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
         type: array
       status:
         type: string
@@ -235,9 +235,9 @@ definitions:
       resource:
         type: string
     required:
-    - action
-    - name
-    - resource
+      - action
+      - name
+      - resource
     type: object
   internal_handlers.CreateRoleRequest:
     properties:
@@ -248,8 +248,143 @@ definitions:
       name:
         type: string
     required:
-    - display_name
-    - name
+      - display_name
+      - name
+    type: object
+  github_com_daniele_web-app-caa_internal_models.BulkOperationRequest:
+    properties:
+      operation:
+        description: "Operation type: delete, activate, deactivate, assign_role, remove_role"
+        type: string
+      role_name:
+        description: Role name for role operations
+        type: string
+      user_ids:
+        items:
+          type: string
+        type: array
+    required:
+      - operation
+      - user_ids
+    type: object
+  github_com_daniele_web-app-caa_internal_models.BulkOperationResult:
+    properties:
+      failed_users:
+        items:
+          $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.FailedUser"
+        type: array
+      message:
+        type: string
+      processed_count:
+        type: integer
+      success_count:
+        type: integer
+    type: object
+  github_com_daniele_web-app-caa_internal_models.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      password:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    required:
+      - username
+      - email
+      - password
+      - name
+    type: object
+  github_com_daniele_web-app-caa_internal_models.FailedUser:
+    properties:
+      error:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_daniele_web-app-caa_internal_models.SystemHealthResponse:
+    properties:
+      database_status:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  github_com_daniele_web-app-caa_internal_models.UpdateUserRequest:
+    properties:
+      email:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_daniele_web-app-caa_internal_models.UserAnalytics:
+    properties:
+      active_users:
+        type: integer
+      inactive_users:
+        type: integer
+      recent_registrations:
+        type: integer
+      roles_distribution:
+        additionalProperties:
+          type: integer
+        type: object
+      total_users:
+        type: integer
+    type: object
+  github_com_daniele_web-app-caa_internal_models.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      last_login:
+        type: string
+      name:
+        type: string
+      roles:
+        items:
+          $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
+        type: array
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_daniele_web-app-caa_internal_models.UsersListResponse:
+    properties:
+      current_page:
+        type: integer
+      page_size:
+        type: integer
+      total_count:
+        type: integer
+      total_pages:
+        type: integer
+      users:
+        items:
+          $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.UserResponse"
+        type: array
     type: object
 externalDocs:
   description: OpenAPI
@@ -279,16 +414,17 @@ info:
 paths:
   /arasaac/icon/{id}:
     get:
-      description: Retrieve an ARASAAC icon by its ID, with file-based caching (public
+      description:
+        Retrieve an ARASAAC icon by its ID, with file-based caching (public
         endpoint)
       parameters:
-      - description: Icon ID
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Icon ID
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - image/png
+        - image/png
       responses:
         "200":
           description: Icon image
@@ -311,28 +447,28 @@ paths:
             type: object
       summary: Get ARASAAC icon by ID
       tags:
-      - ARASAAC
+        - ARASAAC
   /arasaac/search:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Search for ARASAAC icons by keyword with optional parallel preloading
       parameters:
-      - description: Search query
-        in: query
-        name: query
-        required: true
-        type: string
-      - description: Whether to preload icon data in parallel
-        in: query
-        name: preload
-        type: boolean
-      - description: Limit number of icons for preloading (max 20)
-        in: query
-        name: limit
-        type: integer
+        - description: Search query
+          in: query
+          name: query
+          required: true
+          type: string
+        - description: Whether to preload icon data in parallel
+          in: query
+          name: preload
+          type: boolean
+        - description: Limit number of icons for preloading (max 20)
+          in: query
+          name: limit
+          type: integer
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -355,80 +491,80 @@ paths:
             additionalProperties: true
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Search ARASAAC icons
       tags:
-      - ARASAAC
+        - ARASAAC
   /auth/login:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Authenticate user with username and password
       parameters:
-      - description: Login request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.LoginRequest'
+        - description: Login request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.LoginRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.AuthResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.AuthResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       summary: Login user
       tags:
-      - Auth
+        - Auth
   /auth/logout:
     post:
       description: Revoke all refresh tokens for the authenticated user
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Logout user
       tags:
-      - Auth
+        - Auth
   /auth/rbac/permissions:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Get all available permissions in the system
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Permission'
+              $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Permission"
             type: array
         "500":
           description: Internal Server Error
@@ -437,28 +573,28 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Get all permissions
       tags:
-      - Auth
+        - Auth
     post:
       consumes:
-      - application/json
+        - application/json
       description: Create a new permission
       parameters:
-      - description: Permission data
-        in: body
-        name: permission
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.CreatePermissionRequest'
+        - description: Permission data
+          in: body
+          name: permission
+          required: true
+          schema:
+            $ref: "#/definitions/internal_handlers.CreatePermissionRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Permission'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Permission"
         "400":
           description: Bad Request
           schema:
@@ -472,23 +608,23 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Create permission
       tags:
-      - Auth
+        - Auth
   /auth/rbac/roles:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Get all available roles in the system
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
+              $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
             type: array
         "500":
           description: Internal Server Error
@@ -497,28 +633,28 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Get all roles
       tags:
-      - Auth
+        - Auth
     post:
       consumes:
-      - application/json
+        - application/json
       description: Create a new role
       parameters:
-      - description: Role data
-        in: body
-        name: role
-        required: true
-        schema:
-          $ref: '#/definitions/internal_handlers.CreateRoleRequest'
+        - description: Role data
+          in: body
+          name: role
+          required: true
+          schema:
+            $ref: "#/definitions/internal_handlers.CreateRoleRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
         "400":
           description: Bad Request
           schema:
@@ -532,28 +668,28 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Create role
       tags:
-      - Auth
+        - Auth
   /auth/rbac/roles/{role_name}/permissions/{permission_name}:
     delete:
       consumes:
-      - application/json
+        - application/json
       description: Remove a permission from a role
       parameters:
-      - description: Role Name
-        in: path
-        name: role_name
-        required: true
-        type: string
-      - description: Permission Name
-        in: path
-        name: permission_name
-        required: true
-        type: string
+        - description: Role Name
+          in: path
+          name: role_name
+          required: true
+          type: string
+        - description: Permission Name
+          in: path
+          name: permission_name
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -574,27 +710,27 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Remove permission from role
       tags:
-      - Auth
+        - Auth
     post:
       consumes:
-      - application/json
+        - application/json
       description: Assign a permission to a role
       parameters:
-      - description: Role Name
-        in: path
-        name: role_name
-        required: true
-        type: string
-      - description: Permission Name
-        in: path
-        name: permission_name
-        required: true
-        type: string
+        - description: Role Name
+          in: path
+          name: role_name
+          required: true
+          type: string
+        - description: Permission Name
+          in: path
+          name: permission_name
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -615,33 +751,33 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Assign permission to role
       tags:
-      - Auth
+        - Auth
   /auth/rbac/users/{user_id}/check-permission:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Check if a user has permission to perform an action on a resource
       parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      - description: Resource
-        in: query
-        name: resource
-        required: true
-        type: string
-      - description: Action
-        in: query
-        name: action
-        required: true
-        type: string
+        - description: User ID
+          in: path
+          name: user_id
+          required: true
+          type: string
+        - description: Resource
+          in: query
+          name: resource
+          required: true
+          type: string
+        - description: Action
+          in: query
+          name: action
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -662,29 +798,29 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Check user permission
       tags:
-      - Auth
+        - Auth
   /auth/rbac/users/{user_id}/permissions:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Get all permissions assigned to a user through their roles
       parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
+        - description: User ID
+          in: path
+          name: user_id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Permission'
+              $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Permission"
             type: array
         "400":
           description: Bad Request
@@ -699,29 +835,29 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Get user permissions
       tags:
-      - Auth
+        - Auth
   /auth/rbac/users/{user_id}/roles:
     get:
       consumes:
-      - application/json
+        - application/json
       description: Get all roles assigned to a user
       parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
+        - description: User ID
+          in: path
+          name: user_id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.Role'
+              $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.Role"
             type: array
         "400":
           description: Bad Request
@@ -736,28 +872,28 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Get user roles
       tags:
-      - Auth
+        - Auth
   /auth/rbac/users/{user_id}/roles/{role_name}:
     delete:
       consumes:
-      - application/json
+        - application/json
       description: Remove a role from a user
       parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      - description: Role Name
-        in: path
-        name: role_name
-        required: true
-        type: string
+        - description: User ID
+          in: path
+          name: user_id
+          required: true
+          type: string
+        - description: Role Name
+          in: path
+          name: role_name
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -778,27 +914,27 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Remove role from user
       tags:
-      - Auth
+        - Auth
     post:
       consumes:
-      - application/json
+        - application/json
       description: Assign a role to a user
       parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      - description: Role Name
-        in: path
-        name: role_name
-        required: true
-        type: string
+        - description: User ID
+          in: path
+          name: user_id
+          required: true
+          type: string
+        - description: Role Name
+          in: path
+          name: role_name
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -819,446 +955,448 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Assign role to user
       tags:
-      - Auth
+        - Auth
   /auth/refresh:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Generate new access and refresh tokens using a refresh token
       parameters:
-      - description: Refresh token request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest'
+        - description: Refresh token request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       summary: Refresh access token
       tags:
-      - Auth
+        - Auth
   /auth/register:
     post:
       consumes:
-      - application/json
-      description: Register a new user with username, password, editor password, and
+        - application/json
+      description:
+        Register a new user with username, password, editor password, and
         grid type
       parameters:
-      - description: Registration request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.RegisterRequest'
+        - description: Registration request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.RegisterRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.AuthResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.AuthResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       summary: Register a new user
       tags:
-      - Auth
+        - Auth
   /auth/revoke:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Revoke a refresh token to prevent further use
       parameters:
-      - description: Refresh token request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest'
+        - description: Refresh token request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.RefreshTokenRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       summary: Revoke refresh token
       tags:
-      - Auth
+        - Auth
   /auth/verify:
     get:
       description: Get the current authenticated user information
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.User'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.User"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Get current user
       tags:
-      - Auth
+        - Auth
   /check-editor-password:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Validate the editor password for the current user
       parameters:
-      - description: Editor password check request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.CheckEditorPasswordRequest'
+        - description: Editor password check request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.CheckEditorPasswordRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Check editor password
       tags:
-      - Auth
+        - Auth
   /complete-setup:
     post:
       description: Mark the user setup as complete
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Complete setup
       tags:
-      - Grid
+        - Grid
   /conjugate:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Conjugate verbs in Italian based on tense and context
       parameters:
-      - description: Conjugation request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ConjugateRequest'
+        - description: Conjugation request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ConjugateRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ConjugateResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ConjugateResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Conjugate verbs
       tags:
-      - AI
+        - AI
   /correct:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Correct Italian sentences using AI language processing
       parameters:
-      - description: Correction request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.CorrectRequest'
+        - description: Correction request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.CorrectRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.CorrectResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.CorrectResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Correct sentences
       tags:
-      - AI
+        - AI
   /grid:
     get:
       description: Retrieve the complete grid configuration for the current user
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.GridResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Get grid
       tags:
-      - Grid
+        - Grid
     post:
       consumes:
-      - application/json
+        - application/json
       description: Save the complete grid configuration
       parameters:
-      - description: Grid data to save
-        in: body
-        name: grid
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridResponse'
+        - description: Grid data to save
+          in: body
+          name: grid
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.GridResponse"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Save grid
       tags:
-      - Grid
+        - Grid
   /grid/item:
     post:
       consumes:
-      - application/json
+        - application/json
       description: Add a new item to a specific category in the grid
       parameters:
-      - description: Add item request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.AddItemRequest'
+        - description: Add item request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.AddItemRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Add grid item
       tags:
-      - Grid
+        - Grid
   /grid/item/{id}:
     delete:
       description: Delete an existing item from the grid
       parameters:
-      - description: Item ID
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Item ID
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Delete grid item
       tags:
-      - Grid
+        - Grid
     put:
       consumes:
-      - application/json
+        - application/json
       description: Update an existing item in the grid
       parameters:
-      - description: Item ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Updated item data
-        in: body
-        name: item
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse'
+        - description: Item ID
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Updated item data
+          in: body
+          name: item
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.GridItemResponse"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Update grid item
       tags:
-      - Grid
+        - Grid
   /rag-knowledge:
     get:
       consumes:
-      - application/json
-      description: Retrieve the current RAG knowledge data used by the AI system for
+        - application/json
+      description:
+        Retrieve the current RAG knowledge data used by the AI system for
         language processing
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: RAG knowledge data
@@ -1271,29 +1409,30 @@ paths:
             additionalProperties: true
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Get RAG knowledge
       tags:
-      - rag-knowledge
+        - rag-knowledge
     put:
       consumes:
-      - application/json
-      description: Update the RAG knowledge data and optionally save to S3 storage.
+        - application/json
+      description:
+        Update the RAG knowledge data and optionally save to S3 storage.
         Requires admin privileges.
       parameters:
-      - description: RAG knowledge data structure
-        in: body
-        name: knowledge
-        required: true
-        schema:
-          additionalProperties: true
-          type: object
-      - description: Whether to save the updated knowledge to S3 storage
-        in: query
-        name: save_to_s3
-        type: boolean
+        - description: RAG knowledge data structure
+          in: body
+          name: knowledge
+          required: true
+          schema:
+            additionalProperties: true
+            type: object
+        - description: Whether to save the updated knowledge to S3 storage
+          in: query
+          name: save_to_s3
+          type: boolean
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: Success message with S3 save status
@@ -1311,18 +1450,19 @@ paths:
             additionalProperties: true
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Update RAG knowledge
       tags:
-      - rag-knowledge
+        - rag-knowledge
   /rag-knowledge/backup:
     post:
       consumes:
-      - application/json
-      description: Create a timestamped backup of the current RAG knowledge in S3
+        - application/json
+      description:
+        Create a timestamped backup of the current RAG knowledge in S3
         storage. Requires S3 to be enabled and admin privileges.
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: Success message
@@ -1335,18 +1475,19 @@ paths:
             additionalProperties: true
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Create RAG knowledge backup
       tags:
-      - rag-knowledge
+        - rag-knowledge
   /rag-knowledge/backups:
     get:
       consumes:
-      - application/json
-      description: List all available RAG knowledge backups in S3 storage with timestamps
+        - application/json
+      description:
+        List all available RAG knowledge backups in S3 storage with timestamps
         and metadata. Requires S3 to be enabled and admin privileges.
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: Object containing backups array
@@ -1359,18 +1500,19 @@ paths:
             additionalProperties: true
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: List RAG knowledge backups
       tags:
-      - rag-knowledge
+        - rag-knowledge
   /rag-knowledge/health:
     get:
       consumes:
-      - application/json
-      description: Check the health and connectivity of S3 storage service. Verifies
+        - application/json
+      description:
+        Check the health and connectivity of S3 storage service. Verifies
         bucket access and connectivity. Requires admin privileges.
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: S3 health status with connection details
@@ -1383,18 +1525,19 @@ paths:
             additionalProperties: true
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Check S3 health
       tags:
-      - rag-knowledge
+        - rag-knowledge
   /rag-knowledge/reload:
     post:
       consumes:
-      - application/json
-      description: Reload RAG knowledge from S3 storage or fall back to local file
+        - application/json
+      description:
+        Reload RAG knowledge from S3 storage or fall back to local file
         if S3 is unavailable. Requires admin privileges.
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: Success message
@@ -1407,25 +1550,26 @@ paths:
             additionalProperties: true
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Reload RAG knowledge
       tags:
-      - rag-knowledge
+        - rag-knowledge
   /rag-knowledge/restore/{backup_key}:
     post:
       consumes:
-      - application/json
-      description: Restore RAG knowledge from a specific timestamped backup stored
+        - application/json
+      description:
+        Restore RAG knowledge from a specific timestamped backup stored
         in S3. This will replace the current knowledge. Requires S3 to be enabled
         and admin privileges.
       parameters:
-      - description: S3 backup key (e.g., 'caa/backups/rag_knowledge_20240829_143052.json')
-        in: path
-        name: backup_key
-        required: true
-        type: string
+        - description: S3 backup key (e.g., 'caa/backups/rag_knowledge_20240829_143052.json')
+          in: path
+          name: backup_key
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: Success message with backup key
@@ -1443,47 +1587,421 @@ paths:
             additionalProperties: true
             type: object
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Restore RAG knowledge from backup
       tags:
-      - rag-knowledge
+        - rag-knowledge
   /setup:
     post:
       consumes:
-      - application/json
-      description: Initialize a grid with the specified type (simplified, empty, or
+        - application/json
+      description:
+        Initialize a grid with the specified type (simplified, empty, or
         default)
       parameters:
-      - description: Setup request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SetupRequest'
+        - description: Setup request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SetupRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse'
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
       security:
-      - BearerAuth: []
+        - BearerAuth: []
       summary: Setup grid
       tags:
-      - Grid
+        - Grid
+  /admin/analytics/grids:
+    get:
+      description: Get analytics data for grids including total count, active users, and recent activity
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Grid analytics data
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Get grid analytics
+      tags:
+        - Admin
+  /admin/analytics/users:
+    get:
+      description: Get user analytics including total users, active/inactive counts, recent registrations, and role distribution
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: User analytics data
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.UserAnalytics"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Get user analytics
+      tags:
+        - Admin
+  /admin/system/ping:
+    get:
+      description: Check system health and database connectivity
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: System is healthy
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SystemHealthResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: System health check
+      tags:
+        - Admin
+  /admin/users:
+    get:
+      description: Get all users with pagination, filtering, and sorting options. Requires admin role.
+      parameters:
+        - description: Page number (default 1)
+          in: query
+          name: page
+          type: integer
+        - description: Number of items per page (default 10, max 100)
+          in: query
+          name: limit
+          type: integer
+        - description: Filter by active status
+          in: query
+          name: is_active
+          type: boolean
+        - description: Filter by role name
+          in: query
+          name: role
+          type: string
+        - description: Search in username, email, or name
+          in: query
+          name: search
+          type: string
+        - description: Sort field (username, email, name, created_at)
+          in: query
+          name: sort_by
+          type: string
+        - description: Sort order (asc, desc)
+          in: query
+          name: sort_order
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.UsersListResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Get all users
+      tags:
+        - User Management
+    post:
+      consumes:
+        - application/json
+      description: Create a new user with specified roles. Requires admin role.
+      parameters:
+        - description: User creation request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.CreateUserRequest"
+      produces:
+        - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.UserResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "409":
+          description: Conflict - User already exists
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Create new user
+      tags:
+        - User Management
+  /admin/users/bulk:
+    post:
+      consumes:
+        - application/json
+      description: Perform bulk operations on multiple users (delete, activate, deactivate, assign/remove roles). Requires admin role.
+      parameters:
+        - description: Bulk operation request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.BulkOperationRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Bulk operation completed
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.BulkOperationResult"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Bulk user operations
+      tags:
+        - User Management
+  /admin/users/{id}:
+    delete:
+      description: Delete a user by ID. Requires admin role.
+      parameters:
+        - description: User ID
+          in: path
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.SuccessResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Delete user
+      tags:
+        - User Management
+    get:
+      description: Get a specific user by ID. Requires admin role.
+      parameters:
+        - description: User ID
+          in: path
+          name: id
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: User details
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.UserResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Get user by ID
+      tags:
+        - User Management
+    put:
+      consumes:
+        - application/json
+      description: Update a user's information and roles. Requires admin role.
+      parameters:
+        - description: User ID
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: User update request
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.UpdateUserRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.UserResponse"
+        "400":
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "403":
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "409":
+          description: Conflict - Email already exists
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Update user
+      tags:
+        - User Management
+  /user/profile:
+    get:
+      description: Get the current authenticated user's profile information
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: User profile
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.UserResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: "#/definitions/github_com_daniele_web-app-caa_internal_models.ErrorResponse"
+      security:
+        - BearerAuth: []
+      summary: Get user profile
+      tags:
+        - User Profile
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and JWT token.

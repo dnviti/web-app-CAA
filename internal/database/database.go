@@ -69,6 +69,7 @@ func Initialize(cfg *config.Config) {
 		&models.RolePermission{},
 		&models.RefreshToken{},
 		&models.SigningKey{},
+		&models.UserActivity{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

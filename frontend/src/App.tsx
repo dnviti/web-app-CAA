@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage'
 import SetupPage from './pages/SetupPage'
 import MainPage from './pages/MainPage'
 import DemoPage from './pages/DemoPage'
+import AdminDashboard from './pages/AdminDashboard'
 import LoadingSpinner from './components/ui/LoadingSpinner'
 import ErrorBoundary from './components/ErrorBoundary'
 
@@ -31,7 +32,7 @@ function App() {
         navigate('/app', { replace: true })
       }
       // If we don't have a token and are trying to access protected routes, redirect to login
-      else if (!token && (location.pathname === '/app' || location.pathname === '/setup')) {
+      else if (!token && (location.pathname === '/app' || location.pathname === '/setup' || location.pathname === '/admin')) {
         navigate('/login', { replace: true })
       }
     }
@@ -74,6 +75,10 @@ function App() {
           <Route 
             path="/app" 
             element={token ? <MainPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/admin" 
+            element={token ? <AdminDashboard /> : <Navigate to="/login" replace />} 
           />
           
           {/* Default redirect */}

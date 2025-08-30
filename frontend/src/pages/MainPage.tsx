@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { Edit, User } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { useGridStore } from '../stores/gridStore'
 import SymbolGrid from '../components/SymbolGrid'
@@ -9,9 +8,9 @@ import Navigation from '../components/Navigation'
 import EditorPanel from '../components/EditorPanel'
 import AddItemModal from '../components/AddItemModal'
 import AuthStatus from '../components/AuthStatus'
+import TopNavigationBar from '../components/TopNavigationBar'
 import Modal from '../components/ui/Modal'
 import Button from '../components/ui/Button'
-import IconButton from '../components/ui/IconButton'
 import { GridItem, Symbol, Category } from '../types'
 
 const MainPage: React.FC = () => {
@@ -207,23 +206,14 @@ const MainPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-yellow-400 ${sessionActive ? 'session-active' : ''}`}>
-      {/* Auth Status Component */}
+      {/* Auth Status Component (for development) */}
       <AuthStatus />
       
-      {/* Account Info Bar */}
-      <header className="flex justify-between items-center px-4 py-2 bg-black bg-opacity-20 text-white relative z-30">
-        <div className="flex items-center gap-3">
-          <User size={20} />
-          <span className="font-medium">{user?.username || 'Caricamento...'}</span>
-          <IconButton
-            icon={<Edit size={18} />}
-            onClick={handleEditorToggle}
-            className={`${editorMode ? 'bg-blue-500 text-white' : 'bg-white bg-opacity-20 text-white border-white border-opacity-30'}`}
-            aria-label={editorMode ? 'Disattiva Editor' : 'Attiva Editor'}
-            size="sm"
-          />
-        </div>
-      </header>
+      {/* Top Navigation Bar */}
+      <TopNavigationBar 
+        onEditorToggle={handleEditorToggle}
+        editorMode={editorMode}
+      />
 
       {/* Text Bar */}
       <TextBar

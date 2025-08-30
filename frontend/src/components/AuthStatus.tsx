@@ -21,72 +21,72 @@ const AuthStatus: React.FC = () => {
   }
 
   return (
-    <div className="fixed top-4 right-4 bg-white border border-gray-300 shadow-lg rounded-lg p-4 max-w-sm">
+    <div className="fixed top-16 right-4 bg-white border border-gray-300 shadow-lg rounded-lg p-3 max-w-xs text-xs z-40 opacity-80 hover:opacity-100 transition-opacity">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="font-semibold text-gray-800">Auth Status</h3>
+        <h3 className="font-semibold text-gray-800 text-xs">Debug Panel</h3>
         <button
           onClick={() => setShowDebug(!showDebug)}
           className="text-xs bg-gray-100 px-2 py-1 rounded"
         >
-          Debug
+          {showDebug ? 'Hide' : 'Show'}
         </button>
       </div>
       
-      {error && (
-        <div className="mb-2 text-red-600 text-sm bg-red-50 border border-red-200 rounded p-2">
+      {showDebug && error && (
+        <div className="mb-2 text-red-600 text-xs bg-red-50 border border-red-200 rounded p-2">
           {error}
         </div>
       )}
 
-      {user ? (
+      {showDebug && user ? (
         <div className="space-y-2">
-          <div className="text-sm">
-            <strong>Logged in as:</strong> {user.username}
+          <div className="text-xs">
+            <strong>User:</strong> {user.username}
           </div>
           {user.role && (
-            <div className="text-sm">
+            <div className="text-xs">
               <strong>Role:</strong> {user.role}
             </div>
           )}
+          
           <button
             onClick={logout}
-            className="w-full bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+            className="w-full bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
           >
-            Logout
+            Debug Logout
           </button>
         </div>
-      ) : (
+      ) : showDebug ? (
         <div className="space-y-2">
-          <div className="text-sm text-red-600 mb-2">
-            Not authenticated. To add/edit grid items, you need admin or editor role.
+          <div className="text-xs text-red-600 mb-2">
+            Not authenticated. Quick login for testing:
           </div>
           
           <div className="flex space-x-1">
             <button
               onClick={() => handleQuickLogin('admin', 'admin123')}
               disabled={isLoggingIn}
-              className="flex-1 bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 disabled:opacity-50"
+              className="flex-1 bg-blue-500 text-white px-1 py-1 rounded text-xs hover:bg-blue-600 disabled:opacity-50"
             >
-              Login as Admin
+              Admin
             </button>
             <button
               onClick={() => handleQuickLogin('editor', 'editor123')}
               disabled={isLoggingIn}
-              className="flex-1 bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600 disabled:opacity-50"
+              className="flex-1 bg-green-500 text-white px-1 py-1 rounded text-xs hover:bg-green-600 disabled:opacity-50"
             >
-              Login as Editor
+              Editor
+            </button>
+            <button
+              onClick={() => handleQuickLogin('user', 'user123')}
+              disabled={isLoggingIn}
+              className="flex-1 bg-gray-500 text-white px-1 py-1 rounded text-xs hover:bg-gray-600 disabled:opacity-50"
+            >
+              User
             </button>
           </div>
-          
-          <button
-            onClick={() => handleQuickLogin('user', 'user123')}
-            disabled={isLoggingIn}
-            className="w-full bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600 disabled:opacity-50"
-          >
-            Login as User (read-only)
-          </button>
         </div>
-      )}
+      ) : null}
 
       {showDebug && (
         <div className="mt-3 pt-3 border-t border-gray-200">
