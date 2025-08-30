@@ -111,7 +111,7 @@ func Load() *Config {
 
 		// Database configuration
 		Database: DatabaseConfig{
-			Driver:       getEnv("DB_TYPE", "sqlite"),
+			Driver:       getEnv("DB_DRIVER", "sqlite"),
 			Host:         getEnv("DB_HOST", "localhost"),
 			Port:         getEnv("DB_PORT", "3306"),
 			User:         getEnv("DB_USER", "root"),
